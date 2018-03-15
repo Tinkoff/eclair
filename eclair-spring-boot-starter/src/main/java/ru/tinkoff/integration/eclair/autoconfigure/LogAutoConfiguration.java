@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * TODO: extract to 'starter'
  * TODO: add test to Printer ordering
  *
  * @author Viacheslav Klapatniuk
@@ -64,7 +63,7 @@ public class LogAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
+    @ConditionalOnMissingBean(ignored = OverriddenToStringPrinter.class)
     @Order(300)
     public ToStringPrinter toStringPrinter() {
         return new ToStringPrinter();
