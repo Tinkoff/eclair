@@ -78,11 +78,6 @@ public @interface Log {
 
         String printer() default "";
 
-        /**
-         * SpEL literals
-         */
-        String[] mask() default {};
-
         String logger() default "";
     }
 
@@ -134,11 +129,6 @@ public @interface Log {
         LogLevel ifEnabled() default DEBUG;
 
         String printer() default "";
-
-        /**
-         * SpEL literals
-         */
-        String[] mask() default {};
 
         String logger() default "";
     }

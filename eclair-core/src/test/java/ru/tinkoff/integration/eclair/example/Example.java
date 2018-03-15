@@ -315,12 +315,6 @@ public class Example {
                                         @Log.arg(TRACE) Integer i) {
     }
 
-    /**
-     * DEBUG r.t.i.eclair.example.Example.verboseWithMask > dto=<dto><i>0</i><s>********</s></dto>
-     */
-    public void verboseWithMask(@Log.arg(printer = "xml", mask = {"i", "s"}) Dto dto) {
-    }
-
     // TODO: add example with several mask expressions
     // TODO: add example of return value masking
 

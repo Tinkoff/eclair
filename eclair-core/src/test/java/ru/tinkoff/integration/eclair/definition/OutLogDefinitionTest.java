@@ -6,11 +6,9 @@ import ru.tinkoff.integration.eclair.format.printer.Printer;
 import ru.tinkoff.integration.eclair.format.printer.ToStringPrinter;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static java.util.Collections.singletonMap;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.springframework.boot.logging.LogLevel.WARN;
@@ -34,9 +32,6 @@ public class OutLogDefinitionTest {
         assertThat(definition.getIfEnabledLevel(), is(WARN));
         assertThat(definition.getVerbosePolicy(), is(NEVER));
         assertThat(definition.getPrinter(), is(printer));
-        List<String> maskExpressions = definition.getMaskExpressions();
-        assertThat(maskExpressions, hasSize(1));
-        assertThat(maskExpressions.get(0), is("mask"));
     }
 
     private Log.out givenLogOut() {
@@ -44,7 +39,6 @@ public class OutLogDefinitionTest {
         attributes.put("level", WARN);
         attributes.put("ifEnabled", WARN);
         attributes.put("verbose", NEVER);
-        attributes.put("mask", "mask");
         return synthesizeAnnotation(attributes, Log.out.class, null);
     }
 
@@ -65,16 +59,5 @@ public class OutLogDefinitionTest {
 
     private Log.out givenLogOutByValue() {
         return synthesizeAnnotation(singletonMap("value", WARN), Log.out.class, null);
-    }
-
-    @Test(expected = UnsupportedOperationException.class)
-    public void newInstanceImmutable() {
-        // given
-        Log.out logOut = givenLogOut();
-        Printer printer = givenPrinter();
-        // when
-        OutLogDefinition definition = new OutLogDefinition(logOut, printer);
-        // then
-        definition.getMaskExpressions().add("mask");
     }
 }

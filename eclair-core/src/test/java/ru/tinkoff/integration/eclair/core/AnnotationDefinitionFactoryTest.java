@@ -163,7 +163,6 @@ public class AnnotationDefinitionFactoryTest {
         assertThat(definition.getIfEnabledLevel(), is(ERROR));
         assertThat(definition.getVerbosePolicy(), is(NEVER));
         assertThat(definition.getPrinter(), is(printerResolver.getDefaultPrinter()));
-        assertThat(definition.getMaskExpressions(), is(empty()));
     }
 
     @Test

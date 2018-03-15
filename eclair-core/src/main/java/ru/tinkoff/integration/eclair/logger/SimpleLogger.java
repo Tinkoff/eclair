@@ -12,10 +12,8 @@ import ru.tinkoff.integration.eclair.definition.ArgLogDefinition;
 import ru.tinkoff.integration.eclair.definition.ErrorLogDefinition;
 import ru.tinkoff.integration.eclair.definition.InLogDefinition;
 import ru.tinkoff.integration.eclair.definition.OutLogDefinition;
-import ru.tinkoff.integration.eclair.format.printer.Printer;
 import ru.tinkoff.integration.eclair.logger.facade.LoggerFacade;
 import ru.tinkoff.integration.eclair.logger.facade.LoggerFacadeFactory;
-import ru.tinkoff.integration.eclair.mask.Masker;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -37,7 +35,6 @@ public class SimpleLogger extends Logger implements ManualLogger {
 
     private static final Map<Class<?>, String> EVENT_LITERALS = new HashMap<>();
 
-    private final Masker masker;
     private final LoggerFacadeFactory loggerFacadeFactory;
 
     private final ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
@@ -54,9 +51,7 @@ public class SimpleLogger extends Logger implements ManualLogger {
         EVENT_LITERALS.put(ManualLogDefinition.class, "-");
     }
 
-    public SimpleLogger(Masker masker,
-                        LoggerFacadeFactory loggerFacadeFactory) {
-        this.masker = masker;
+    public SimpleLogger(LoggerFacadeFactory loggerFacadeFactory) {
         this.loggerFacadeFactory = loggerFacadeFactory;
     }
 
@@ -139,11 +134,7 @@ public class SimpleLogger extends Logger implements ManualLogger {
                 if (isNull(arguments[a])) {
                     builder.append((String) null);
                 } else {
-                    List<String> maskExpressions = argLogDefinition.getMaskExpressions();
-                    // TODO: reduce supplier?
-                    Supplier<Printer> printerSupplier = argLogDefinition::getPrinter;
-                    String serializedArgument = masker.mask(arguments[a], maskExpressions, printerSupplier);
-                    builder.append(serializedArgument);
+                    builder.append(argLogDefinition.getPrinter().print(arguments[a]));
                 }
             }
         }
@@ -203,9 +194,7 @@ public class SimpleLogger extends Logger implements ManualLogger {
                 }
                 return " null";
             }
-            List<String> maskExpressions = outLogDefinition.getMaskExpressions();
-            Supplier<Printer> printerSupplier = outLogDefinition::getPrinter;
-            return format(" %s", masker.mask(result, maskExpressions, printerSupplier));
+            return format(" %s", outLogDefinition.getPrinter().print(result));
         }
         return "";
     }

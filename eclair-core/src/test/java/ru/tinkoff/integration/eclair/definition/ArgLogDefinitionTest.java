@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static java.util.Collections.singletonMap;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -31,15 +30,12 @@ public class ArgLogDefinitionTest {
         // then
         assertThat(definition.getIfEnabledLevel(), is(WARN));
         assertThat(definition.getPrinter(), is(printer));
-        assertThat(definition.getMaskExpressions(), hasSize(1));
-        assertThat(definition.getMaskExpressions().get(0), is("mask"));
     }
 
     private Log.arg givenLogArg() {
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("ifEnabled", WARN);
         attributes.put("printer", "json");
-        attributes.put("mask", "mask");
         return synthesizeAnnotation(attributes, Log.arg.class, null);
     }
 
@@ -71,16 +67,5 @@ public class ArgLogDefinitionTest {
         ArgLogDefinition definition = new ArgLogDefinition(logArg, printer);
         // then
         assertThat(definition, nullValue());
-    }
-
-    @Test(expected = UnsupportedOperationException.class)
-    public void newInstanceImmutable() {
-        // given
-        Log.arg logArg = givenLogArg();
-        Printer printer = givenPrinter();
-        // when
-        ArgLogDefinition definition = new ArgLogDefinition(logArg, printer);
-        // then
-        definition.getMaskExpressions().add("additional");
     }
 }

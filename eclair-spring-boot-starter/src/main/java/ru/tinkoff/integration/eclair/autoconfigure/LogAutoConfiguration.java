@@ -20,9 +20,6 @@ import ru.tinkoff.integration.eclair.logger.SimpleLogger;
 import ru.tinkoff.integration.eclair.logger.facade.JavaLoggerFacadeFactory;
 import ru.tinkoff.integration.eclair.logger.facade.LoggerFacadeFactory;
 import ru.tinkoff.integration.eclair.logger.facade.Slf4JLoggerFacadeFactory;
-import ru.tinkoff.integration.eclair.mask.DoUndoMasker;
-import ru.tinkoff.integration.eclair.mask.MaskRegistry;
-import ru.tinkoff.integration.eclair.mask.Masker;
 import ru.tinkoff.integration.eclair.validate.BeanClassValidator;
 
 import java.util.List;
@@ -84,16 +81,9 @@ public class LogAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public Masker masker() {
-        return new DoUndoMasker(new MaskRegistry());
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public SimpleLogger simpleLogger(Masker masker,
-                                     LoggerFacadeFactory loggerFacadeFactory,
+    public SimpleLogger simpleLogger(LoggerFacadeFactory loggerFacadeFactory,
                                      LogProperties logProperties) {
-        SimpleLogger logger = new SimpleLogger(masker, loggerFacadeFactory);
+        SimpleLogger logger = new SimpleLogger(loggerFacadeFactory);
         logger.setVerboseLevel(logProperties.getVerboseLevel());
         return logger;
     }
