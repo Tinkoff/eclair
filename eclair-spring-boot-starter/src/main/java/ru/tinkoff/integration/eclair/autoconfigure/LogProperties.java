@@ -1,4 +1,4 @@
-package ru.tinkoff.integration.eclair.configuration;
+package ru.tinkoff.integration.eclair.autoconfigure;
 
 import lombok.Getter;
 import lombok.Setter;

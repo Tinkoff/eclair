@@ -6,14 +6,11 @@ import org.springframework.aop.TargetSource;
 import org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator;
 import org.springframework.beans.BeanInstantiationException;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
-import org.springframework.stereotype.Component;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
-import ru.tinkoff.integration.eclair.configuration.LogProperties;
 import ru.tinkoff.integration.eclair.core.AnnotationDefinitionFactory;
 import ru.tinkoff.integration.eclair.core.AnnotationExtractor;
 import ru.tinkoff.integration.eclair.core.LoggerBeanNamesResolver;
@@ -39,7 +36,6 @@ import static java.util.stream.Collectors.toMap;
 /**
  * @author Viacheslav Klapatniuk
  */
-@Component
 public class LogProxyCreator extends AbstractAutoProxyCreator {
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(LogProxyCreator.class);
@@ -50,24 +46,22 @@ public class LogProxyCreator extends AbstractAutoProxyCreator {
 
     private final Map<String, Logger> loggers;
     private final GenericApplicationContext genericApplicationContext;
-    private final LogProperties logProperties;
     private final BeanClassValidator beanClassValidator;
 
     private final AnnotationDefinitionFactory annotationDefinitionFactory;
     private final LoggerBeanNamesResolver loggerBeanNamesResolver = LoggerBeanNamesResolver.getInstance();
     private final AnnotationExtractor annotationExtractor = AnnotationExtractor.getInstance();
 
-    @Autowired
+    private boolean validate = false;
+
     public LogProxyCreator(Map<String, Printer> printerMap,
                            List<Printer> printerList,
                            Map<String, Logger> loggers,
                            GenericApplicationContext genericApplicationContext,
-                           LogProperties logProperties,
                            BeanClassValidator beanClassValidator) {
         this.annotationDefinitionFactory = new AnnotationDefinitionFactory(new PrinterResolver(initPrinters(printerMap, printerList)));
         this.loggers = initLoggers(loggers);
         this.genericApplicationContext = genericApplicationContext;
-        this.logProperties = logProperties;
         this.beanClassValidator = beanClassValidator;
         setFrozen(true);
     }
@@ -114,7 +108,7 @@ public class LogProxyCreator extends AbstractAutoProxyCreator {
             advisorsCache.put(beanClass, EMPTY_ARRAY);
             return bean;
         }
-        if (logProperties.isValidate()) {
+        if (validate) {
             validateBeanClass(beanClass, beanName);
         }
         MdcAdvisor mdcAdvisor = getMdcAdvisor(beanClass);
@@ -190,5 +184,9 @@ public class LogProxyCreator extends AbstractAutoProxyCreator {
         List<Advisor> advisors = new ArrayList<>(singletonList(mdcAdvisor));
         advisors.addAll(logAdvisors);
         return advisors.toArray();
+    }
+
+    public void setValidate(boolean validate) {
+        this.validate = validate;
     }
 }

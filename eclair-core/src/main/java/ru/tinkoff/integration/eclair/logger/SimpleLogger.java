@@ -5,7 +5,6 @@ import org.springframework.boot.logging.LogLevel;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 import ru.tinkoff.integration.eclair.annotation.Verbose;
-import ru.tinkoff.integration.eclair.configuration.LogProperties;
 import ru.tinkoff.integration.eclair.core.ActualLevelResolver;
 import ru.tinkoff.integration.eclair.core.ClassInvokerResolver;
 import ru.tinkoff.integration.eclair.core.LoggerNameBuilder;
@@ -28,6 +27,7 @@ import java.util.stream.Stream;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static org.springframework.boot.logging.LogLevel.DEBUG;
 import static org.springframework.boot.logging.LogLevel.OFF;
 
 /**
@@ -39,12 +39,13 @@ public class SimpleLogger extends Logger implements ManualLogger {
 
     private final Masker masker;
     private final LoggerFacadeFactory loggerFacadeFactory;
-    private final LogProperties logProperties;
 
     private final ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
     private final ClassInvokerResolver invokerResolver = ClassInvokerResolver.getInstance();
     private final ActualLevelResolver actualLevelResolver = ActualLevelResolver.getInstance();
     private final LoggerNameBuilder loggerNameBuilder = LoggerNameBuilder.getInstance();
+
+    private LogLevel verboseLevel = DEBUG;
 
     static {
         EVENT_LITERALS.put(InLogDefinition.class, ">");
@@ -54,11 +55,9 @@ public class SimpleLogger extends Logger implements ManualLogger {
     }
 
     public SimpleLogger(Masker masker,
-                        LoggerFacadeFactory loggerFacadeFactory,
-                        LogProperties logProperties) {
+                        LoggerFacadeFactory loggerFacadeFactory) {
         this.masker = masker;
         this.loggerFacadeFactory = loggerFacadeFactory;
-        this.logProperties = logProperties;
     }
 
     @Override
@@ -167,7 +166,7 @@ public class SimpleLogger extends Logger implements ManualLogger {
     private boolean isVerboseIn(Verbose verbose, LogLevel actualLevel) {
         switch (verbose) {
             case LEVEL:
-                return isLevelEnabled(logProperties.getVerboseLevel(), actualLevel);
+                return isLevelEnabled(verboseLevel, actualLevel);
             case NEVER:
                 return false;
             case ALWAYS:
@@ -227,6 +226,10 @@ public class SimpleLogger extends Logger implements ManualLogger {
 
     private String buildStackTraceClause(Throwable throwable) {
         return format(" %s", throwable.toString());
+    }
+
+    public void setVerboseLevel(LogLevel verboseLevel) {
+        this.verboseLevel = verboseLevel;
     }
 
     private static class ManualLogDefinition {
