@@ -2,11 +2,13 @@ package ru.tinkoff.integration.eclair.format.printer;
 
 /**
  * any.toString -> throws
+ *
+ * @author Viacheslav Klapatniuk
  */
-public class ToStringPrinter implements Printer {
+public class ToStringPrinter extends Printer {
 
     @Override
-    public String print(Object input) {
+    protected String serialize(Object input) {
         if (input instanceof String) {
             return "\"" + input + "\"";
         }

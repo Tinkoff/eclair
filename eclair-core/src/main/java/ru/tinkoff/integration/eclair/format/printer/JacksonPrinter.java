@@ -5,8 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * json -> throws
+ *
+ * @author Viacheslav Klapatniuk
  */
-public class JacksonPrinter implements Printer {
+public class JacksonPrinter extends Printer {
 
     private final ObjectMapper objectMapper;
 
@@ -15,7 +17,7 @@ public class JacksonPrinter implements Printer {
     }
 
     @Override
-    public String print(Object input) {
+    public String serialize(Object input) {
         try {
             return objectMapper.writeValueAsString(input);
         } catch (JsonProcessingException e) {

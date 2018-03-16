@@ -10,10 +10,12 @@ import static java.util.Objects.isNull;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
 
 /**
- * @author Viacheslav Klapatniuk
+ * TODO: split to wrapping/not wrapping printers
  * xml -> throws
+ *
+ * @author Viacheslav Klapatniuk
  */
-public class Jaxb2Printer implements Printer {
+public class Jaxb2Printer extends Printer {
 
     private final JaxbElementWrapper jaxbElementWrapper = JaxbElementWrapper.getInstance();
     private final Jaxb2Marshaller jaxb2Marshaller;
@@ -23,7 +25,7 @@ public class Jaxb2Printer implements Printer {
     }
 
     @Override
-    public String print(Object input) {
+    public String serialize(Object input) {
         if (isNull(findAnnotation(input.getClass(), XmlRootElement.class))) {
             input = jaxbElementWrapper.wrap(jaxb2Marshaller, input);
         }

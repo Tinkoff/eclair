@@ -3,14 +3,18 @@ package ru.tinkoff.integration.eclair.format.printer;
 /**
  * @author Viacheslav Klapatniuk
  */
-public interface Printer {
+public abstract class Printer {
 
-    default boolean supports(Class<?> clazz) {
+    public boolean supports(Class<?> clazz) {
         return true;
     }
 
     /**
      * @param input never {@code null}
      */
-    String print(Object input);
+    public String print(Object input) {
+        return serialize(input);
+    }
+
+    protected abstract String serialize(Object input);
 }
