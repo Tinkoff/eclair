@@ -6,7 +6,6 @@ import org.springframework.core.annotation.AliasFor;
 import java.lang.annotation.*;
 
 import static org.springframework.boot.logging.LogLevel.*;
-import static ru.tinkoff.eclair.annotation.Verbose.*;
 
 /**
  * @author Viacheslav Klapatniuk
@@ -24,7 +23,7 @@ public @interface Log {
 
     LogLevel ifEnabled() default OFF;
 
-    Verbose verbose() default LEVEL;
+    LogLevel verbose() default DEBUG;
 
     String printer() default "";
 
@@ -46,7 +45,7 @@ public @interface Log {
 
         LogLevel ifEnabled() default OFF;
 
-        Verbose verbose() default LEVEL;
+        LogLevel verbose() default DEBUG;
 
         String printer() default "";
 
@@ -74,7 +73,7 @@ public @interface Log {
 
         LogLevel ifEnabled() default OFF;
 
-        Verbose verbose() default LEVEL;
+        LogLevel verbose() default DEBUG;
 
         String printer() default "";
 

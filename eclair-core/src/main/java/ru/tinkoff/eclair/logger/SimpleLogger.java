@@ -4,16 +4,15 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.boot.logging.LogLevel;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
-import ru.tinkoff.eclair.annotation.Verbose;
 import ru.tinkoff.eclair.core.ActualLevelResolver;
 import ru.tinkoff.eclair.core.ClassInvokerResolver;
 import ru.tinkoff.eclair.core.LoggerNameBuilder;
 import ru.tinkoff.eclair.definition.ArgLogDefinition;
 import ru.tinkoff.eclair.definition.ErrorLogDefinition;
+import ru.tinkoff.eclair.definition.InLogDefinition;
 import ru.tinkoff.eclair.definition.OutLogDefinition;
 import ru.tinkoff.eclair.logger.facade.LoggerFacade;
 import ru.tinkoff.eclair.logger.facade.LoggerFacadeFactory;
-import ru.tinkoff.eclair.definition.InLogDefinition;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -25,7 +24,6 @@ import java.util.stream.Stream;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static org.springframework.boot.logging.LogLevel.DEBUG;
 import static org.springframework.boot.logging.LogLevel.OFF;
 
 /**
@@ -42,7 +40,7 @@ public class SimpleLogger extends Logger implements ManualLogger {
     private final ActualLevelResolver actualLevelResolver = ActualLevelResolver.getInstance();
     private final LoggerNameBuilder loggerNameBuilder = LoggerNameBuilder.getInstance();
 
-    private LogLevel verboseLevel = DEBUG;
+    private boolean printParameterName = true;
 
     static {
         EVENT_LITERALS.put(InLogDefinition.class, ">");
@@ -118,17 +116,20 @@ public class SimpleLogger extends Logger implements ManualLogger {
         StringBuilder builder = new StringBuilder();
         List<ArgLogDefinition> argLogDefinitions = inLogDefinition.getArgLogDefinitions();
         Object[] arguments = invocation.getArguments();
-        String[] parameterNames = parameterNameDiscoverer.getParameterNames(method);
+        String[] parameterNames = null;
+        if (printParameterName) {
+            parameterNames = parameterNameDiscoverer.getParameterNames(method);
+        }
         int length = arguments.length;
         for (int a = 0; a < length; a++) {
             ArgLogDefinition argLogDefinition = argLogDefinitions.get(a);
-            if (nonNull(argLogDefinition) && isVerboseArg(inLogDefinition.getVerbosePolicy(), argLogDefinition, actualLevel)) {
+            if (nonNull(argLogDefinition) && isVerboseArg(inLogDefinition.getVerboseLevel(), argLogDefinition, actualLevel)) {
                 if (verboseFound) {
                     builder.append(", ");
                 } else {
                     verboseFound = true;
                 }
-                if (nonNull(parameterNames)) {
+                if (printParameterName && nonNull(parameterNames)) {
                     builder.append(parameterNames[a]).append("=");
                 }
                 if (isNull(arguments[a])) {
@@ -140,31 +141,16 @@ public class SimpleLogger extends Logger implements ManualLogger {
         }
 
         if (!verboseFound && length == 0) {
-            verboseFound = isVerboseIn(inLogDefinition.getVerbosePolicy(), actualLevel);
+            verboseFound = isLevelEnabled(inLogDefinition.getVerboseLevel(), actualLevel);
         }
 
         return verboseFound ? format(" %s", builder.toString()) : "";
     }
 
 
-    private boolean isVerboseArg(Verbose verbose, ArgLogDefinition argLogDefinition, LogLevel actualLevel) {
-        if (isNull(argLogDefinition)) {
-            return isVerboseIn(verbose, actualLevel);
-        }
-        return isLevelEnabled(argLogDefinition.getIfEnabledLevel(), actualLevel);
-    }
-
-    private boolean isVerboseIn(Verbose verbose, LogLevel actualLevel) {
-        switch (verbose) {
-            case LEVEL:
-                return isLevelEnabled(verboseLevel, actualLevel);
-            case NEVER:
-                return false;
-            case ALWAYS:
-                return true;
-            default:
-                throw new IllegalArgumentException("Unexpected verbose: " + verbose);
-        }
+    private boolean isVerboseArg(LogLevel verboseLevel, ArgLogDefinition argLogDefinition, LogLevel actualLevel) {
+        LogLevel expectedLevel = isNull(argLogDefinition) ? verboseLevel : argLogDefinition.getIfEnabledLevel();
+        return isLevelEnabled(expectedLevel, actualLevel);
     }
 
     @Override
@@ -186,7 +172,7 @@ public class SimpleLogger extends Logger implements ManualLogger {
 
     private String buildOutArgClause(MethodInvocation invocation, Object result, OutLogDefinition outLogDefinition) {
         LogLevel actualLevel = actualLevelResolver.resolve(invocation.getMethod());
-        if (isVerboseArg(outLogDefinition.getVerbosePolicy(), null, actualLevel)) {
+        if (isVerboseArg(outLogDefinition.getVerboseLevel(), null, actualLevel)) {
             if (isNull(result)) {
                 Class<?> returnType = invocation.getMethod().getReturnType();
                 if (returnType == void.class || returnType == Void.class) {
@@ -217,8 +203,8 @@ public class SimpleLogger extends Logger implements ManualLogger {
         return format(" %s", throwable.toString());
     }
 
-    public void setVerboseLevel(LogLevel verboseLevel) {
-        this.verboseLevel = verboseLevel;
+    public void setPrintParameterName(boolean printParameterName) {
+        this.printParameterName = printParameterName;
     }
 
     private static class ManualLogDefinition {

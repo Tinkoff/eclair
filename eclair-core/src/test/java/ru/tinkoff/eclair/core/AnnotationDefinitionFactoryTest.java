@@ -26,7 +26,6 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.springframework.boot.logging.LogLevel.*;
-import static ru.tinkoff.eclair.annotation.Verbose.NEVER;
 
 /**
  * @author Viacheslav Klapatniuk
@@ -86,7 +85,7 @@ public class AnnotationDefinitionFactoryTest {
         // then
         assertThat(definition.getLevel(), is(WARN));
         assertThat(definition.getIfEnabledLevel(), is(ERROR));
-        assertThat(definition.getVerbosePolicy(), is(NEVER));
+        assertThat(definition.getVerboseLevel(), is(TRACE));
         assertThat(definition.getArgLogDefinitions(), hasSize(2));
         assertThat(definition.getArgLogDefinitions().get(0).getPrinter(), is(jsonPrinter));
         assertThat(definition.getArgLogDefinitions().get(1).getPrinter(), is(jsonPrinter));
@@ -129,7 +128,7 @@ public class AnnotationDefinitionFactoryTest {
         public void logInLogArg(@Log.arg(ifEnabled = WARN, printer = "xml") String a, String b) {
         }
 
-        @Log(level = WARN, ifEnabled = ERROR, verbose = NEVER, printer = "json")
+        @Log(level = WARN, ifEnabled = ERROR, verbose = TRACE, printer = "json")
         public void log(String a, String b) {
         }
 
@@ -161,7 +160,7 @@ public class AnnotationDefinitionFactoryTest {
         // then
         assertThat(definition.getLevel(), is(WARN));
         assertThat(definition.getIfEnabledLevel(), is(ERROR));
-        assertThat(definition.getVerbosePolicy(), is(NEVER));
+        assertThat(definition.getVerboseLevel(), is(TRACE));
         assertThat(definition.getPrinter(), is(printerResolver.getDefaultPrinter()));
     }
 
@@ -184,7 +183,7 @@ public class AnnotationDefinitionFactoryTest {
         public void logOut() {
         }
 
-        @Log(level = WARN, ifEnabled = ERROR, verbose = NEVER, printer = "json")
+        @Log(level = WARN, ifEnabled = ERROR, verbose = TRACE, printer = "json")
         public void log() {
         }
 

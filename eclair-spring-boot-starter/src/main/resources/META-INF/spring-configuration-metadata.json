@@ -2,23 +2,17 @@
   "hints": [],
   "groups": [
     {
-      "name": "logging",
-      "type": "ru.tinkoff.eclair.autoconfigure.LogProperties",
-      "sourceType": "ru.tinkoff.eclair.autoconfigure.LogProperties"
+      "name": "eclair",
+      "type": "ru.tinkoff.eclair.autoconfigure.EclairProperties",
+      "sourceType": "ru.tinkoff.eclair.autoconfigure.EclairProperties"
     }
   ],
   "properties": [
     {
-      "name": "logging.validate",
+      "name": "eclair.validate",
       "type": "java.lang.Boolean",
-      "sourceType": "ru.tinkoff.eclair.autoconfigure.LogProperties",
+      "sourceType": "ru.tinkoff.eclair.autoconfigure.EclairProperties",
       "defaultValue": true
-    },
-    {
-      "name": "logging.verbose-level",
-      "type": "org.springframework.boot.logging.LogLevel",
-      "sourceType": "ru.tinkoff.eclair.autoconfigure.LogProperties",
-      "defaultValue": "debug"
     }
   ]
 }

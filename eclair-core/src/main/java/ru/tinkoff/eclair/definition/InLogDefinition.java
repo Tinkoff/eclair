@@ -3,7 +3,6 @@ package ru.tinkoff.eclair.definition;
 import lombok.Getter;
 import org.springframework.boot.logging.LogLevel;
 import ru.tinkoff.eclair.annotation.Log;
-import ru.tinkoff.eclair.annotation.Verbose;
 import ru.tinkoff.eclair.core.AnnotationAttribute;
 
 import java.util.List;
@@ -19,13 +18,13 @@ public class InLogDefinition {
 
     private final LogLevel level;
     private final LogLevel ifEnabledLevel;
-    private final Verbose verbosePolicy;
+    private final LogLevel verboseLevel;
     private final List<ArgLogDefinition> argLogDefinitions;
 
     private InLogDefinition(Log.in logIn, List<ArgLogDefinition> argLogDefinitions) {
         this.level = AnnotationAttribute.LEVEL.extract(logIn);
         this.ifEnabledLevel = logIn.ifEnabled();
-        this.verbosePolicy = logIn.verbose();
+        this.verboseLevel = logIn.verbose();
         this.argLogDefinitions = unmodifiableList(argLogDefinitions);
     }
 

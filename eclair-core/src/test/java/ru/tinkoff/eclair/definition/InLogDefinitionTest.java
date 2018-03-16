@@ -14,9 +14,9 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.springframework.boot.logging.LogLevel.TRACE;
 import static org.springframework.boot.logging.LogLevel.WARN;
 import static org.springframework.core.annotation.AnnotationUtils.synthesizeAnnotation;
-import static ru.tinkoff.eclair.annotation.Verbose.NEVER;
 
 /**
  * @author Viacheslav Klapatniuk
@@ -34,7 +34,7 @@ public class InLogDefinitionTest {
         // then
         assertThat(definition.getLevel(), is(WARN));
         assertThat(definition.getIfEnabledLevel(), is(WARN));
-        assertThat(definition.getVerbosePolicy(), is(NEVER));
+        assertThat(definition.getVerboseLevel(), is(TRACE));
         assertThat(definition.getArgLogDefinitions(), hasSize(1));
         assertThat(definition.getArgLogDefinitions().get(0), is(argLogDefinition));
     }
@@ -43,7 +43,7 @@ public class InLogDefinitionTest {
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("level", WARN);
         attributes.put("ifEnabled", WARN);
-        attributes.put("verbose", NEVER);
+        attributes.put("verbose", TRACE);
         attributes.put("printer", "json");
         return synthesizeAnnotation(attributes, Log.in.class, null);
     }

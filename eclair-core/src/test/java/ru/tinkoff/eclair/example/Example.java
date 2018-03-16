@@ -10,8 +10,6 @@ import java.util.Random;
 import java.util.function.Supplier;
 
 import static org.springframework.boot.logging.LogLevel.*;
-import static ru.tinkoff.eclair.annotation.Verbose.ALWAYS;
-import static ru.tinkoff.eclair.annotation.Verbose.NEVER;
 
 /**
  * Estimated configuration:
@@ -89,22 +87,26 @@ public class Example {
     }
 
     /**
-     * for any logger level
-     * DEBUG ru.tinkoff.eclair.example.Example.verboseNone >
-     * DEBUG ru.tinkoff.eclair.example.Example.verboseNone <
+     * if logger level = TRACE
+     * TRACE ru.tinkoff.eclair.example.Example.verboseLowest > s="a", i=0, d=0.0
+     * TRACE ru.tinkoff.eclair.example.Example.verboseLowest < false
+     *
+     * for any other logger level
+     * TRACE ru.tinkoff.eclair.example.Example.verboseLowest >
+     * TRACE ru.tinkoff.eclair.example.Example.verboseLowest <
      */
-    @Log(verbose = NEVER)
-    public Boolean verboseNone(String s, Integer i, Double d) {
+    @Log(level = TRACE, verbose = TRACE)
+    public Boolean verboseLowest(String s, Integer i, Double d) {
         return false;
     }
 
     /**
      * for any logger level
-     * DEBUG ru.tinkoff.eclair.example.Example.verboseAny > s="a", i=0, d=0.0
-     * DEBUG ru.tinkoff.eclair.example.Example.verboseAny < false
+     * DEBUG ru.tinkoff.eclair.example.Example.verboseHighest > s="a", i=0, d=0.0
+     * DEBUG ru.tinkoff.eclair.example.Example.verboseHighest < false
      */
-    @Log(verbose = ALWAYS)
-    public Boolean verboseAny(String s, Integer i, Double d) {
+    @Log(verbose = OFF)
+    public Boolean verboseHighest(String s, Integer i, Double d) {
         return false;
     }
 
@@ -345,7 +347,7 @@ public class Example {
      * (nothing to log)
      */
     @Log.in(INFO)
-    @Log.out(level = TRACE, verbose = NEVER)
+    @Log.out(level = TRACE, verbose = TRACE)
     @Log.error(level = WARN, ofType = RuntimeException.class, exclude = NullPointerException.class)
     @Log.error(level = ERROR, ofType = {Error.class, Exception.class})
     public Dto mix(@Log.arg(printer = "xml") Dto xmlDto,
@@ -512,38 +514,38 @@ public class Example {
     /**
      * equals to next
      */
-    @Log.in(level = INFO, ifEnabled = WARN, verbose = ALWAYS, printer = "json")
-    @Log.out(level = INFO, ifEnabled = WARN, verbose = ALWAYS, printer = "json")
+    @Log.in(level = INFO, ifEnabled = WARN, verbose = ERROR, printer = "json")
+    @Log.out(level = INFO, ifEnabled = WARN, verbose = ERROR, printer = "json")
     public void inAndOut() {
     }
 
-    @Log(level = INFO, ifEnabled = WARN, verbose = ALWAYS, printer = "json")
+    @Log(level = INFO, ifEnabled = WARN, verbose = ERROR, printer = "json")
     public void logEqualsToInAndOut() {
     }
 
     /**
      * equals to next
      */
-    @Log.in(level = INFO, verbose = NEVER)
-    @Log(level = TRACE, verbose = ALWAYS)
+    @Log.in(level = INFO, verbose = TRACE)
+    @Log(level = TRACE, verbose = OFF)
     public void inAndLog() {
     }
 
-    @Log.in(level = INFO, verbose = NEVER)
-    @Log.out(level = TRACE, verbose = ALWAYS)
+    @Log.in(level = INFO, verbose = TRACE)
+    @Log.out(level = TRACE, verbose = OFF)
     public void inAndOutEqualsToInAndLog() {
     }
 
     /**
      * equals to next
      */
-    @Log(level = TRACE, verbose = ALWAYS)
-    @Log.out(level = INFO, verbose = NEVER)
+    @Log(level = TRACE, verbose = OFF)
+    @Log.out(level = INFO, verbose = TRACE)
     public void logAndOut() {
     }
 
-    @Log.in(level = TRACE, verbose = ALWAYS)
-    @Log.out(level = INFO, verbose = NEVER)
+    @Log.in(level = TRACE, verbose = OFF)
+    @Log.out(level = INFO, verbose = TRACE)
     public void inAndOutEqualsToLogAndOut() {
     }
 
@@ -558,8 +560,8 @@ public class Example {
      * INFO  ru.tinkoff.eclair.example.Example.priority >
      * TRACE ru.tinkoff.eclair.example.Example.priority <
      */
-    @Log.in(level = INFO, verbose = NEVER)
-    @Log(level = TRACE, verbose = ALWAYS)
+    @Log.in(level = INFO, verbose = TRACE)
+    @Log(level = TRACE, verbose = OFF)
     public void priority() {
     }
 

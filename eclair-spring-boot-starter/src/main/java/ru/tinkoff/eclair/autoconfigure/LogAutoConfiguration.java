@@ -31,7 +31,7 @@ import java.util.Map;
  * @author Viacheslav Klapatniuk
  */
 @Configuration
-@EnableConfigurationProperties(LogProperties.class)
+@EnableConfigurationProperties(EclairProperties.class)
 public class LogAutoConfiguration {
 
     @Bean
@@ -81,11 +81,8 @@ public class LogAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public SimpleLogger simpleLogger(LoggerFacadeFactory loggerFacadeFactory,
-                                     LogProperties logProperties) {
-        SimpleLogger logger = new SimpleLogger(loggerFacadeFactory);
-        logger.setVerboseLevel(logProperties.getVerboseLevel());
-        return logger;
+    public SimpleLogger simpleLogger(LoggerFacadeFactory loggerFacadeFactory) {
+        return new SimpleLogger(loggerFacadeFactory);
     }
 
     @Bean
@@ -94,9 +91,9 @@ public class LogAutoConfiguration {
                                            Map<String, Logger> loggers,
                                            GenericApplicationContext genericApplicationContext,
                                            BeanClassValidator beanClassValidator,
-                                           LogProperties logProperties) {
+                                           EclairProperties eclairProperties) {
         LogProxyCreator logProxyCreator = new LogProxyCreator(printerMap, printerList, loggers, genericApplicationContext, beanClassValidator);
-        logProxyCreator.setValidate(logProperties.isValidate());
+        logProxyCreator.setValidate(eclairProperties.isValidate());
         return logProxyCreator;
     }
 }
