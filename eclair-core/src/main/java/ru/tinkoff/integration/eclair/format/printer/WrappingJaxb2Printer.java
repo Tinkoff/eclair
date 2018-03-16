@@ -14,6 +14,7 @@ import org.springframework.util.SystemPropertyUtils;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.bind.annotation.XmlRegistry;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -29,25 +30,31 @@ import static org.springframework.core.annotation.AnnotationUtils.findAnnotation
 import static org.springframework.util.StringUtils.hasText;
 
 /**
+ * TODO: add tests
+ *
  * @author Viacheslav Klapatniuk
  */
-final class JaxbElementWrapper {
+public class WrappingJaxb2Printer extends Jaxb2Printer {
 
-    private static final JaxbElementWrapper instance = new JaxbElementWrapper();
     private static final Object EMPTY_METHOD = new Object();
     private static final ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
     private static final MetadataReaderFactory metadataReaderFactory = new CachingMetadataReaderFactory(resourcePatternResolver);
 
     private final Map<Class<?>, Object> wrapperMethodCache = new ConcurrentHashMap<>();
 
-    private JaxbElementWrapper() {
+    public WrappingJaxb2Printer(Jaxb2Marshaller jaxb2Marshaller) {
+        super(jaxb2Marshaller);
     }
 
-    public static JaxbElementWrapper getInstance() {
-        return instance;
+    @Override
+    public String serialize(Object input) {
+        if (isNull(findAnnotation(input.getClass(), XmlRootElement.class))) {
+            input = wrap(jaxb2Marshaller, input);
+        }
+        return super.serialize(input);
     }
 
-    Object wrap(Jaxb2Marshaller jaxb2Marshaller, Object input) {
+    private Object wrap(Jaxb2Marshaller jaxb2Marshaller, Object input) {
         Class<?> clazz = input.getClass();
 
         Object cached = wrapperMethodCache.get(clazz);

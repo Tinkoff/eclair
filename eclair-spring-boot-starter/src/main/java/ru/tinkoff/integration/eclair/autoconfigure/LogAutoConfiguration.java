@@ -46,8 +46,8 @@ public class LogAutoConfiguration {
     @ConditionalOnMissingBean
     @ConditionalOnSingleCandidate(Jaxb2Marshaller.class)
     @Order(100)
-    public Jaxb2Printer jaxb2Printer(Jaxb2Marshaller jaxb2Marshaller) {
-        return new Jaxb2Printer(jaxb2Marshaller);
+    public WrappingJaxb2Printer jaxb2Printer(Jaxb2Marshaller jaxb2Marshaller) {
+        return new WrappingJaxb2Printer(jaxb2Marshaller);
     }
 
     @Bean
