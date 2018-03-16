@@ -2,8 +2,6 @@ package ru.tinkoff.eclair.annotation;
 
 import java.lang.annotation.*;
 
-import static ru.tinkoff.eclair.annotation.Scope.*;
-
 /**
  * @author Viacheslav Klapatniuk
  */
@@ -20,5 +18,5 @@ public @interface Mdc {
      */
     String value();
 
-    Scope scope() default METHOD;
+    boolean global() default false;
 }

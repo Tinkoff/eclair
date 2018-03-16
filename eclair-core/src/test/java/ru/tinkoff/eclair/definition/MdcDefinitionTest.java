@@ -8,8 +8,8 @@ import java.util.Map;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.core.annotation.AnnotationUtils.synthesizeAnnotation;
-import static ru.tinkoff.eclair.annotation.Scope.GLOBAL;
 
 /**
  * @author Viacheslav Klapatniuk
@@ -25,14 +25,14 @@ public class MdcDefinitionTest {
         // then
         assertThat(definition.getKey(), is("key"));
         assertThat(definition.getValue(), is("value"));
-        assertThat(definition.getScope(), is(GLOBAL));
+        assertTrue(definition.isGlobal());
     }
 
     private Mdc givenMdc() {
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("key", "key");
         attributes.put("value", "value");
-        attributes.put("scope", GLOBAL);
+        attributes.put("global", true);
         return synthesizeAnnotation(attributes, Mdc.class, null);
     }
 }

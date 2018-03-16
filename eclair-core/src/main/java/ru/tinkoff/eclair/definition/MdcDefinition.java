@@ -2,7 +2,6 @@ package ru.tinkoff.eclair.definition;
 
 import lombok.Getter;
 import ru.tinkoff.eclair.annotation.Mdc;
-import ru.tinkoff.eclair.annotation.Scope;
 
 /**
  * @author Viacheslav Klapatniuk
@@ -12,11 +11,11 @@ public class MdcDefinition {
 
     private final String key;
     private final String value;
-    private final Scope scope;
+    private final boolean global;
 
     MdcDefinition(Mdc mdc) {
         this.key = mdc.key();
         this.value = mdc.value();
-        this.scope = mdc.scope();
+        this.global = mdc.global();
     }
 }

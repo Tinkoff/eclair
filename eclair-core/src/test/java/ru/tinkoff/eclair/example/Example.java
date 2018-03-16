@@ -10,7 +10,6 @@ import java.util.Random;
 import java.util.function.Supplier;
 
 import static org.springframework.boot.logging.LogLevel.*;
-import static ru.tinkoff.eclair.annotation.Scope.GLOBAL;
 import static ru.tinkoff.eclair.annotation.Verbose.ALWAYS;
 import static ru.tinkoff.eclair.annotation.Verbose.NEVER;
 
@@ -370,7 +369,7 @@ public class Example {
      * DEBUG ru.tinkoff.eclair.example.OuterClass.method sum=2 <
      */
     @Mdc(key = "key", value = "value")
-    @Mdc(key = "sum", value = "1 + 1", scope = GLOBAL)
+    @Mdc(key = "sum", value = "1 + 1", global = true)
     @Log
     public void mdcByMethod(Dto dto) {
     }
@@ -387,7 +386,7 @@ public class Example {
      */
     @Log
     public void mdcByArg(@Mdc(key = "length", value = "s.length()")
-                         @Mdc(key = "staticString", value = "some string", scope = GLOBAL) Dto dto) {
+                         @Mdc(key = "staticString", value = "some string", global = true) Dto dto) {
     }
 
     /**
@@ -432,9 +431,6 @@ public class Example {
         logger.debug("Manual logging: {}", new Random().nextDouble());
         logger.info("Lazy manual logging: {}", (Supplier) () -> new Random().nextDouble());
     }
-
-    // TODO: add example for multiple AOP MDCs with one parameter (if necessary)
-    // TODO: add example for manual MDC setting with scope
 
     /**
      * if logger level <= DEBUG

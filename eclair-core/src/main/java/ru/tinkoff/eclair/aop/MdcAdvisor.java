@@ -14,7 +14,6 @@ import java.util.*;
 import java.util.function.Function;
 
 import static java.util.stream.Collectors.toMap;
-import static ru.tinkoff.eclair.annotation.Scope.METHOD;
 
 /**
  * @author Viacheslav Klapatniuk
@@ -71,7 +70,7 @@ final class MdcAdvisor extends StaticMethodMatcherPointcutAdvisor implements Met
             MDC.put(definition.getKey(), value);
         });
         definitions.stream()
-                .filter(definition -> definition.getScope() == METHOD)
+                .filter(definition -> !definition.isGlobal())
                 .map(MdcDefinition::getKey)
                 .forEach(keys::add);
     }
@@ -86,7 +85,7 @@ final class MdcAdvisor extends StaticMethodMatcherPointcutAdvisor implements Met
         }
         definitions.stream()
                 .flatMap(Collection::stream)
-                .filter(definition -> definition.getScope() == METHOD)
+                .filter(definition -> !definition.isGlobal())
                 .map(MdcDefinition::getKey)
                 .forEach(keys::add);
     }
