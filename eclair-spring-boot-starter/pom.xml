@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>ru.tinkoff.integration</groupId>
+        <groupId>ru.tinkoff</groupId>
         <artifactId>eclair</artifactId>
         <version>0.1.0</version>
     </parent>
@@ -13,7 +13,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>ru.tinkoff.integration</groupId>
+            <groupId>ru.tinkoff</groupId>
             <artifactId>eclair-core</artifactId>
             <version>0.1.0</version>
         </dependency>

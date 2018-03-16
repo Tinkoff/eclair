@@ -3,8 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- TODO: remove 'integration' node -->
-    <groupId>ru.tinkoff.integration</groupId>
+    <groupId>ru.tinkoff</groupId>
     <artifactId>eclair</artifactId>
     <version>0.1.0</version>
     <packaging>pom</packaging>

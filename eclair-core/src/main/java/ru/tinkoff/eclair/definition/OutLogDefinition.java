@@ -1,0 +1,27 @@
+package ru.tinkoff.eclair.definition;
+
+import lombok.Getter;
+import org.springframework.boot.logging.LogLevel;
+import ru.tinkoff.eclair.annotation.Verbose;
+import ru.tinkoff.eclair.core.AnnotationAttribute;
+import ru.tinkoff.eclair.format.printer.Printer;
+import ru.tinkoff.eclair.annotation.Log;
+
+/**
+ * @author Viacheslav Klapatniuk
+ */
+@Getter
+public class OutLogDefinition {
+
+    private final LogLevel level;
+    private final LogLevel ifEnabledLevel;
+    private final Verbose verbosePolicy;
+    private final Printer printer;
+
+    public OutLogDefinition(Log.out logOut, Printer printer) {
+        this.level = AnnotationAttribute.LEVEL.extract(logOut);
+        this.ifEnabledLevel = logOut.ifEnabled();
+        this.verbosePolicy = logOut.verbose();
+        this.printer = printer;
+    }
+}
