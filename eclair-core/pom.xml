@@ -6,7 +6,7 @@
     <parent>
         <groupId>ru.tinkoff</groupId>
         <artifactId>eclair</artifactId>
-        <version>0.1.0</version>
+        <version>0.1.1</version>
     </parent>
 
     <artifactId>eclair-core</artifactId>
@@ -54,20 +54,12 @@
         </dependency>
     </dependencies>
 
-    <!-- TODO: correct -->
-    <repositories>
-        <repository>
-            <id>esb</id>
-            <name>ESB Repository</name>
-            <url>http://nexus.tcsbank.ru/content/repositories/esb</url>
-        </repository>
-    </repositories>
-
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
+                <version>3.0.1</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
