@@ -16,6 +16,8 @@ import static java.util.Objects.nonNull;
 import static org.springframework.core.annotation.AnnotationUtils.synthesizeAnnotation;
 
 /**
+ * TODO: extract common methods to interface
+ *
  * @author Viacheslav Klapatniuk
  */
 @AllArgsConstructor

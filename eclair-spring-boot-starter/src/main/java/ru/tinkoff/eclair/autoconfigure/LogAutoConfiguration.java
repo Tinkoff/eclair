@@ -15,7 +15,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import ru.tinkoff.eclair.aop.LogProxyCreator;
 import ru.tinkoff.eclair.format.printer.*;
-import ru.tinkoff.eclair.logger.Logger;
+import ru.tinkoff.eclair.logger.EclairLogger;
 import ru.tinkoff.eclair.logger.SimpleLogger;
 import ru.tinkoff.eclair.logger.facade.JavaLoggerFacadeFactory;
 import ru.tinkoff.eclair.logger.facade.LoggerFacadeFactory;
@@ -88,7 +88,7 @@ public class LogAutoConfiguration {
     @Bean
     public LogProxyCreator logProxyCreator(Map<String, Printer> printerMap,
                                            List<Printer> printerList,
-                                           Map<String, Logger> loggers,
+                                           Map<String, EclairLogger> loggers,
                                            GenericApplicationContext genericApplicationContext,
                                            BeanClassValidator beanClassValidator,
                                            EclairProperties eclairProperties) {

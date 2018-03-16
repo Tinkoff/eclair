@@ -1,5 +1,6 @@
 package ru.tinkoff.eclair.logger.facade;
 
+import org.slf4j.Logger;
 import org.springframework.boot.logging.LogLevel;
 
 /**
@@ -7,9 +8,9 @@ import org.springframework.boot.logging.LogLevel;
  */
 public class Slf4JLoggerFacade implements LoggerFacade {
 
-    private final org.slf4j.Logger logger;
+    private final Logger logger;
 
-    Slf4JLoggerFacade(org.slf4j.Logger logger) {
+    Slf4JLoggerFacade(Logger logger) {
         this.logger = logger;
     }
 

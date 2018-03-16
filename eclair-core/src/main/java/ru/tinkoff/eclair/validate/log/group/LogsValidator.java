@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
-import ru.tinkoff.eclair.logger.Logger;
+import ru.tinkoff.eclair.logger.EclairLogger;
 import ru.tinkoff.eclair.validate.log.single.LogValidator;
 
 import java.util.Map;
@@ -19,7 +19,7 @@ public class LogsValidator extends LoggerSpecificLogAnnotationsValidator {
 
     @Autowired
     public LogsValidator(GenericApplicationContext applicationContext,
-                         Map<String, Logger> loggers,
+                         Map<String, EclairLogger> loggers,
                          LogValidator logValidator) {
         super(applicationContext, loggers);
         this.logValidator = logValidator;

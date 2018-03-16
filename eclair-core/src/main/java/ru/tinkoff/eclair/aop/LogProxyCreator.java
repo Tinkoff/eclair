@@ -17,7 +17,7 @@ import ru.tinkoff.eclair.core.LoggerBeanNamesResolver;
 import ru.tinkoff.eclair.core.PrinterResolver;
 import ru.tinkoff.eclair.definition.*;
 import ru.tinkoff.eclair.format.printer.Printer;
-import ru.tinkoff.eclair.logger.Logger;
+import ru.tinkoff.eclair.logger.EclairLogger;
 import ru.tinkoff.eclair.validate.BeanClassValidator;
 
 import java.lang.reflect.Method;
@@ -44,7 +44,7 @@ public class LogProxyCreator extends AbstractAutoProxyCreator {
     private final Map<String, Class<?>> beanClassCache = new ConcurrentHashMap<>();
     private final Map<Class<?>, Object[]> advisorsCache = new ConcurrentHashMap<>();
 
-    private final Map<String, Logger> loggers;
+    private final Map<String, EclairLogger> loggers;
     private final GenericApplicationContext genericApplicationContext;
     private final BeanClassValidator beanClassValidator;
 
@@ -56,7 +56,7 @@ public class LogProxyCreator extends AbstractAutoProxyCreator {
 
     public LogProxyCreator(Map<String, Printer> printerMap,
                            List<Printer> printerList,
-                           Map<String, Logger> loggers,
+                           Map<String, EclairLogger> loggers,
                            GenericApplicationContext genericApplicationContext,
                            BeanClassValidator beanClassValidator) {
         this.annotationDefinitionFactory = new AnnotationDefinitionFactory(new PrinterResolver(initPrinters(printerMap, printerList)));
@@ -74,14 +74,14 @@ public class LogProxyCreator extends AbstractAutoProxyCreator {
                                 .findFirst()
                                 .map(Map.Entry::getKey)
                                 // never happens
-                                .orElseThrow(() -> new IllegalArgumentException("Logger bean not found on map")),
+                                .orElseThrow(() -> new IllegalArgumentException("EclairLogger bean not found on map")),
                         identity(),
                         this::mergeFunction,
                         LinkedHashMap::new
                 ));
     }
 
-    private Map<String, Logger> initLoggers(Map<String, Logger> loggers) {
+    private Map<String, EclairLogger> initLoggers(Map<String, EclairLogger> loggers) {
         return loggers.entrySet().stream()
                 .sorted(comparing(Map.Entry::getValue, AnnotationAwareOrderComparator.INSTANCE))
                 .collect(toMap(
@@ -157,9 +157,9 @@ public class LogProxyCreator extends AbstractAutoProxyCreator {
                 .collect(toList());
     }
 
-    private LogAdvisor getLogAdvisor(Class<?> beanClass, String loggerName, Logger logger) {
+    private LogAdvisor getLogAdvisor(Class<?> beanClass, String loggerName, EclairLogger eclairLogger) {
         List<LogDefinition> logDefinitions = getLogDefinitions(beanClass, loggerName);
-        return LogAdvisor.newInstance(logger, logDefinitions);
+        return LogAdvisor.newInstance(eclairLogger, logDefinitions);
     }
 
     private List<LogDefinition> getLogDefinitions(Class<?> beanClass, String loggerName) {

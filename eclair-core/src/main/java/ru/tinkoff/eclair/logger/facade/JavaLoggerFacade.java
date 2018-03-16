@@ -7,12 +7,16 @@ import org.springframework.boot.logging.LogLevel;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
+/**
+ * TODO: test this case
+ */
 public class JavaLoggerFacade implements LoggerFacade {
 
     private static final Map<LogLevel, Level> LEVELS = new EnumMap<>(LogLevel.class);
 
-    private final java.util.logging.Logger logger;
+    private final Logger logger;
 
     static {
         LEVELS.put(LogLevel.TRACE, Level.FINEST);
@@ -24,7 +28,7 @@ public class JavaLoggerFacade implements LoggerFacade {
         LEVELS.put(LogLevel.OFF, Level.OFF);
     }
 
-    public JavaLoggerFacade(java.util.logging.Logger logger) {
+    JavaLoggerFacade(Logger logger) {
         this.logger = logger;
     }
 

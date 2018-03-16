@@ -7,7 +7,7 @@ import org.springframework.validation.Errors;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.core.ErrorFilterFactory;
 import ru.tinkoff.eclair.definition.ErrorFilter;
-import ru.tinkoff.eclair.logger.Logger;
+import ru.tinkoff.eclair.logger.EclairLogger;
 import ru.tinkoff.eclair.validate.log.single.LogErrorValidator;
 
 import java.util.List;
@@ -28,7 +28,7 @@ public class LogErrorsValidator extends LoggerSpecificLogAnnotationsValidator {
 
     @Autowired
     public LogErrorsValidator(GenericApplicationContext applicationContext,
-                              Map<String, Logger> loggers,
+                              Map<String, EclairLogger> loggers,
                               LogErrorValidator logErrorValidator) {
         super(applicationContext, loggers);
         this.logErrorValidator = logErrorValidator;

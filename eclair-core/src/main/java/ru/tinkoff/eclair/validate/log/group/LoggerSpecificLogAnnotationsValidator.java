@@ -5,7 +5,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import ru.tinkoff.eclair.core.AnnotationAttribute;
 import ru.tinkoff.eclair.core.LoggerBeanNamesResolver;
-import ru.tinkoff.eclair.logger.Logger;
+import ru.tinkoff.eclair.logger.EclairLogger;
 
 import java.lang.annotation.Annotation;
 import java.util.List;
@@ -26,7 +26,7 @@ abstract class LoggerSpecificLogAnnotationsValidator implements Validator {
     private final Map<String, Set<String>> loggerNames;
 
     LoggerSpecificLogAnnotationsValidator(GenericApplicationContext genericApplicationContext,
-                                          Map<String, Logger> loggers) {
+                                          Map<String, EclairLogger> loggers) {
         this.loggerNames = loggers.keySet().stream()
                 .collect(toMap(identity(), loggerName -> loggerBeanNamesResolver.resolve(genericApplicationContext, loggerName)));
     }

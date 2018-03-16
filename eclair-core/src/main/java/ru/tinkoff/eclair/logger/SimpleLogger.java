@@ -1,11 +1,11 @@
 package ru.tinkoff.eclair.logger;
 
+import lombok.Setter;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.boot.logging.LogLevel;
+import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
-import ru.tinkoff.eclair.core.ActualLevelResolver;
-import ru.tinkoff.eclair.core.ClassInvokerResolver;
 import ru.tinkoff.eclair.core.LoggerNameBuilder;
 import ru.tinkoff.eclair.definition.ArgLogDefinition;
 import ru.tinkoff.eclair.definition.ErrorLogDefinition;
@@ -14,12 +14,8 @@ import ru.tinkoff.eclair.definition.OutLogDefinition;
 import ru.tinkoff.eclair.logger.facade.LoggerFacade;
 import ru.tinkoff.eclair.logger.facade.LoggerFacadeFactory;
 
-import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
@@ -29,88 +25,62 @@ import static org.springframework.boot.logging.LogLevel.OFF;
 /**
  * @author Viacheslav Klapatniuk
  */
-public class SimpleLogger extends Logger implements ManualLogger {
+public class SimpleLogger extends EclairLogger implements ManualLogger {
 
-    private static final Map<Class<?>, String> EVENT_LITERALS = new HashMap<>();
+    private static final String IN = ">";
+    private static final String OUT = "<";
+    private static final String ERROR = "!";
+    private static final String MANUAL = "-";
+
+    private static final LoggingSystem loggingSystem = LoggingSystem.get(SimpleLogger.class.getClassLoader());
 
     private final LoggerFacadeFactory loggerFacadeFactory;
 
     private final ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
-    private final ClassInvokerResolver invokerResolver = ClassInvokerResolver.getInstance();
-    private final ActualLevelResolver actualLevelResolver = ActualLevelResolver.getInstance();
     private final LoggerNameBuilder loggerNameBuilder = LoggerNameBuilder.getInstance();
 
+    @Setter
     private boolean printParameterName = true;
-
-    static {
-        EVENT_LITERALS.put(InLogDefinition.class, ">");
-        EVENT_LITERALS.put(OutLogDefinition.class, "<");
-        EVENT_LITERALS.put(ErrorLogDefinition.class, "!");
-        EVENT_LITERALS.put(ManualLogDefinition.class, "-");
-    }
 
     public SimpleLogger(LoggerFacadeFactory loggerFacadeFactory) {
         this.loggerFacadeFactory = loggerFacadeFactory;
     }
 
     @Override
-    protected boolean isLevelEnabled(MethodInvocation invocation, LogLevel expectedLevel) {
-        LogLevel actualLevel = actualLevelResolver.resolve(invocation.getMethod());
-        return isLevelEnabled(expectedLevel, actualLevel);
-    }
-
-    private boolean isLevelEnabled(LogLevel expectedLevel, LogLevel actualLevel) {
-        return expectedLevel.ordinal() >= actualLevel.ordinal() && actualLevel != OFF;
-    }
-
-    @Override
     public boolean isLevelEnabled(LogLevel expectedLevel) {
-        LogLevel actualLevel = actualLevelResolver.resolve(invokerResolver.resolve(SimpleLogger.class));
-        return isLevelEnabled(expectedLevel, actualLevel);
+        String loggerName = loggerNameBuilder.build(this.getClass());
+        return isLevelEnabled(loggerName, expectedLevel);
     }
 
     @Override
     public void log(LogLevel level, String format, Object... arguments) {
-        String loggerName = loggerNameBuilder.build(invokerResolver.resolve(SimpleLogger.class));
-        if (isLevelEnabled(level, actualLevelResolver.resolve(loggerName))) {
-            String message = buildManualMessage(format);
+        String loggerName = loggerNameBuilder.build(this.getClass());
+        if (isLevelEnabled(loggerName, level)) {
+            String message = MANUAL + " " + format;
             Object[] unwrappedArguments = unwrapArguments(arguments);
             loggerFacadeFactory.getLoggerFacade(loggerName).log(level, message, unwrappedArguments);
         }
     }
 
-    private String buildManualMessage(String format) {
-        String eventLiteral = buildEventLiteral(ManualLogDefinition.class);
-        return format("%s %s", eventLiteral, format);
-    }
-
-    private Object[] unwrapArguments(Object... arguments) {
-        return Stream.of(arguments)
-                .map(argument -> (argument instanceof Supplier) ? ((Supplier) argument).get() : argument)
-                .toArray();
+    public String getLoggerName(MethodInvocation invocation) {
+        return loggerNameBuilder.build(invocation);
     }
 
     @Override
-    public void logIn(MethodInvocation invocation, InLogDefinition inLogDefinition) {
+    public boolean isLevelEnabled(String loggerName, LogLevel expectedLevel) {
+        LogLevel actualLevel = loggingSystem.getLoggerConfiguration(loggerName).getEffectiveLevel();
+        return expectedLevel.ordinal() >= actualLevel.ordinal() && actualLevel != OFF;
+    }
+
+    @Override
+    public void logIn(MethodInvocation invocation, String loggerName, InLogDefinition inLogDefinition) {
         LogLevel expectedLevel = inLogDefinition.getLevel();
-        String message = buildInMessage(invocation, inLogDefinition);
-        LoggerFacade loggerFacade = loggerFacadeFactory.getLoggerFacade(loggerNameBuilder.build(invocation.getMethod()));
-        loggerFacade.log(expectedLevel, message);
-    }
-
-    private String buildInMessage(MethodInvocation invocation, InLogDefinition inLogDefinition) {
-        String eventLiteral = buildEventLiteral(InLogDefinition.class);
-        String argsClause = buildInArgsClause(invocation, inLogDefinition);
-        return format("%s%s", eventLiteral, argsClause);
-    }
-
-    private String buildEventLiteral(Class<?> logDefinitionClass) {
-        return EVENT_LITERALS.get(logDefinitionClass);
+        String message = IN + buildInArgsClause(invocation, inLogDefinition);
+        loggerFacadeFactory.getLoggerFacade(loggerName).log(expectedLevel, message);
     }
 
     private String buildInArgsClause(MethodInvocation invocation, InLogDefinition inLogDefinition) {
-        Method method = invocation.getMethod();
-        LogLevel actualLevel = actualLevelResolver.resolve(method);
+        String loggerName = loggerNameBuilder.build(invocation);
         boolean verboseFound = false;
 
         StringBuilder builder = new StringBuilder();
@@ -118,12 +88,12 @@ public class SimpleLogger extends Logger implements ManualLogger {
         Object[] arguments = invocation.getArguments();
         String[] parameterNames = null;
         if (printParameterName) {
-            parameterNames = parameterNameDiscoverer.getParameterNames(method);
+            parameterNames = parameterNameDiscoverer.getParameterNames(invocation.getMethod());
         }
         int length = arguments.length;
         for (int a = 0; a < length; a++) {
             ArgLogDefinition argLogDefinition = argLogDefinitions.get(a);
-            if (nonNull(argLogDefinition) && isVerboseArg(inLogDefinition.getVerboseLevel(), argLogDefinition, actualLevel)) {
+            if (nonNull(argLogDefinition) && isVerboseArg(inLogDefinition.getVerboseLevel(), argLogDefinition, loggerName)) {
                 if (verboseFound) {
                     builder.append(", ");
                 } else {
@@ -141,38 +111,35 @@ public class SimpleLogger extends Logger implements ManualLogger {
         }
 
         if (!verboseFound && length == 0) {
-            verboseFound = isLevelEnabled(inLogDefinition.getVerboseLevel(), actualLevel);
+            verboseFound = isLevelEnabled(loggerName, inLogDefinition.getVerboseLevel());
         }
 
         return verboseFound ? format(" %s", builder.toString()) : "";
     }
 
 
-    private boolean isVerboseArg(LogLevel verboseLevel, ArgLogDefinition argLogDefinition, LogLevel actualLevel) {
+    private boolean isVerboseArg(LogLevel verboseLevel, ArgLogDefinition argLogDefinition, String loggerName) {
         LogLevel expectedLevel = isNull(argLogDefinition) ? verboseLevel : argLogDefinition.getIfEnabledLevel();
-        return isLevelEnabled(expectedLevel, actualLevel);
+        return isLevelEnabled(loggerName, expectedLevel);
     }
 
     @Override
-    public void logOut(MethodInvocation invocation, Object result, OutLogDefinition outLogDefinition, boolean emergency) {
+    public void logOut(MethodInvocation invocation, String loggerName, Object result, OutLogDefinition outLogDefinition, boolean emergency) {
         LogLevel expectedLevel = outLogDefinition.getLevel();
         String message = buildOutMessage(invocation, result, outLogDefinition, emergency);
-        LoggerFacade loggerFacade = loggerFacadeFactory.getLoggerFacade(loggerNameBuilder.build(invocation.getMethod()));
-        loggerFacade.log(expectedLevel, message);
+        loggerFacadeFactory.getLoggerFacade(loggerName).log(expectedLevel, message);
     }
 
     private String buildOutMessage(MethodInvocation invocation, Object result, OutLogDefinition outLogDefinition, boolean emergency) {
         if (emergency) {
-            return buildEventLiteral(ErrorLogDefinition.class);
+            return ERROR;
         }
-        String eventLiteral = buildEventLiteral(OutLogDefinition.class);
-        String argClause = buildOutArgClause(invocation, result, outLogDefinition);
-        return format("%s%s", eventLiteral, argClause);
+        return OUT + buildOutArgClause(invocation, result, outLogDefinition);
     }
 
     private String buildOutArgClause(MethodInvocation invocation, Object result, OutLogDefinition outLogDefinition) {
-        LogLevel actualLevel = actualLevelResolver.resolve(invocation.getMethod());
-        if (isVerboseArg(outLogDefinition.getVerboseLevel(), null, actualLevel)) {
+        String loggerName = loggerNameBuilder.build(invocation);
+        if (isVerboseArg(outLogDefinition.getVerboseLevel(), null, loggerName)) {
             if (isNull(result)) {
                 Class<?> returnType = invocation.getMethod().getReturnType();
                 if (returnType == void.class || returnType == Void.class) {
@@ -186,30 +153,24 @@ public class SimpleLogger extends Logger implements ManualLogger {
     }
 
     @Override
-    public void logError(MethodInvocation invocation, Throwable throwable, ErrorLogDefinition errorLogDefinition) {
+    public void logError(MethodInvocation invocation, String loggerName, Throwable throwable, ErrorLogDefinition errorLogDefinition) {
         LogLevel expectedLevel = errorLogDefinition.getLevel();
-        String message = buildErrorMessage(throwable);
-        LoggerFacade loggerFacade = loggerFacadeFactory.getLoggerFacade(loggerNameBuilder.build(invocation.getMethod()));
+        String message = ERROR + " " + throwable.toString();
+        LoggerFacade loggerFacade = loggerFacadeFactory.getLoggerFacade(loggerName);
         loggerFacade.log(expectedLevel, message, throwable);
     }
 
-    private String buildErrorMessage(Throwable throwable) {
-        String eventLiteral = buildEventLiteral(ErrorLogDefinition.class);
-        String argClause = buildStackTraceClause(throwable);
-        return format("%s%s", eventLiteral, argClause);
-    }
-
-    private String buildStackTraceClause(Throwable throwable) {
-        return format(" %s", throwable.toString());
-    }
-
-    public void setPrintParameterName(boolean printParameterName) {
-        this.printParameterName = printParameterName;
-    }
-
-    private static class ManualLogDefinition {
-
-        private ManualLogDefinition() {
+    private Object[] unwrapArguments(Object[] arguments) {
+        int length = arguments.length;
+        Object[] result = new Object[length];
+        for (int a = 0; a < length; a++) {
+            Object argument = arguments[a];
+            if (argument instanceof Supplier) {
+                result[a] = ((Supplier) argument).get();
+            } else {
+                result[a] = argument;
+            }
         }
+        return result;
     }
 }

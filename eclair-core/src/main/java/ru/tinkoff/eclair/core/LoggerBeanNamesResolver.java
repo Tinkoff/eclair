@@ -1,7 +1,7 @@
 package ru.tinkoff.eclair.core;
 
 import org.springframework.context.support.GenericApplicationContext;
-import ru.tinkoff.eclair.logger.Logger;
+import ru.tinkoff.eclair.logger.EclairLogger;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -24,9 +24,9 @@ public final class LoggerBeanNamesResolver {
     }
 
     public Set<String> resolve(GenericApplicationContext applicationContext, String beanName) {
-        String[] beanNamesForType = applicationContext.getBeanNamesForType(Logger.class);
+        String[] beanNamesForType = applicationContext.getBeanNamesForType(EclairLogger.class);
         if (!asList(beanNamesForType).contains(beanName)) {
-            throw new IllegalArgumentException(format("Logger '%s' not found", beanName));
+            throw new IllegalArgumentException(format("EclairLogger '%s' not found", beanName));
         }
         Set<String> result = new HashSet<>(asList(applicationContext.getAliases(beanName)));
         result.add(beanName);
