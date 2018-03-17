@@ -6,14 +6,12 @@ import ru.tinkoff.eclair.definition.*;
 import ru.tinkoff.eclair.format.printer.Printer;
 
 import java.lang.reflect.Method;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.core.annotation.AnnotationUtils.synthesizeAnnotation;
 
@@ -80,13 +78,10 @@ public final class AnnotationDefinitionFactory {
         return null;
     }
 
-    /**
-     * TODO: replace List by LinkedHashSet to demonstrate uniqueness of elements
-     */
-    public List<ErrorLogDefinition> buildErrorLogDefinitions(Set<String> loggerNames, Method method) {
+    public Set<ErrorLogDefinition> buildErrorLogDefinitions(Set<String> loggerNames, Method method) {
         return annotationExtractor.findLogErrors(method, loggerNames).stream()
                 .map(ErrorLogDefinition::new)
-                .collect(toList());
+                .collect(toCollection(LinkedHashSet::new));
     }
 
     public MdcPackDefinition buildMdcPackDefinition(Method method) {

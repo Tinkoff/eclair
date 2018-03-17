@@ -6,11 +6,11 @@ import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.core.ErrorLogDefinitionResolver;
 
 import java.lang.reflect.Method;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.springframework.core.annotation.AnnotationUtils.synthesizeAnnotation;
@@ -31,7 +31,7 @@ public class LogDefinition {
     private final InLogDefinition inLogDefinition;
     @Getter
     private final OutLogDefinition outLogDefinition;
-    private final List<ErrorLogDefinition> errorLogDefinitions;
+    private final Set<ErrorLogDefinition> errorLogDefinitions;
 
     private final ErrorLogDefinitionResolver errorLogDefinitionResolver = ErrorLogDefinitionResolver.getInstance();
     private final Map<Class<? extends Throwable>, ErrorLogDefinition> errorLogDefinitionCache = new ConcurrentHashMap<>();
@@ -44,9 +44,9 @@ public class LogDefinition {
     public static LogDefinition newInstance(Method method,
                                             InLogDefinition inLogDefinition,
                                             OutLogDefinition outLogDefinition,
-                                            List<ErrorLogDefinition> errorLogDefinitions) {
+                                            Set<ErrorLogDefinition> errorLogDefinitions) {
         return isNull(inLogDefinition) && isNull(outLogDefinition) && errorLogDefinitions.isEmpty() ?
-                null : new LogDefinition(method, inLogDefinition, outLogDefinition, unmodifiableList(errorLogDefinitions));
+                null : new LogDefinition(method, inLogDefinition, outLogDefinition, unmodifiableSet(errorLogDefinitions));
     }
 
     public ErrorLogDefinition findErrorLogDefinition(Class<? extends Throwable> causeClass) {

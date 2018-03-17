@@ -7,9 +7,9 @@ import ru.tinkoff.eclair.format.printer.ToStringPrinter;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Set;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
+import static java.util.Collections.*;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.springframework.core.annotation.AnnotationUtils.synthesizeAnnotation;
@@ -25,8 +25,8 @@ public class LogDefinitionTest {
         Method method = LogDefinitionTest.class.getMethod("newInstance");
         InLogDefinition inLogDefinition = givenInLogDefinition();
         OutLogDefinition outLogDefinition = givenOutLogDefinition();
-        List<ErrorLogDefinition> errorLogDefinitions =
-                singletonList(ErrorLogDefinitionFactory.newInstance(new Class<?>[]{Throwable.class}, new Class<?>[]{}));
+        Set<ErrorLogDefinition> errorLogDefinitions =
+                singleton(ErrorLogDefinitionFactory.newInstance(new Class<?>[]{Throwable.class}, new Class<?>[]{}));
         // when
         LogDefinition definition = LogDefinition.newInstance(method, inLogDefinition, outLogDefinition, errorLogDefinitions);
         // then
@@ -41,7 +41,7 @@ public class LogDefinitionTest {
         Method method = LogDefinitionTest.class.getMethod("newInstance");
         InLogDefinition inLogDefinition = null;
         OutLogDefinition outLogDefinition = null;
-        List<ErrorLogDefinition> errorLogDefinitions = emptyList();
+        Set<ErrorLogDefinition> errorLogDefinitions = emptySet();
         // when
         LogDefinition definition = LogDefinition.newInstance(method, inLogDefinition, outLogDefinition, errorLogDefinitions);
         // then
@@ -55,7 +55,7 @@ public class LogDefinitionTest {
         InLogDefinition inLogDefinition = givenInLogDefinition();
         OutLogDefinition outLogDefinition = givenOutLogDefinition();
         ErrorLogDefinition errorLogDefinition = ErrorLogDefinitionFactory.newInstance(new Class<?>[]{Exception.class}, new Class<?>[]{Error.class});
-        List<ErrorLogDefinition> errorLogDefinitions = singletonList(errorLogDefinition);
+        Set<ErrorLogDefinition> errorLogDefinitions = singleton(errorLogDefinition);
         // when
         LogDefinition definition = LogDefinition.newInstance(method, inLogDefinition, outLogDefinition, errorLogDefinitions);
         // then

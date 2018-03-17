@@ -2,7 +2,7 @@ package ru.tinkoff.eclair.core;
 
 import ru.tinkoff.eclair.definition.ErrorLogDefinition;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * @author Viacheslav Klapatniuk
@@ -18,7 +18,7 @@ public final class ErrorLogDefinitionResolver {
         return instance;
     }
 
-    public ErrorLogDefinition resolve(List<ErrorLogDefinition> errorLogDefinitions, Class<?> causeClass) {
+    public ErrorLogDefinition resolve(Set<ErrorLogDefinition> errorLogDefinitions, Class<?> causeClass) {
         int minDistance = -1;
         ErrorLogDefinition result = null;
         for (ErrorLogDefinition errorLogDefinition : errorLogDefinitions) {

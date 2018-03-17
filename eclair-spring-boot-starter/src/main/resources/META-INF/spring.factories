@@ -1,1 +1,1 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=ru.tinkoff.eclair.autoconfigure.LogAutoConfiguration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=ru.tinkoff.eclair.autoconfigure.EclairAutoConfiguration

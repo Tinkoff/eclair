@@ -32,7 +32,7 @@ import java.util.Map;
  */
 @Configuration
 @EnableConfigurationProperties(EclairProperties.class)
-public class LogAutoConfiguration {
+public class EclairAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
@@ -69,7 +69,7 @@ public class LogAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public LoggerFacadeFactory loggerFactory() {
-        LoggingSystem loggingSystem = LoggingSystem.get(LogAutoConfiguration.class.getClassLoader());
+        LoggingSystem loggingSystem = LoggingSystem.get(EclairAutoConfiguration.class.getClassLoader());
         if (loggingSystem instanceof Slf4JLoggingSystem) {
             return new Slf4JLoggerFacadeFactory();
         }
@@ -81,7 +81,7 @@ public class LogAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public SimpleLogger simpleLogger(LoggerFacadeFactory loggerFacadeFactory) {
+    public EclairLogger eclairLogger(LoggerFacadeFactory loggerFacadeFactory) {
         return new SimpleLogger(loggerFacadeFactory);
     }
 

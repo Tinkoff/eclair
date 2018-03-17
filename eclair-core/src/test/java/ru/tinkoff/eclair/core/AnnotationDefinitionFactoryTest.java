@@ -14,10 +14,7 @@ import ru.tinkoff.eclair.format.printer.Jaxb2Printer;
 import ru.tinkoff.eclair.format.printer.Printer;
 
 import java.lang.reflect.Method;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static java.util.Collections.singleton;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -197,11 +194,12 @@ public class AnnotationDefinitionFactoryTest {
         Set<String> loggerNames = singleton("");
         Method method = LogErrorLoggableClass.class.getMethod("logError");
         // when
-        List<ErrorLogDefinition> errorLogDefinitions = annotationDefinitionFactory.buildErrorLogDefinitions(loggerNames, method);
+        Set<ErrorLogDefinition> errorLogDefinitions = annotationDefinitionFactory.buildErrorLogDefinitions(loggerNames, method);
         // then
         assertThat(errorLogDefinitions, hasSize(2));
-        assertThat(errorLogDefinitions.get(0).getLevel(), is(WARN));
-        assertThat(errorLogDefinitions.get(1).getLevel(), is(INFO));
+        Iterator<ErrorLogDefinition> iterator = errorLogDefinitions.iterator();
+        assertThat(iterator.next().getLevel(), is(WARN));
+        assertThat(iterator.next().getLevel(), is(INFO));
     }
 
     @Test
@@ -210,7 +208,7 @@ public class AnnotationDefinitionFactoryTest {
         Set<String> loggerNames = singleton("");
         Method method = LogErrorLoggableClass.class.getMethod("empty");
         // when
-        List<ErrorLogDefinition> errorLogDefinitions = annotationDefinitionFactory.buildErrorLogDefinitions(loggerNames, method);
+        Set<ErrorLogDefinition> errorLogDefinitions = annotationDefinitionFactory.buildErrorLogDefinitions(loggerNames, method);
         // then
         assertThat(errorLogDefinitions, is(empty()));
     }

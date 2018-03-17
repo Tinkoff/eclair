@@ -173,7 +173,7 @@ public class LogProxyCreator extends AbstractAutoProxyCreator {
     private LogDefinition getLogDefinition(Set<String> loggerNames, Method method) {
         InLogDefinition inLogDefinition = annotationDefinitionFactory.buildInLogDefinition(loggerNames, method);
         OutLogDefinition outLogDefinition = annotationDefinitionFactory.buildOutLogDefinition(loggerNames, method);
-        List<ErrorLogDefinition> errorLogDefinitions = annotationDefinitionFactory.buildErrorLogDefinitions(loggerNames, method);
+        Set<ErrorLogDefinition> errorLogDefinitions = annotationDefinitionFactory.buildErrorLogDefinitions(loggerNames, method);
         return LogDefinition.newInstance(method, inLogDefinition, outLogDefinition, errorLogDefinitions);
     }
 

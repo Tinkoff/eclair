@@ -98,9 +98,6 @@ final class MdcAdvisor extends StaticMethodMatcherPointcutAdvisor implements Met
             this.keys = keys;
         }
 
-        /**
-         * TODO: remove by reference?
-         */
         @Override
         public void close() throws Exception {
             keys.forEach(MDC::remove);

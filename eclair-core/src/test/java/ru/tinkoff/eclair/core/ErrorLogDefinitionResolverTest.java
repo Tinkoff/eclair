@@ -4,10 +4,11 @@ import org.junit.Test;
 import ru.tinkoff.eclair.definition.ErrorLogDefinition;
 import ru.tinkoff.eclair.definition.ErrorLogDefinitionFactory;
 
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
+import static java.util.Collections.singleton;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -25,7 +26,7 @@ public class ErrorLogDefinitionResolverTest {
         ErrorLogDefinition aDefinition = ErrorLogDefinitionFactory.newInstance(
                 new Class<?>[]{NullPointerException.class, IndexOutOfBoundsException.class},
                 new Class<?>[]{StringIndexOutOfBoundsException.class});
-        List<ErrorLogDefinition> errorLogDefinitions = singletonList(aDefinition);
+        Set<ErrorLogDefinition> errorLogDefinitions = singleton(aDefinition);
         Class<?> causeClass = ArrayIndexOutOfBoundsException.class;
         // when
         ErrorLogDefinition definition = errorLogDefinitionResolver.resolve(errorLogDefinitions, causeClass);
@@ -37,7 +38,7 @@ public class ErrorLogDefinitionResolverTest {
     public void resolveExclude() {
         // given
         ErrorLogDefinition aDefinition = ErrorLogDefinitionFactory.newInstance(new Class<?>[]{Throwable.class}, new Class<?>[]{RuntimeException.class});
-        List<ErrorLogDefinition> errorLogDefinitions = singletonList(aDefinition);
+        Set<ErrorLogDefinition> errorLogDefinitions = singleton(aDefinition);
         Class<?> causeClass = NullPointerException.class;
         // when
         ErrorLogDefinition definition = errorLogDefinitionResolver.resolve(errorLogDefinitions, causeClass);
@@ -49,7 +50,7 @@ public class ErrorLogDefinitionResolverTest {
     public void resolveNotFound() {
         // given
         ErrorLogDefinition aDefinition = ErrorLogDefinitionFactory.newInstance(new Class<?>[]{Exception.class}, new Class<?>[]{RuntimeException.class});
-        List<ErrorLogDefinition> errorLogDefinitions = singletonList(aDefinition);
+        Set<ErrorLogDefinition> errorLogDefinitions = singleton(aDefinition);
         Class<?> causeClass = Throwable.class;
         // when
         ErrorLogDefinition definition = errorLogDefinitionResolver.resolve(errorLogDefinitions, causeClass);
@@ -66,7 +67,7 @@ public class ErrorLogDefinitionResolverTest {
         ErrorLogDefinition bDefinition = ErrorLogDefinitionFactory.newInstance(
                 new Class<?>[]{ArrayIndexOutOfBoundsException.class},
                 new Class<?>[]{});
-        List<ErrorLogDefinition> errorLogDefinitions = asList(aDefinition, bDefinition);
+        Set<ErrorLogDefinition> errorLogDefinitions = new LinkedHashSet<>(asList(aDefinition, bDefinition));
         Class<?> causeClass = ArrayIndexOutOfBoundsException.class;
         // when
         ErrorLogDefinition definition = errorLogDefinitionResolver.resolve(errorLogDefinitions, causeClass);
