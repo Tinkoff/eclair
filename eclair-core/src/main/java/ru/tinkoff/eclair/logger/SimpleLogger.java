@@ -13,7 +13,6 @@ import ru.tinkoff.eclair.logger.facade.LoggerFacadeFactory;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.springframework.boot.logging.LogLevel.OFF;
@@ -87,13 +86,34 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
     protected void logIn(MethodInvocation invocation, LogDefinition definition) {
         InLogDefinition inLogDefinition = definition.getInLogDefinition();
         String loggerName = getLoggerName(invocation);
-        String message = buildInMessage(invocation, inLogDefinition, loggerName);
+        String message = IN + buildArgumentsClause(invocation, inLogDefinition, loggerName);
         loggerFacadeFactory.getLoggerFacade(loggerName).log(inLogDefinition.getLevel(), message);
     }
 
-    private String buildInMessage(MethodInvocation invocation, InLogDefinition definition, String loggerName) {
-        boolean verboseFound = false;
+    @Override
+    protected void logOut(MethodInvocation invocation, LogDefinition definition, Object result) {
+        OutLogDefinition outLogDefinition = definition.getOutLogDefinition();
+        String loggerName = getLoggerName(invocation);
+        String message = OUT + buildResultClause(invocation, outLogDefinition, result, loggerName);
+        loggerFacadeFactory.getLoggerFacade(loggerName).log(outLogDefinition.getLevel(), message);
+    }
 
+    @Override
+    public void logError(MethodInvocation invocation, LogDefinition definition, Throwable throwable) {
+        ErrorLogDefinition errorLogDefinition = definition.findErrorLogDefinition(throwable.getClass());
+        String loggerName = getLoggerName(invocation);
+        String message = ERROR + buildCauseClause(errorLogDefinition, throwable, loggerName);
+        loggerFacadeFactory.getLoggerFacade(loggerName).log(errorLogDefinition.getLevel(), message, throwable);
+    }
+
+    @Override
+    protected void logEmergencyOut(MethodInvocation invocation, LogDefinition definition, Throwable throwable) {
+        String loggerName = getLoggerName(invocation);
+        loggerFacadeFactory.getLoggerFacade(loggerName).log(definition.getOutLogDefinition().getLevel(), ERROR);
+    }
+
+    private String buildArgumentsClause(MethodInvocation invocation, InLogDefinition definition, String loggerName) {
+        boolean verboseFound = false;
         StringBuilder builder = new StringBuilder();
         List<ArgLogDefinition> argLogDefinitions = definition.getArgLogDefinitions();
         Object[] arguments = invocation.getArguments();
@@ -113,36 +133,21 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
                 if (printParameterName && nonNull(parameterNames)) {
                     builder.append(parameterNames[a]).append("=");
                 }
-                if (isNull(arguments[a])) {
+                Object argument = arguments[a];
+                if (isNull(argument)) {
                     builder.append((String) null);
                 } else {
-                    builder.append(argLogDefinition.getPrinter().print(arguments[a]));
+                    builder.append(argLogDefinition.getPrinter().print(argument));
                 }
             }
         }
-
         if (!verboseFound && length == 0) {
             verboseFound = isLevelEnabled(loggerName, definition.getVerboseLevel());
         }
-
-        String inArgsClause = verboseFound ? format(" %s", builder.toString()) : "";
-
-        return IN + inArgsClause;
+        return verboseFound ? " " + builder : "";
     }
 
-    @Override
-    protected void logOut(MethodInvocation invocation, LogDefinition definition, Object result) {
-        OutLogDefinition outLogDefinition = definition.getOutLogDefinition();
-        String loggerName = getLoggerName(invocation);
-        String message = buildOutMessage(invocation, result, outLogDefinition, loggerName);
-        loggerFacadeFactory.getLoggerFacade(loggerName).log(outLogDefinition.getLevel(), message);
-    }
-
-    private String buildOutMessage(MethodInvocation invocation, Object result, OutLogDefinition definition, String loggerName) {
-        return OUT + buildOutArgClause(invocation, result, definition, loggerName);
-    }
-
-    private String buildOutArgClause(MethodInvocation invocation, Object result, OutLogDefinition outLogDefinition, String loggerName) {
+    private String buildResultClause(MethodInvocation invocation, OutLogDefinition outLogDefinition, Object result, String loggerName) {
         if (isLevelEnabled(loggerName, outLogDefinition.getVerboseLevel())) {
             if (nonNull(result)) {
                 return " " + outLogDefinition.getPrinter().print(result);
@@ -155,24 +160,10 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
         return "";
     }
 
-    @Override
-    public void logError(MethodInvocation invocation, LogDefinition definition, Throwable throwable) {
-        ErrorLogDefinition errorLogDefinition = definition.findErrorLogDefinition(throwable.getClass());
-        String loggerName = getLoggerName(invocation);
-        String message = buildErrorMessage(throwable, errorLogDefinition, loggerName);
-        loggerFacadeFactory.getLoggerFacade(loggerName).log(errorLogDefinition.getLevel(), message, throwable);
-    }
-
-    private String buildErrorMessage(Throwable throwable, ErrorLogDefinition definition, String loggerName) {
+    private String buildCauseClause(ErrorLogDefinition definition, Throwable throwable, String loggerName) {
         if (isLevelEnabled(loggerName, definition.getVerboseLevel())) {
-            return ERROR + " " + throwable.toString();
+            return " " + throwable.toString();
         }
-        return ERROR;
-    }
-
-    @Override
-    protected void logEmergencyOut(MethodInvocation invocation, LogDefinition definition, Throwable throwable) {
-        String loggerName = getLoggerName(invocation);
-        loggerFacadeFactory.getLoggerFacade(loggerName).log(definition.getOutLogDefinition().getLevel(), ERROR);
+        return "";
     }
 }
