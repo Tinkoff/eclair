@@ -101,6 +101,11 @@ public @interface Log {
 
         LogLevel ifEnabled() default OFF;
 
+        /**
+         * TODO: add example for 'verbose' attribute
+         */
+        LogLevel verbose() default WARN;
+
         Class<? extends Throwable>[] ofType() default Throwable.class;
 
         Class<? extends Throwable>[] exclude() default {};

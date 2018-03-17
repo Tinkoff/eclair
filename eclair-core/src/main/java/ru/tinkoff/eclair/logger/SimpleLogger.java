@@ -105,7 +105,7 @@ public class SimpleLogger extends EclairLogger implements ManualLogger {
         int length = arguments.length;
         for (int a = 0; a < length; a++) {
             ArgLogDefinition argLogDefinition = argLogDefinitions.get(a);
-            if (nonNull(argLogDefinition) && isVerboseArg(definition.getVerboseLevel(), argLogDefinition, loggerName)) {
+            if (nonNull(argLogDefinition) && isLevelEnabled(loggerName, argLogDefinition.getIfEnabledLevel())) {
                 if (verboseFound) {
                     builder.append(", ");
                 } else {
@@ -132,45 +132,43 @@ public class SimpleLogger extends EclairLogger implements ManualLogger {
     }
 
     @Override
-    protected void logOut(MethodInvocation invocation, Object result, OutLogDefinition definition, boolean emergency, String loggerName) {
-        String message = buildOutMessage(invocation, result, definition, emergency);
+    protected void logOut(MethodInvocation invocation, OutLogDefinition definition, Object result, String loggerName) {
+        String message = buildOutMessage(invocation, result, definition, loggerName);
         loggerFacadeFactory.getLoggerFacade(loggerName).log(definition.getLevel(), message);
     }
 
-    private String buildOutMessage(MethodInvocation invocation, Object result, OutLogDefinition definition, boolean emergency) {
-        if (emergency) {
-            return ERROR;
-        }
-        return OUT + buildOutArgClause(invocation, result, definition);
+    private String buildOutMessage(MethodInvocation invocation, Object result, OutLogDefinition definition, String loggerName) {
+        return OUT + buildOutArgClause(invocation, result, definition, loggerName);
     }
 
-    private String buildOutArgClause(MethodInvocation invocation, Object result, OutLogDefinition outLogDefinition) {
-        String loggerName = loggerNameBuilder.build(invocation);
-        if (isVerboseArg(outLogDefinition.getVerboseLevel(), null, loggerName)) {
-            if (isNull(result)) {
-                Class<?> returnType = invocation.getMethod().getReturnType();
-                if (returnType == void.class || returnType == Void.class) {
-                    return "";
-                }
+    private String buildOutArgClause(MethodInvocation invocation, Object result, OutLogDefinition outLogDefinition, String loggerName) {
+        if (isLevelEnabled(loggerName, outLogDefinition.getVerboseLevel())) {
+            if (nonNull(result)) {
+                return " " + outLogDefinition.getPrinter().print(result);
+            }
+            Class<?> returnType = invocation.getMethod().getReturnType();
+            if (returnType != void.class && returnType != Void.class) {
                 return " null";
             }
-            return " " + outLogDefinition.getPrinter().print(result);
         }
         return "";
     }
 
-    private boolean isVerboseArg(LogLevel verboseLevel, ArgLogDefinition argLogDefinition, String loggerName) {
-        LogLevel expectedLevel = isNull(argLogDefinition) ? verboseLevel : argLogDefinition.getIfEnabledLevel();
-        return isLevelEnabled(loggerName, expectedLevel);
-    }
-
     @Override
-    public void logError(MethodInvocation invocation, Throwable throwable, ErrorLogDefinition definition, String loggerName) {
-        String message = buildErrorMessage(throwable);
+    public void logError(MethodInvocation invocation, ErrorLogDefinition definition, Throwable throwable, String loggerName) {
+        String message = buildErrorMessage(throwable, definition, loggerName);
         loggerFacadeFactory.getLoggerFacade(loggerName).log(definition.getLevel(), message, throwable);
     }
 
-    private String buildErrorMessage(Throwable throwable) {
-        return ERROR + " " + throwable.toString();
+    private String buildErrorMessage(Throwable throwable, ErrorLogDefinition definition, String loggerName) {
+        if (isLevelEnabled(loggerName, definition.getVerboseLevel())) {
+            return ERROR + " " + throwable.toString();
+        }
+        return ERROR;
+    }
+
+    @Override
+    protected void logEmergencyOut(MethodInvocation invocation, OutLogDefinition definition, Throwable throwable, String loggerName) {
+        loggerFacadeFactory.getLoggerFacade(loggerName).log(definition.getLevel(), ERROR);
     }
 }

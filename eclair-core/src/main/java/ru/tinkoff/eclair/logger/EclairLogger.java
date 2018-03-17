@@ -3,18 +3,19 @@ package ru.tinkoff.eclair.logger;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.boot.logging.LogLevel;
 import org.springframework.core.Ordered;
-import ru.tinkoff.eclair.definition.ErrorLogDefinition;
-import ru.tinkoff.eclair.definition.InLogDefinition;
-import ru.tinkoff.eclair.definition.OutLogDefinition;
+import ru.tinkoff.eclair.core.ExpectedLevelResolver;
+import ru.tinkoff.eclair.definition.*;
 
-import java.util.function.BinaryOperator;
+import java.util.function.Function;
+
+import static java.util.Objects.nonNull;
 
 /**
  * @author Viacheslav Klapatniuk
  */
 public abstract class EclairLogger implements Ordered {
 
-    private static final BinaryOperator<LogLevel> expectedLevelOperator = (o, o2) -> o.ordinal() <= o2.ordinal() ? o : o2;
+    private static final Function<EventLogDefinition, LogLevel> expectedLevelResolver = ExpectedLevelResolver.getInstance();
 
     @Override
     public int getOrder() {
@@ -25,33 +26,49 @@ public abstract class EclairLogger implements Ordered {
 
     protected abstract boolean isLevelEnabled(String loggerName, LogLevel expectedLevel);
 
-    public void logInIfLevelEnabled(MethodInvocation invocation, InLogDefinition definition) {
-        String loggerName = getLoggerName(invocation);
-        LogLevel expectedLevel = expectedLevelOperator.apply(definition.getLevel(), definition.getIfEnabledLevel());
-        if (isLevelEnabled(loggerName, expectedLevel)) {
-            logIn(invocation, definition, loggerName);
+    public void logInIfNecessary(MethodInvocation invocation, LogDefinition definition) {
+        InLogDefinition inLogDefinition = definition.getInLogDefinition();
+        if (nonNull(inLogDefinition)) {
+            String loggerName = getLoggerName(invocation);
+            if (isLevelEnabled(loggerName, expectedLevelResolver.apply(inLogDefinition))) {
+                logIn(invocation, inLogDefinition, loggerName);
+            }
         }
     }
 
     protected abstract void logIn(MethodInvocation invocation, InLogDefinition definition, String loggerName);
 
-    public void logOutIfLevelEnabled(MethodInvocation invocation, Object result, OutLogDefinition definition, boolean emergency) {
-        String loggerName = getLoggerName(invocation);
-        LogLevel expectedLevel = expectedLevelOperator.apply(definition.getLevel(), definition.getIfEnabledLevel());
-        if (isLevelEnabled(loggerName, expectedLevel)) {
-            logOut(invocation, result, definition, emergency, loggerName);
+    public void logOutIfNecessary(MethodInvocation invocation, LogDefinition definition, Object result) {
+        OutLogDefinition outLogDefinition = definition.getOutLogDefinition();
+        if (nonNull(outLogDefinition)) {
+            String loggerName = getLoggerName(invocation);
+            if (isLevelEnabled(loggerName, expectedLevelResolver.apply(outLogDefinition))) {
+                logOut(invocation, outLogDefinition, result, loggerName);
+            }
         }
     }
 
-    protected abstract void logOut(MethodInvocation invocation, Object result, OutLogDefinition definition, boolean emergency, String loggerName);
+    protected abstract void logOut(MethodInvocation invocation, OutLogDefinition definition, Object result, String loggerName);
 
-    public void logErrorIfLevelEnabled(MethodInvocation invocation, Throwable throwable, ErrorLogDefinition definition) {
-        String loggerName = getLoggerName(invocation);
-        LogLevel expectedLevel = expectedLevelOperator.apply(definition.getLevel(), definition.getIfEnabledLevel());
-        if (isLevelEnabled(loggerName, expectedLevel)) {
-            logError(invocation, throwable, definition, loggerName);
+    public void logErrorIfNecessary(MethodInvocation invocation, LogDefinition definition, Throwable throwable) {
+        ErrorLogDefinition errorLogDefinition = definition.findErrorLogDefinition(throwable.getClass());
+        if (nonNull(errorLogDefinition)) {
+            String loggerName = getLoggerName(invocation);
+            if (isLevelEnabled(loggerName, expectedLevelResolver.apply(errorLogDefinition))) {
+                logError(invocation, errorLogDefinition, throwable, loggerName);
+            }
+        } else {
+            OutLogDefinition outLogDefinition = definition.getOutLogDefinition();
+            if (nonNull(outLogDefinition)) {
+                String loggerName = getLoggerName(invocation);
+                if (isLevelEnabled(loggerName, expectedLevelResolver.apply(outLogDefinition))) {
+                    logEmergencyOut(invocation, outLogDefinition, throwable, loggerName);
+                }
+            }
         }
     }
 
-    protected abstract void logError(MethodInvocation invocation, Throwable throwable, ErrorLogDefinition definition, String loggerName);
+    protected abstract void logError(MethodInvocation invocation, ErrorLogDefinition definition, Throwable throwable, String loggerName);
+
+    protected abstract void logEmergencyOut(MethodInvocation invocation, OutLogDefinition definition, Throwable throwable, String loggerName);
 }

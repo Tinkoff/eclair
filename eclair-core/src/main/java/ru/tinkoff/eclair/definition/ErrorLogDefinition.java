@@ -2,8 +2,8 @@ package ru.tinkoff.eclair.definition;
 
 import lombok.Getter;
 import org.springframework.boot.logging.LogLevel;
-import ru.tinkoff.eclair.core.AnnotationAttribute;
 import ru.tinkoff.eclair.annotation.Log;
+import ru.tinkoff.eclair.core.AnnotationAttribute;
 import ru.tinkoff.eclair.core.ErrorFilterFactory;
 
 import java.util.Set;
@@ -11,17 +11,20 @@ import java.util.Set;
 /**
  * @author Viacheslav Klapatniuk
  */
-public class ErrorLogDefinition {
+public class ErrorLogDefinition implements EventLogDefinition {
 
     @Getter
     private final LogLevel level;
     @Getter
     private final LogLevel ifEnabledLevel;
+    @Getter
+    private final LogLevel verboseLevel;
     private final ErrorFilter errorFilter;
 
     public ErrorLogDefinition(Log.error logError) {
         this.level = AnnotationAttribute.LEVEL.extract(logError);
         this.ifEnabledLevel = logError.ifEnabled();
+        this.verboseLevel = logError.verbose();
         this.errorFilter = ErrorFilterFactory.getInstance().buildErrorFilter(logError.ofType(), logError.exclude());
     }
 

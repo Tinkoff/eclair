@@ -15,6 +15,8 @@ import static org.springframework.boot.logging.LogLevel.WARN;
 import static org.springframework.core.annotation.AnnotationUtils.synthesizeAnnotation;
 
 /**
+ * TODO: add verbose level check
+ *
  * @author Viacheslav Klapatniuk
  */
 public class ErrorLogDefinitionTest {

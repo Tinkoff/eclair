@@ -14,7 +14,7 @@ import static java.util.Objects.isNull;
  * @author Viacheslav Klapatniuk
  */
 @Getter
-public class InLogDefinition {
+public class InLogDefinition implements EventLogDefinition {
 
     private final LogLevel level;
     private final LogLevel ifEnabledLevel;

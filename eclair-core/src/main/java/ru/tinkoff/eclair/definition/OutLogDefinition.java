@@ -10,7 +10,7 @@ import ru.tinkoff.eclair.annotation.Log;
  * @author Viacheslav Klapatniuk
  */
 @Getter
-public class OutLogDefinition {
+public class OutLogDefinition implements EventLogDefinition {
 
     private final LogLevel level;
     private final LogLevel ifEnabledLevel;

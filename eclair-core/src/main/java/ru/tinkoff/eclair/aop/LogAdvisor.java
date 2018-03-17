@@ -4,10 +4,7 @@ import org.aopalliance.aop.Advice;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.support.StaticMethodMatcherPointcutAdvisor;
-import ru.tinkoff.eclair.definition.ErrorLogDefinition;
-import ru.tinkoff.eclair.definition.InLogDefinition;
 import ru.tinkoff.eclair.definition.LogDefinition;
-import ru.tinkoff.eclair.definition.OutLogDefinition;
 import ru.tinkoff.eclair.logger.EclairLogger;
 
 import java.lang.reflect.Method;
@@ -15,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
@@ -60,37 +56,15 @@ final class LogAdvisor extends StaticMethodMatcherPointcutAdvisor implements Met
         if (isNull(logDefinition)) {
             return invocation.proceed();
         }
-        logInIfNecessary(invocation, logDefinition.getInLogDefinition());
+        eclairLogger.logInIfNecessary(invocation, logDefinition);
         Object result;
         try {
             result = invocation.proceed();
         } catch (Throwable throwable) {
-            ErrorLogDefinition errorLogDefinition = logDefinition.findErrorLogDefinition(throwable.getClass());
-            logErrorIfNecessary(invocation, errorLogDefinition, logDefinition.getOutLogDefinition(), throwable);
+            eclairLogger.logErrorIfNecessary(invocation, logDefinition, throwable);
             throw throwable;
         }
-        logOutIfNecessary(invocation, logDefinition.getOutLogDefinition(), result, false);
+        eclairLogger.logOutIfNecessary(invocation, logDefinition, result);
         return result;
-    }
-
-    private void logInIfNecessary(MethodInvocation invocation, InLogDefinition inLogDefinition) {
-        if (nonNull(inLogDefinition)) {
-            eclairLogger.logInIfLevelEnabled(invocation, inLogDefinition);
-        }
-    }
-
-    private void logOutIfNecessary(MethodInvocation invocation, OutLogDefinition outLogDefinition, Object result, /* TODO: refactor */ boolean emergency) {
-        if (nonNull(outLogDefinition)) {
-            eclairLogger.logOutIfLevelEnabled(invocation, result, outLogDefinition, emergency);
-        }
-    }
-
-    private void logErrorIfNecessary(MethodInvocation invocation, ErrorLogDefinition errorLogDefinition, OutLogDefinition outLogDefinition, Throwable throwable) {
-        if (nonNull(errorLogDefinition)) {
-            eclairLogger.logErrorIfLevelEnabled(invocation, throwable, errorLogDefinition);
-        } else {
-            // TODO: refactor
-            logOutIfNecessary(invocation, outLogDefinition, null, true);
-        }
     }
 }
