@@ -3,6 +3,7 @@ package ru.tinkoff.eclair.core;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.annotation.Mdc;
@@ -16,6 +17,7 @@ import ru.tinkoff.eclair.format.printer.Printer;
 import java.lang.reflect.Method;
 import java.util.*;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.empty;
@@ -37,10 +39,10 @@ public class AnnotationDefinitionFactoryTest {
 
     @Before
     public void init() {
-        Map<String, Printer> printers = new LinkedHashMap<>();
+        Map<String, Object> printers = new LinkedHashMap<>();
         printers.put("xml", xmlPrinter);
         printers.put("json", jsonPrinter);
-        printerResolver = new PrinterResolver(printers);
+        printerResolver = new PrinterResolver(new StaticListableBeanFactory(printers), asList(xmlPrinter, jsonPrinter));
         annotationDefinitionFactory = new AnnotationDefinitionFactory(printerResolver);
     }
 

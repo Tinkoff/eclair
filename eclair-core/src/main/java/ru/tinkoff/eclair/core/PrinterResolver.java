@@ -1,15 +1,23 @@
 package ru.tinkoff.eclair.core;
 
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.ListableBeanFactory;
 import ru.tinkoff.eclair.format.printer.Printer;
 import ru.tinkoff.eclair.format.printer.ToStringPrinter;
 
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
+import static java.util.Objects.isNull;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
 import static org.springframework.util.StringUtils.hasText;
 
 /**
  * TODO: add tests
- * TODO: resolve by aliases
  *
  * @author Viacheslav Klapatniuk
  */
@@ -18,14 +26,39 @@ public class PrinterResolver {
     private static final Printer defaultPrinter = new ToStringPrinter();
 
     private final Map<String, Printer> printers;
+    private final Map<String, String> aliases;
 
-    public PrinterResolver(Map<String, Printer> printers) {
-        this.printers = printers;
+    public PrinterResolver(ListableBeanFactory beanFactory, List<Printer> printerList) {
+        Map<String, Printer> printerMap = beanFactory.getBeansOfType(Printer.class);
+        this.printers = initPrinters(printerMap, printerList);
+        this.aliases = initAliases(beanFactory, printerMap);
     }
 
-    public Printer resolve(String printerName, Class<?> parameterType) {
+    private Map<String, Printer> initPrinters(Map<String, Printer> printerMap, List<Printer> printerList) {
+        return printerList.stream()
+                .collect(toMap(
+                        printer -> printerMap.entrySet().stream()
+                                .filter(entry -> entry.getValue().equals(printer))
+                                .findFirst()
+                                .map(Map.Entry::getKey)
+                                .orElseThrow(() -> new IllegalArgumentException("EclairLogger bean not found on map")),
+                        identity(),
+                        (printer, printer2) -> printer,
+                        LinkedHashMap::new
+                ));
+    }
+
+    private Map<String, String> initAliases(BeanFactory beanFactory, Map<String, Printer> printers) {
+        return printers.keySet().stream()
+                .map(name -> Stream.of(beanFactory.getAliases(name)).collect(toMap(identity(), alias -> name)).entrySet())
+                .flatMap(Collection::stream)
+                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    Printer resolve(String printerName, Class<?> parameterType) {
         if (hasText(printerName)) {
-            return printers.getOrDefault(printerName, defaultPrinter);
+            Printer printer = printers.get(printerName);
+            return isNull(printer) ? printers.getOrDefault(aliases.get(printerName), defaultPrinter) : printer;
         }
         return printers.values().stream()
                 .filter(item -> item.supports(parameterType))

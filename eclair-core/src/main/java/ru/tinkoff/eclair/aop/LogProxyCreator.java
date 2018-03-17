@@ -24,12 +24,10 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
@@ -45,7 +43,7 @@ public class LogProxyCreator extends AbstractAutoProxyCreator {
     private final Map<Class<?>, Object[]> advisorsCache = new ConcurrentHashMap<>();
 
     private final Map<String, EclairLogger> loggers;
-    private final GenericApplicationContext genericApplicationContext;
+    private final GenericApplicationContext applicationContext;
     private final BeanClassValidator beanClassValidator;
 
     private final AnnotationDefinitionFactory annotationDefinitionFactory;
@@ -54,31 +52,15 @@ public class LogProxyCreator extends AbstractAutoProxyCreator {
 
     private boolean validate = false;
 
-    public LogProxyCreator(Map<String, Printer> printerMap,
-                           List<Printer> printerList,
+    public LogProxyCreator(List<Printer> printerList,
                            Map<String, EclairLogger> loggers,
-                           GenericApplicationContext genericApplicationContext,
+                           GenericApplicationContext applicationContext,
                            BeanClassValidator beanClassValidator) {
-        this.annotationDefinitionFactory = new AnnotationDefinitionFactory(new PrinterResolver(initPrinters(printerMap, printerList)));
+        this.annotationDefinitionFactory = new AnnotationDefinitionFactory(new PrinterResolver(applicationContext, printerList));
         this.loggers = initLoggers(loggers);
-        this.genericApplicationContext = genericApplicationContext;
+        this.applicationContext = applicationContext;
         this.beanClassValidator = beanClassValidator;
         setFrozen(true);
-    }
-
-    private Map<String, Printer> initPrinters(Map<String, Printer> printerMap, List<Printer> printerList) {
-        return printerList.stream()
-                .collect(toMap(
-                        printer -> printerMap.entrySet().stream()
-                                .filter(entry -> entry.getValue().equals(printer))
-                                .findFirst()
-                                .map(Map.Entry::getKey)
-                                // never happens
-                                .orElseThrow(() -> new IllegalArgumentException("EclairLogger bean not found on map")),
-                        identity(),
-                        this::mergeFunction,
-                        LinkedHashMap::new
-                ));
     }
 
     private Map<String, EclairLogger> initLoggers(Map<String, EclairLogger> loggers) {
@@ -87,14 +69,9 @@ public class LogProxyCreator extends AbstractAutoProxyCreator {
                 .collect(toMap(
                         Map.Entry::getKey,
                         Map.Entry::getValue,
-                        this::mergeFunction,
+                        (logger, logger2) -> logger,
                         LinkedHashMap::new
                 ));
-    }
-
-    private <T> T mergeFunction(T b1, T b2) {
-        // never happens
-        throw new IllegalArgumentException(format("Two beans with one name: '%s', '%s'", b1, b2));
     }
 
     @Override
@@ -163,7 +140,7 @@ public class LogProxyCreator extends AbstractAutoProxyCreator {
     }
 
     private List<LogDefinition> getLogDefinitions(Class<?> beanClass, String loggerName) {
-        Set<String> loggerNames = loggerBeanNamesResolver.resolve(genericApplicationContext, loggerName);
+        Set<String> loggerNames = loggerBeanNamesResolver.resolve(applicationContext, loggerName);
         return annotationExtractor.getCandidateMethods(beanClass).stream()
                 .map(method -> getLogDefinition(loggerNames, method))
                 .filter(Objects::nonNull)

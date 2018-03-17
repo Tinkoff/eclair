@@ -86,13 +86,12 @@ public class EclairAutoConfiguration {
     }
 
     @Bean
-    public LogProxyCreator logProxyCreator(Map<String, Printer> printerMap,
-                                           List<Printer> printerList,
+    public LogProxyCreator logProxyCreator(List<Printer> printerList,
                                            Map<String, EclairLogger> loggers,
                                            GenericApplicationContext genericApplicationContext,
                                            BeanClassValidator beanClassValidator,
                                            EclairProperties eclairProperties) {
-        LogProxyCreator logProxyCreator = new LogProxyCreator(printerMap, printerList, loggers, genericApplicationContext, beanClassValidator);
+        LogProxyCreator logProxyCreator = new LogProxyCreator(printerList, loggers, genericApplicationContext, beanClassValidator);
         logProxyCreator.setValidate(eclairProperties.isValidate());
         return logProxyCreator;
     }
