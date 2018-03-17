@@ -8,6 +8,8 @@ import java.lang.annotation.*;
 import static org.springframework.boot.logging.LogLevel.*;
 
 /**
+ * TODO: use meta-annotation for @Log declaration
+ *
  * @author Viacheslav Klapatniuk
  */
 @Repeatable(Logs.class)

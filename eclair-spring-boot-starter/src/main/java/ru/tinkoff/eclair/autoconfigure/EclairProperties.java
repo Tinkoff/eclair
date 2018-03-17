@@ -3,8 +3,6 @@ package ru.tinkoff.eclair.autoconfigure;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * TODO: remove manual JSON
- *
  * @author Viacheslav Klapatniuk
  */
 @ConfigurationProperties(prefix = "eclair")

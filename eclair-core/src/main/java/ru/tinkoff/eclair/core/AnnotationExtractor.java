@@ -7,18 +7,14 @@ import ru.tinkoff.eclair.annotation.Mdc;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.singletonMap;
 import static java.util.stream.Collectors.*;
 import static org.springframework.core.annotation.AnnotationUtils.*;
-import static ru.tinkoff.eclair.core.AnnotationAttribute.*;
+import static ru.tinkoff.eclair.core.AnnotationAttribute.LOGGER;
 
 /**
  * @author Viacheslav Klapatniuk
@@ -141,24 +137,17 @@ public final class AnnotationExtractor {
         return annotation -> loggers.contains(LOGGER.extract(annotation));
     }
 
-    /**
-     * TODO: add test
-     */
     Log.in synthesizeLogIn(Log log) {
         return synthesizeAnnotation(getAnnotationAttributes(log), Log.in.class, null);
     }
 
-    /**
-     * TODO: add test
-     */
     Log.out synthesizeLogOut(Log log) {
         return synthesizeAnnotation(getAnnotationAttributes(log), Log.out.class, null);
     }
 
-    /**
-     * TODO: add test
-     */
     Log.arg synthesizeLogArg(Log.in logIn) {
-        return synthesizeAnnotation(singletonMap(PRINTER.getName(), logIn.printer()), Log.arg.class, null);
+        Map<String, Object> attributes = getAnnotationAttributes(logIn);
+        attributes.put("ifEnabled", logIn.verbose());
+        return synthesizeAnnotation(attributes, Log.arg.class, null);
     }
 }

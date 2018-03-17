@@ -1,6 +1,7 @@
 package ru.tinkoff.eclair.core;
 
 import org.junit.Test;
+import org.springframework.core.annotation.AnnotationUtils;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.annotation.Logs;
 import ru.tinkoff.eclair.annotation.Mdc;
@@ -8,10 +9,7 @@ import ru.tinkoff.eclair.annotation.Mdcs;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
@@ -615,5 +613,61 @@ public class AnnotationExtractorTest {
 
         public void loggerLogArgs(@Log.arg(logger = "logger") String input) {
         }
+    }
+
+    @Test
+    public void synthesizeLogIn() {
+        // given
+        Map<String, Object> attributes = new HashMap<>();
+        attributes.put("level", ERROR);
+        attributes.put("ifEnabled", WARN);
+        attributes.put("verbose", INFO);
+        attributes.put("printer", "printer");
+        attributes.put("logger", "logger");
+        Log log = AnnotationUtils.synthesizeAnnotation(attributes, Log.class, null);
+        // when
+        Log.in logIn = annotationExtractor.synthesizeLogIn(log);
+        // then
+        assertThat(logIn.level(), is(ERROR));
+        assertThat(logIn.ifEnabled(), is(WARN));
+        assertThat(logIn.verbose(), is(INFO));
+        assertThat(logIn.printer(), is("printer"));
+        assertThat(logIn.logger(), is("logger"));
+    }
+
+    @Test
+    public void synthesizeLogOut() {
+        // given
+        Map<String, Object> attributes = new HashMap<>();
+        attributes.put("level", ERROR);
+        attributes.put("ifEnabled", WARN);
+        attributes.put("verbose", INFO);
+        attributes.put("printer", "printer");
+        attributes.put("logger", "logger");
+        Log log = AnnotationUtils.synthesizeAnnotation(attributes, Log.class, null);
+        // when
+        Log.out logOut = annotationExtractor.synthesizeLogOut(log);
+        // then
+        assertThat(logOut.level(), is(ERROR));
+        assertThat(logOut.ifEnabled(), is(WARN));
+        assertThat(logOut.verbose(), is(INFO));
+        assertThat(logOut.printer(), is("printer"));
+        assertThat(logOut.logger(), is("logger"));
+    }
+
+    @Test
+    public void synthesizeLogArg() {
+        // given
+        Map<String, Object> attributes = new HashMap<>();
+        attributes.put("verbose", INFO);
+        attributes.put("printer", "printer");
+        attributes.put("logger", "logger");
+        Log.in logIn = AnnotationUtils.synthesizeAnnotation(attributes, Log.in.class, null);
+        // when
+        Log.arg logArg = annotationExtractor.synthesizeLogArg(logIn);
+        // then
+        assertThat(logArg.ifEnabled(), is(INFO));
+        assertThat(logArg.printer(), is("printer"));
+        assertThat(logArg.logger(), is("logger"));
     }
 }
