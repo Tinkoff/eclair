@@ -1,6 +1,6 @@
 package ru.tinkoff.eclair.validate;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -12,16 +12,12 @@ import java.util.stream.Stream;
  * @author Viacheslav Klapatniuk
  */
 @Component
+@RequiredArgsConstructor
 public class BeanClassValidator implements Validator {
 
     private final BeanMethodValidator beanMethodValidator;
 
     private final AnnotationExtractor annotationExtractor = AnnotationExtractor.getInstance();
-
-    @Autowired
-    public BeanClassValidator(BeanMethodValidator beanMethodValidator) {
-        this.beanMethodValidator = beanMethodValidator;
-    }
 
     @Override
     public boolean supports(Class<?> clazz) {

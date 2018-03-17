@@ -15,9 +15,12 @@ import ru.tinkoff.eclair.core.AnnotationDefinitionFactory;
 import ru.tinkoff.eclair.core.AnnotationExtractor;
 import ru.tinkoff.eclair.core.LoggerBeanNamesResolver;
 import ru.tinkoff.eclair.core.PrinterResolver;
-import ru.tinkoff.eclair.definition.*;
-import ru.tinkoff.eclair.format.printer.Printer;
+import ru.tinkoff.eclair.definition.ErrorLog;
+import ru.tinkoff.eclair.definition.InLog;
+import ru.tinkoff.eclair.definition.LogPack;
+import ru.tinkoff.eclair.definition.OutLog;
 import ru.tinkoff.eclair.logger.EclairLogger;
+import ru.tinkoff.eclair.printer.Printer;
 import ru.tinkoff.eclair.validate.BeanClassValidator;
 
 import java.lang.reflect.Method;
@@ -34,9 +37,9 @@ import static java.util.stream.Collectors.toMap;
 /**
  * @author Viacheslav Klapatniuk
  */
-public class LogProxyCreator extends AbstractAutoProxyCreator {
+public class EclairProxyCreator extends AbstractAutoProxyCreator {
 
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(LogProxyCreator.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(EclairProxyCreator.class);
     private static final Object[] EMPTY_ARRAY = new Object[0];
 
     private final Map<String, Class<?>> beanClassCache = new ConcurrentHashMap<>();
@@ -52,10 +55,10 @@ public class LogProxyCreator extends AbstractAutoProxyCreator {
 
     private boolean validate = false;
 
-    public LogProxyCreator(List<Printer> printerList,
-                           Map<String, EclairLogger> loggers,
-                           GenericApplicationContext applicationContext,
-                           BeanClassValidator beanClassValidator) {
+    public EclairProxyCreator(List<Printer> printerList,
+                              Map<String, EclairLogger> loggers,
+                              GenericApplicationContext applicationContext,
+                              BeanClassValidator beanClassValidator) {
         this.annotationDefinitionFactory = new AnnotationDefinitionFactory(new PrinterResolver(applicationContext, printerList));
         this.loggers = initLoggers(loggers);
         this.applicationContext = applicationContext;
@@ -120,11 +123,10 @@ public class LogProxyCreator extends AbstractAutoProxyCreator {
     }
 
     private MdcAdvisor getMdcAdvisor(Class<?> beanClass) {
-        List<MdcPackDefinition> mdcDefinitions = annotationExtractor.getCandidateMethods(beanClass).stream()
-                .map(annotationDefinitionFactory::buildMdcPackDefinition)
+        return MdcAdvisor.newInstance(annotationExtractor.getCandidateMethods(beanClass).stream()
+                .map(annotationDefinitionFactory::buildMdcPack)
                 .filter(Objects::nonNull)
-                .collect(toList());
-        return MdcAdvisor.newInstance(mdcDefinitions);
+                .collect(toList()));
     }
 
     private List<LogAdvisor> getLoggingAdvisors(Class<?> beanClass) {
@@ -135,23 +137,23 @@ public class LogProxyCreator extends AbstractAutoProxyCreator {
     }
 
     private LogAdvisor getLogAdvisor(Class<?> beanClass, String loggerName, EclairLogger eclairLogger) {
-        List<LogDefinition> logDefinitions = getLogDefinitions(beanClass, loggerName);
-        return LogAdvisor.newInstance(eclairLogger, logDefinitions);
+        List<LogPack> logPacks = getLogPacks(beanClass, loggerName);
+        return LogAdvisor.newInstance(eclairLogger, logPacks);
     }
 
-    private List<LogDefinition> getLogDefinitions(Class<?> beanClass, String loggerName) {
+    private List<LogPack> getLogPacks(Class<?> beanClass, String loggerName) {
         Set<String> loggerNames = loggerBeanNamesResolver.resolve(applicationContext, loggerName);
         return annotationExtractor.getCandidateMethods(beanClass).stream()
-                .map(method -> getLogDefinition(loggerNames, method))
+                .map(method -> getLogPack(loggerNames, method))
                 .filter(Objects::nonNull)
                 .collect(toList());
     }
 
-    private LogDefinition getLogDefinition(Set<String> loggerNames, Method method) {
-        InLogDefinition inLogDefinition = annotationDefinitionFactory.buildInLogDefinition(loggerNames, method);
-        OutLogDefinition outLogDefinition = annotationDefinitionFactory.buildOutLogDefinition(loggerNames, method);
-        Set<ErrorLogDefinition> errorLogDefinitions = annotationDefinitionFactory.buildErrorLogDefinitions(loggerNames, method);
-        return LogDefinition.newInstance(method, inLogDefinition, outLogDefinition, errorLogDefinitions);
+    private LogPack getLogPack(Set<String> loggerNames, Method method) {
+        InLog inLog = annotationDefinitionFactory.buildInLog(loggerNames, method);
+        OutLog outLog = annotationDefinitionFactory.buildOutLog(loggerNames, method);
+        Set<ErrorLog> errorLogs = annotationDefinitionFactory.buildErrorLogs(loggerNames, method);
+        return LogPack.newInstance(method, inLog, outLog, errorLogs);
     }
 
     private Object[] composeAdvisors(MdcAdvisor mdcAdvisor, List<LogAdvisor> logAdvisors) {

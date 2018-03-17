@@ -7,12 +7,15 @@ import org.slf4j.MDC;
 import org.springframework.aop.support.StaticMethodMatcherPointcutAdvisor;
 import ru.tinkoff.eclair.core.ExpressionEvaluator;
 import ru.tinkoff.eclair.definition.MdcDefinition;
-import ru.tinkoff.eclair.definition.MdcPackDefinition;
+import ru.tinkoff.eclair.definition.MdcPack;
 
 import java.lang.reflect.Method;
-import java.util.*;
-import java.util.function.Function;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
 /**
@@ -21,18 +24,14 @@ import static java.util.stream.Collectors.toMap;
 final class MdcAdvisor extends StaticMethodMatcherPointcutAdvisor implements MethodInterceptor {
 
     private final ExpressionEvaluator expressionEvaluator = ExpressionEvaluator.getInstance();
-    private final Map<Method, MdcPackDefinition> mdcPackDefinitions;
+    private final Map<Method, MdcPack> mdcPacks;
 
-    private MdcAdvisor(List<MdcPackDefinition> mdcPackDefinitions) {
-        this.mdcPackDefinitions = mdcPackDefinitions.stream()
-                .collect(toMap(MdcPackDefinition::getMethod, Function.identity()));
+    private MdcAdvisor(List<MdcPack> mdcPacks) {
+        this.mdcPacks = mdcPacks.stream().collect(toMap(MdcPack::getMethod, identity()));
     }
 
-    static MdcAdvisor newInstance(List<MdcPackDefinition> mdcPackDefinitions) {
-        if (mdcPackDefinitions.isEmpty()) {
-            return null;
-        }
-        return new MdcAdvisor(mdcPackDefinitions);
+    static MdcAdvisor newInstance(List<MdcPack> mdcPacks) {
+        return mdcPacks.isEmpty() ? null : new MdcAdvisor(mdcPacks);
     }
 
     @Override
@@ -42,7 +41,7 @@ final class MdcAdvisor extends StaticMethodMatcherPointcutAdvisor implements Met
 
     @Override
     public boolean matches(Method method, Class<?> targetClass) {
-        return mdcPackDefinitions.containsKey(method);
+        return mdcPacks.containsKey(method);
     }
 
     /**
@@ -57,37 +56,34 @@ final class MdcAdvisor extends StaticMethodMatcherPointcutAdvisor implements Met
     public Object invoke(MethodInvocation invocation) throws Throwable {
         Set<String> keys = new HashSet<>();
         try (MethodMdcKeysHolder ignored = new MethodMdcKeysHolder(keys)) {
-            MdcPackDefinition mdcPackDefinition = mdcPackDefinitions.get(invocation.getMethod());
-            processMethodDefinitions(mdcPackDefinition.getMethodDefinitions(), keys);
-            processArgumentDefinitions(mdcPackDefinition.getArgumentDefinitions(), invocation.getArguments(), keys);
+            MdcPack mdcPack = mdcPacks.get(invocation.getMethod());
+            processMethodDefinitions(mdcPack.getMethodDefinitions(), keys);
+            processParameterDefinitions(mdcPack.getParameterDefinitions(), invocation.getArguments(), keys);
             return invocation.proceed();
         }
     }
 
     private void processMethodDefinitions(Set<MdcDefinition> definitions, Set<String> keys) {
-        definitions.forEach(definition -> {
-            String value = expressionEvaluator.evaluate(definition.getValue());
-            MDC.put(definition.getKey(), value);
-        });
-        definitions.stream()
-                .filter(definition -> !definition.isGlobal())
-                .map(MdcDefinition::getKey)
-                .forEach(keys::add);
+        for (MdcDefinition definition : definitions) {
+            String key = definition.getKey();
+            if (!definition.isGlobal()) {
+                keys.add(key);
+            }
+            MDC.put(key, expressionEvaluator.evaluate(definition.getValue()));
+        }
     }
 
-    private void processArgumentDefinitions(List<Set<MdcDefinition>> definitions, Object[] arguments, Set<String> keys) {
+    private void processParameterDefinitions(List<Set<MdcDefinition>> definitions, Object[] arguments, Set<String> keys) {
         for (int a = 0; a < definitions.size(); a++) {
             Object argument = arguments[a];
-            definitions.get(a).forEach(definition -> {
-                String value = expressionEvaluator.evaluate(definition.getValue(), argument);
-                MDC.put(definition.getKey(), value);
-            });
+            for (MdcDefinition definition : definitions.get(a)) {
+                String key = definition.getKey();
+                if (!definition.isGlobal()) {
+                    keys.add(key);
+                }
+                MDC.put(key, expressionEvaluator.evaluate(definition.getValue(), argument));
+            }
         }
-        definitions.stream()
-                .flatMap(Collection::stream)
-                .filter(definition -> !definition.isGlobal())
-                .map(MdcDefinition::getKey)
-                .forEach(keys::add);
     }
 
     private static final class MethodMdcKeysHolder implements AutoCloseable {

@@ -7,12 +7,12 @@ import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.annotation.Mdc;
-import ru.tinkoff.eclair.definition.ErrorLogDefinition;
-import ru.tinkoff.eclair.definition.InLogDefinition;
-import ru.tinkoff.eclair.definition.OutLogDefinition;
-import ru.tinkoff.eclair.format.printer.JacksonPrinter;
-import ru.tinkoff.eclair.format.printer.Jaxb2Printer;
-import ru.tinkoff.eclair.format.printer.Printer;
+import ru.tinkoff.eclair.definition.ErrorLog;
+import ru.tinkoff.eclair.definition.InLog;
+import ru.tinkoff.eclair.definition.OutLog;
+import ru.tinkoff.eclair.printer.JacksonPrinter;
+import ru.tinkoff.eclair.printer.Jaxb2Printer;
+import ru.tinkoff.eclair.printer.Printer;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -47,72 +47,72 @@ public class AnnotationDefinitionFactoryTest {
     }
 
     @Test
-    public void buildInLogDefinitionByLogIn() throws NoSuchMethodException {
+    public void buildInLogByLogIn() throws NoSuchMethodException {
         // given
         Set<String> loggerNames = singleton("");
         Method method = LogInLoggableClass.class.getMethod("logIn", String.class, String.class);
         // when
-        InLogDefinition definition = annotationDefinitionFactory.buildInLogDefinition(loggerNames, method);
+        InLog inLog = annotationDefinitionFactory.buildInLog(loggerNames, method);
         // then
-        assertThat(definition.getLevel(), is(INFO));
-        assertThat(definition.getArgLogDefinitions(), hasSize(2));
-        assertThat(definition.getArgLogDefinitions().get(0).getPrinter(), is(jsonPrinter));
-        assertThat(definition.getArgLogDefinitions().get(1).getPrinter(), is(jsonPrinter));
+        assertThat(inLog.getLevel(), is(INFO));
+        assertThat(inLog.getArgLogs(), hasSize(2));
+        assertThat(inLog.getArgLogs().get(0).getPrinter(), is(jsonPrinter));
+        assertThat(inLog.getArgLogs().get(1).getPrinter(), is(jsonPrinter));
     }
 
     @Test
-    public void buildInLogDefinitionByLogInLogArg() throws NoSuchMethodException {
+    public void buildInLogByLogInLogArg() throws NoSuchMethodException {
         // given
         Set<String> loggerNames = singleton("");
         Method method = LogInLoggableClass.class.getMethod("logInLogArg", String.class, String.class);
         // when
-        InLogDefinition definition = annotationDefinitionFactory.buildInLogDefinition(loggerNames, method);
+        InLog inLog = annotationDefinitionFactory.buildInLog(loggerNames, method);
         // then
-        assertThat(definition.getLevel(), is(INFO));
-        assertThat(definition.getArgLogDefinitions().get(0).getIfEnabledLevel(), is(WARN));
-        assertThat(definition.getArgLogDefinitions().get(0).getPrinter(), is(xmlPrinter));
-        assertThat(definition.getArgLogDefinitions().get(1).getPrinter(), is(jsonPrinter));
+        assertThat(inLog.getLevel(), is(INFO));
+        assertThat(inLog.getArgLogs().get(0).getIfEnabledLevel(), is(WARN));
+        assertThat(inLog.getArgLogs().get(0).getPrinter(), is(xmlPrinter));
+        assertThat(inLog.getArgLogs().get(1).getPrinter(), is(jsonPrinter));
     }
 
     @Test
-    public void buildInLogDefinitionByLog() throws NoSuchMethodException {
+    public void buildInLogByLog() throws NoSuchMethodException {
         // given
         Set<String> loggerNames = singleton("");
         Method method = LogInLoggableClass.class.getMethod("log", String.class, String.class);
         // when
-        InLogDefinition definition = annotationDefinitionFactory.buildInLogDefinition(loggerNames, method);
+        InLog inLog = annotationDefinitionFactory.buildInLog(loggerNames, method);
         // then
-        assertThat(definition.getLevel(), is(WARN));
-        assertThat(definition.getIfEnabledLevel(), is(ERROR));
-        assertThat(definition.getVerboseLevel(), is(TRACE));
-        assertThat(definition.getArgLogDefinitions(), hasSize(2));
-        assertThat(definition.getArgLogDefinitions().get(0).getPrinter(), is(jsonPrinter));
-        assertThat(definition.getArgLogDefinitions().get(1).getPrinter(), is(jsonPrinter));
+        assertThat(inLog.getLevel(), is(WARN));
+        assertThat(inLog.getIfEnabledLevel(), is(ERROR));
+        assertThat(inLog.getVerboseLevel(), is(TRACE));
+        assertThat(inLog.getArgLogs(), hasSize(2));
+        assertThat(inLog.getArgLogs().get(0).getPrinter(), is(jsonPrinter));
+        assertThat(inLog.getArgLogs().get(1).getPrinter(), is(jsonPrinter));
     }
 
     @Test
-    public void buildInLogDefinitionEmpty() throws NoSuchMethodException {
+    public void buildInLogEmpty() throws NoSuchMethodException {
         // given
         Set<String> loggerNames = singleton("");
         Method method = LogInLoggableClass.class.getMethod("empty", String.class, String.class);
         // when
-        InLogDefinition definition = annotationDefinitionFactory.buildInLogDefinition(loggerNames, method);
+        InLog inLog = annotationDefinitionFactory.buildInLog(loggerNames, method);
         // then
-        assertThat(definition, nullValue());
+        assertThat(inLog, nullValue());
     }
 
     @Test
-    public void buildInLogDefinitionByLogArg() throws NoSuchMethodException {
+    public void buildInLogByLogArg() throws NoSuchMethodException {
         // given
         Set<String> loggerNames = singleton("");
         Method method = LogInLoggableClass.class.getMethod("logArg", String.class, String.class);
         // when
-        InLogDefinition definition = annotationDefinitionFactory.buildInLogDefinition(loggerNames, method);
+        InLog inLog = annotationDefinitionFactory.buildInLog(loggerNames, method);
         // then
-        assertThat(definition.getLevel(), is(DEBUG));
-        assertThat(definition.getArgLogDefinitions(), hasSize(2));
-        assertThat(definition.getArgLogDefinitions().get(0).getIfEnabledLevel(), is(WARN));
-        assertThat(definition.getArgLogDefinitions().get(1), nullValue());
+        assertThat(inLog.getLevel(), is(DEBUG));
+        assertThat(inLog.getArgLogs(), hasSize(2));
+        assertThat(inLog.getArgLogs().get(0).getIfEnabledLevel(), is(WARN));
+        assertThat(inLog.getArgLogs().get(1), nullValue());
     }
 
     @SuppressWarnings("unused")
@@ -139,39 +139,39 @@ public class AnnotationDefinitionFactoryTest {
     }
 
     @Test
-    public void buildOutLogDefinition() throws NoSuchMethodException {
+    public void buildOutLog() throws NoSuchMethodException {
         // given
         Set<String> loggerNames = singleton("");
         Method method = LogOutLoggableClass.class.getMethod("logOut");
         // when
-        OutLogDefinition definition = annotationDefinitionFactory.buildOutLogDefinition(loggerNames, method);
+        OutLog outLog = annotationDefinitionFactory.buildOutLog(loggerNames, method);
         // then
-        assertThat(definition.getLevel(), is(INFO));
+        assertThat(outLog.getLevel(), is(INFO));
     }
 
     @Test
-    public void buildOutLogDefinitionByLog() throws NoSuchMethodException {
+    public void buildOutLogByLog() throws NoSuchMethodException {
         // given
         Set<String> loggerNames = singleton("");
         Method method = LogOutLoggableClass.class.getMethod("log");
         // when
-        OutLogDefinition definition = annotationDefinitionFactory.buildOutLogDefinition(loggerNames, method);
+        OutLog outLog = annotationDefinitionFactory.buildOutLog(loggerNames, method);
         // then
-        assertThat(definition.getLevel(), is(WARN));
-        assertThat(definition.getIfEnabledLevel(), is(ERROR));
-        assertThat(definition.getVerboseLevel(), is(TRACE));
-        assertThat(definition.getPrinter(), is(printerResolver.getDefaultPrinter()));
+        assertThat(outLog.getLevel(), is(WARN));
+        assertThat(outLog.getIfEnabledLevel(), is(ERROR));
+        assertThat(outLog.getVerboseLevel(), is(TRACE));
+        assertThat(outLog.getPrinter(), is(printerResolver.getDefaultPrinter()));
     }
 
     @Test
-    public void buildOutLogDefinitionEmpty() throws NoSuchMethodException {
+    public void buildOutLogEmpty() throws NoSuchMethodException {
         // given
         Set<String> loggerNames = singleton("");
         Method method = LogOutLoggableClass.class.getMethod("empty");
         // when
-        OutLogDefinition definition = annotationDefinitionFactory.buildOutLogDefinition(loggerNames, method);
+        OutLog outLog = annotationDefinitionFactory.buildOutLog(loggerNames, method);
         // then
-        assertThat(definition, nullValue());
+        assertThat(outLog, nullValue());
     }
 
     @SuppressWarnings("unused")
@@ -191,28 +191,28 @@ public class AnnotationDefinitionFactoryTest {
     }
 
     @Test
-    public void buildErrorLogDefinitions() throws NoSuchMethodException {
+    public void buildErrorLogs() throws NoSuchMethodException {
         // given
         Set<String> loggerNames = singleton("");
         Method method = LogErrorLoggableClass.class.getMethod("logError");
         // when
-        Set<ErrorLogDefinition> errorLogDefinitions = annotationDefinitionFactory.buildErrorLogDefinitions(loggerNames, method);
+        Set<ErrorLog> errorLogs = annotationDefinitionFactory.buildErrorLogs(loggerNames, method);
         // then
-        assertThat(errorLogDefinitions, hasSize(2));
-        Iterator<ErrorLogDefinition> iterator = errorLogDefinitions.iterator();
+        assertThat(errorLogs, hasSize(2));
+        Iterator<ErrorLog> iterator = errorLogs.iterator();
         assertThat(iterator.next().getLevel(), is(WARN));
         assertThat(iterator.next().getLevel(), is(INFO));
     }
 
     @Test
-    public void buildErrorLogDefinitionsEmpty() throws NoSuchMethodException {
+    public void buildErrorLogsEmpty() throws NoSuchMethodException {
         // given
         Set<String> loggerNames = singleton("");
         Method method = LogErrorLoggableClass.class.getMethod("empty");
         // when
-        Set<ErrorLogDefinition> errorLogDefinitions = annotationDefinitionFactory.buildErrorLogDefinitions(loggerNames, method);
+        Set<ErrorLog> errorLogs = annotationDefinitionFactory.buildErrorLogs(loggerNames, method);
         // then
-        assertThat(errorLogDefinitions, is(empty()));
+        assertThat(errorLogs, is(empty()));
     }
 
     @SuppressWarnings("unused")
@@ -231,13 +231,13 @@ public class AnnotationDefinitionFactoryTest {
      * TODO: implement
      */
     @Test
-    public void buildMdcPackDefinition() throws NoSuchMethodException {
+    public void buildMdcPack() throws NoSuchMethodException {
         // given
 //        Method method = MdcLoggableClass.class.getMethod("mdc", String.class, String.class);
         // when
-//        MdcPackDefinition definition = annotationDefinitionFactory.buildMdcPackDefinition(method);
+//        MdcPack mdcPack = annotationDefinitionFactory.buildMdcPack(method);
         // then
-//        assertThat(definition.getMethod());
+//        assertThat(mdcPack.getMethod());
     }
 
     private static class MdcLoggableClass {

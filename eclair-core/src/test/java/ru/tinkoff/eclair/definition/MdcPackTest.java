@@ -20,7 +20,7 @@ import static org.springframework.core.annotation.AnnotationUtils.synthesizeAnno
 /**
  * @author Viacheslav Klapatniuk
  */
-public class MdcPackDefinitionTest {
+public class MdcPackTest {
 
     @Test
     public void newInstance() throws NoSuchMethodException {
@@ -29,15 +29,15 @@ public class MdcPackDefinitionTest {
         Set<Mdc> methodMdcs = givenMethodMdcs();
         List<Set<Mdc>> argumentMdcs = givenArgumentMdcs();
         // when
-        MdcPackDefinition definition = MdcPackDefinition.newInstance(method, methodMdcs, argumentMdcs);
+        MdcPack mdcPack = MdcPack.newInstance(method, methodMdcs, argumentMdcs);
         // then
-        assertThat(definition.getMethod(), is(method));
-        thenMdcPackDefinition(definition.getMethodDefinitions());
-        thenArgumentDefinitions(definition.getArgumentDefinitions());
+        assertThat(mdcPack.getMethod(), is(method));
+        thenMethodDefinition(mdcPack.getMethodDefinitions());
+        thenParameterDefinitions(mdcPack.getParameterDefinitions());
     }
 
     private Method givenMethod() throws NoSuchMethodException {
-        return MdcPackDefinitionTest.class.getMethod("annotatedMethod", String.class, String.class);
+        return MdcPackTest.class.getMethod("annotatedMethod", String.class, String.class);
     }
 
     @SuppressWarnings("unused")
@@ -59,23 +59,23 @@ public class MdcPackDefinitionTest {
         return synthesizeAnnotation(attributes, Mdc.class, null);
     }
 
-    private void thenMdcPackDefinition(Set<MdcDefinition> methodDefinitions) {
-        assertThat(methodDefinitions, hasSize(1));
-        assertThat(methodDefinitions.iterator().next(), notNullValue());
+    private void thenMethodDefinition(Set<MdcDefinition> definitions) {
+        assertThat(definitions, hasSize(1));
+        assertThat(definitions.iterator().next(), notNullValue());
     }
 
-    private void thenArgumentDefinitions(List<Set<MdcDefinition>> argumentDefinitions) {
-        assertThat(argumentDefinitions, hasSize(2));
-        thenAArgumentDefinition(argumentDefinitions.get(0));
-        thenBArgumentDefinition(argumentDefinitions.get(1));
+    private void thenParameterDefinitions(List<Set<MdcDefinition>> definitions) {
+        assertThat(definitions, hasSize(2));
+        thenAParameterDefinition(definitions.get(0));
+        thenBParameterDefinition(definitions.get(1));
     }
 
-    private void thenAArgumentDefinition(Set<MdcDefinition> definitions) {
+    private void thenAParameterDefinition(Set<MdcDefinition> definitions) {
         assertThat(definitions, hasSize(1));
         assertThat(definitions.iterator().next().getKey(), is("a"));
     }
 
-    private void thenBArgumentDefinition(Set<MdcDefinition> definitions) {
+    private void thenBParameterDefinition(Set<MdcDefinition> definitions) {
         assertThat(definitions, hasSize(1));
         assertThat(definitions.iterator().next().getKey(), is("b"));
     }
@@ -87,32 +87,32 @@ public class MdcPackDefinitionTest {
         Set<Mdc> methodMdcs = emptySet();
         List<Set<Mdc>> argumentMdcs = asList(emptySet(), emptySet());
         // when
-        MdcPackDefinition definition = MdcPackDefinition.newInstance(method, methodMdcs, argumentMdcs);
+        MdcPack mdcPack = MdcPack.newInstance(method, methodMdcs, argumentMdcs);
         // then
-        assertThat(definition, nullValue());
+        assertThat(mdcPack, nullValue());
     }
 
     @Test(expected = UnsupportedOperationException.class)
-    public void newInstanceImmutableMethodMdcDefinitions() throws NoSuchMethodException {
+    public void newInstanceImmutableMethodDefinitions() throws NoSuchMethodException {
         // given
         Method method = givenMethod();
         Set<Mdc> methodMdcs = givenMethodMdcs();
         List<Set<Mdc>> argumentMdcs = givenArgumentMdcs();
         // when
-        MdcPackDefinition definition = MdcPackDefinition.newInstance(method, methodMdcs, argumentMdcs);
+        MdcPack mdcPack = MdcPack.newInstance(method, methodMdcs, argumentMdcs);
         // then
-        definition.getMethodDefinitions().add(new MdcDefinition(givenMdc("")));
+        mdcPack.getMethodDefinitions().add(new MdcDefinition(givenMdc("")));
     }
 
     @Test(expected = UnsupportedOperationException.class)
-    public void newInstanceImmutableArgumentMdcDefinitions() throws NoSuchMethodException {
+    public void newInstanceImmutableParameterDefinitions() throws NoSuchMethodException {
         // given
         Method method = givenMethod();
         Set<Mdc> methodMdcs = givenMethodMdcs();
         List<Set<Mdc>> argumentMdcs = givenArgumentMdcs();
         // when
-        MdcPackDefinition definition = MdcPackDefinition.newInstance(method, methodMdcs, argumentMdcs);
+        MdcPack mdcPack = MdcPack.newInstance(method, methodMdcs, argumentMdcs);
         // then
-        definition.getArgumentDefinitions().add(emptySet());
+        mdcPack.getParameterDefinitions().add(emptySet());
     }
 }

@@ -1,6 +1,6 @@
 package ru.tinkoff.eclair.validate;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -24,6 +24,7 @@ import static java.util.stream.Collectors.toSet;
  * @author Viacheslav Klapatniuk
  */
 @Component
+@RequiredArgsConstructor
 class BeanMethodValidator implements Validator {
 
     private final LogsValidator logsValidator;
@@ -34,21 +35,6 @@ class BeanMethodValidator implements Validator {
     private final MdcsValidator mdcsValidator;
 
     private final AnnotationExtractor annotationExtractor = AnnotationExtractor.getInstance();
-
-    @Autowired
-    BeanMethodValidator(LogsValidator logsValidator,
-                        LogInsValidator logInsValidator,
-                        LogOutsValidator logOutsValidator,
-                        LogErrorsValidator logErrorsValidator,
-                        LogArgsValidator logArgsValidator,
-                        MdcsValidator mdcsValidator) {
-        this.logsValidator = logsValidator;
-        this.logInsValidator = logInsValidator;
-        this.logOutsValidator = logOutsValidator;
-        this.logErrorsValidator = logErrorsValidator;
-        this.logArgsValidator = logArgsValidator;
-        this.mdcsValidator = mdcsValidator;
-    }
 
     @Override
     public boolean supports(Class<?> clazz) {

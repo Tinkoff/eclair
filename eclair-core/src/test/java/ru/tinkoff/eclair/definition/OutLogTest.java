@@ -2,8 +2,8 @@ package ru.tinkoff.eclair.definition;
 
 import org.junit.Test;
 import ru.tinkoff.eclair.annotation.Log;
-import ru.tinkoff.eclair.format.printer.Printer;
-import ru.tinkoff.eclair.format.printer.ToStringPrinter;
+import ru.tinkoff.eclair.printer.Printer;
+import ru.tinkoff.eclair.printer.ToStringPrinter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +18,7 @@ import static org.springframework.core.annotation.AnnotationUtils.synthesizeAnno
 /**
  * @author Viacheslav Klapatniuk
  */
-public class OutLogDefinitionTest {
+public class OutLogTest {
 
     @Test
     public void newInstance() {
@@ -26,12 +26,12 @@ public class OutLogDefinitionTest {
         Log.out logOut = givenLogOut();
         Printer printer = givenPrinter();
         // when
-        OutLogDefinition definition = new OutLogDefinition(logOut, printer);
+        OutLog outLog = new OutLog(logOut, printer);
         // then
-        assertThat(definition.getLevel(), is(WARN));
-        assertThat(definition.getIfEnabledLevel(), is(WARN));
-        assertThat(definition.getVerboseLevel(), is(TRACE));
-        assertThat(definition.getPrinter(), is(printer));
+        assertThat(outLog.getLevel(), is(WARN));
+        assertThat(outLog.getIfEnabledLevel(), is(WARN));
+        assertThat(outLog.getVerboseLevel(), is(TRACE));
+        assertThat(outLog.getPrinter(), is(printer));
     }
 
     private Log.out givenLogOut() {
@@ -52,9 +52,9 @@ public class OutLogDefinitionTest {
         Log.out logOut = givenLogOutByValue();
         Printer printer = givenPrinter();
         // when
-        OutLogDefinition definition = new OutLogDefinition(logOut, printer);
+        OutLog outLog = new OutLog(logOut, printer);
         // then
-        assertThat(definition.getLevel(), is(WARN));
+        assertThat(outLog.getLevel(), is(WARN));
     }
 
     private Log.out givenLogOutByValue() {

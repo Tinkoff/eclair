@@ -83,39 +83,39 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
     }
 
     @Override
-    protected void logIn(MethodInvocation invocation, LogDefinition definition) {
-        InLogDefinition inLogDefinition = definition.getInLogDefinition();
+    protected void logIn(MethodInvocation invocation, LogPack logPack) {
+        InLog inLog = logPack.getInLog();
         String loggerName = getLoggerName(invocation);
-        String message = IN + buildArgumentsClause(invocation, inLogDefinition, loggerName);
-        loggerFacadeFactory.getLoggerFacade(loggerName).log(inLogDefinition.getLevel(), message);
+        String message = IN + buildArgumentsClause(invocation, inLog, loggerName);
+        loggerFacadeFactory.getLoggerFacade(loggerName).log(inLog.getLevel(), message);
     }
 
     @Override
-    protected void logOut(MethodInvocation invocation, LogDefinition definition, Object result) {
-        OutLogDefinition outLogDefinition = definition.getOutLogDefinition();
+    protected void logOut(MethodInvocation invocation, LogPack logPack, Object result) {
+        OutLog outLog = logPack.getOutLog();
         String loggerName = getLoggerName(invocation);
-        String message = OUT + buildResultClause(invocation, outLogDefinition, result, loggerName);
-        loggerFacadeFactory.getLoggerFacade(loggerName).log(outLogDefinition.getLevel(), message);
+        String message = OUT + buildResultClause(invocation, outLog, result, loggerName);
+        loggerFacadeFactory.getLoggerFacade(loggerName).log(outLog.getLevel(), message);
     }
 
     @Override
-    public void logError(MethodInvocation invocation, LogDefinition definition, Throwable throwable) {
-        ErrorLogDefinition errorLogDefinition = definition.findErrorLogDefinition(throwable.getClass());
+    public void logError(MethodInvocation invocation, LogPack logPack, Throwable throwable) {
+        ErrorLog errorLog = logPack.findErrorLog(throwable.getClass());
         String loggerName = getLoggerName(invocation);
-        String message = ERROR + buildCauseClause(errorLogDefinition, throwable, loggerName);
-        loggerFacadeFactory.getLoggerFacade(loggerName).log(errorLogDefinition.getLevel(), message, throwable);
+        String message = ERROR + buildCauseClause(errorLog, throwable, loggerName);
+        loggerFacadeFactory.getLoggerFacade(loggerName).log(errorLog.getLevel(), message, throwable);
     }
 
     @Override
-    protected void logEmergencyOut(MethodInvocation invocation, LogDefinition definition, Throwable throwable) {
+    protected void logEmergencyOut(MethodInvocation invocation, LogPack logPack, Throwable throwable) {
         String loggerName = getLoggerName(invocation);
-        loggerFacadeFactory.getLoggerFacade(loggerName).log(definition.getOutLogDefinition().getLevel(), ERROR);
+        loggerFacadeFactory.getLoggerFacade(loggerName).log(logPack.getOutLog().getLevel(), ERROR);
     }
 
-    private String buildArgumentsClause(MethodInvocation invocation, InLogDefinition definition, String loggerName) {
+    private String buildArgumentsClause(MethodInvocation invocation, InLog inLog, String loggerName) {
         boolean verboseFound = false;
         StringBuilder builder = new StringBuilder();
-        List<ArgLogDefinition> argLogDefinitions = definition.getArgLogDefinitions();
+        List<ArgLog> argLogs = inLog.getArgLogs();
         Object[] arguments = invocation.getArguments();
         String[] parameterNames = null;
         if (printParameterName) {
@@ -123,8 +123,8 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
         }
         int length = arguments.length;
         for (int a = 0; a < length; a++) {
-            ArgLogDefinition argLogDefinition = argLogDefinitions.get(a);
-            if (nonNull(argLogDefinition) && isLevelEnabled(loggerName, argLogDefinition.getIfEnabledLevel())) {
+            ArgLog argLog = argLogs.get(a);
+            if (nonNull(argLog) && isLevelEnabled(loggerName, argLog.getIfEnabledLevel())) {
                 if (verboseFound) {
                     builder.append(", ");
                 } else {
@@ -137,20 +137,20 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
                 if (isNull(argument)) {
                     builder.append((String) null);
                 } else {
-                    builder.append(argLogDefinition.getPrinter().print(argument));
+                    builder.append(argLog.getPrinter().print(argument));
                 }
             }
         }
         if (!verboseFound && length == 0) {
-            verboseFound = isLevelEnabled(loggerName, definition.getVerboseLevel());
+            verboseFound = isLevelEnabled(loggerName, inLog.getVerboseLevel());
         }
         return verboseFound ? " " + builder : "";
     }
 
-    private String buildResultClause(MethodInvocation invocation, OutLogDefinition outLogDefinition, Object result, String loggerName) {
-        if (isLevelEnabled(loggerName, outLogDefinition.getVerboseLevel())) {
+    private String buildResultClause(MethodInvocation invocation, OutLog outLog, Object result, String loggerName) {
+        if (isLevelEnabled(loggerName, outLog.getVerboseLevel())) {
             if (nonNull(result)) {
-                return " " + outLogDefinition.getPrinter().print(result);
+                return " " + outLog.getPrinter().print(result);
             }
             Class<?> returnType = invocation.getMethod().getReturnType();
             if (returnType != void.class && returnType != Void.class) {
@@ -160,8 +160,8 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
         return "";
     }
 
-    private String buildCauseClause(ErrorLogDefinition definition, Throwable throwable, String loggerName) {
-        if (isLevelEnabled(loggerName, definition.getVerboseLevel())) {
+    private String buildCauseClause(ErrorLog errorLog, Throwable throwable, String loggerName) {
+        if (isLevelEnabled(loggerName, errorLog.getVerboseLevel())) {
             return " " + throwable.toString();
         }
         return "";

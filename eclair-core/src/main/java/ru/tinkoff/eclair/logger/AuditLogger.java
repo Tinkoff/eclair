@@ -2,7 +2,7 @@ package ru.tinkoff.eclair.logger;
 
 import org.aopalliance.intercept.MethodInvocation;
 import ru.tinkoff.eclair.core.LoggerNameBuilder;
-import ru.tinkoff.eclair.definition.LogDefinition;
+import ru.tinkoff.eclair.definition.LogPack;
 
 import static java.util.Arrays.asList;
 
@@ -21,22 +21,22 @@ public class AuditLogger extends EclairLogger {
     }
 
     @Override
-    protected void logIn(MethodInvocation invocation, LogDefinition definition) {
+    protected void logIn(MethodInvocation invocation, LogPack logPack) {
         System.out.println(getLoggerName(invocation) + " " + asList(invocation.getArguments()));
     }
 
     @Override
-    protected void logOut(MethodInvocation invocation, LogDefinition definition, Object result) {
+    protected void logOut(MethodInvocation invocation, LogPack logPack, Object result) {
         System.out.println(getLoggerName(invocation) + " " + result);
     }
 
     @Override
-    protected void logError(MethodInvocation invocation, LogDefinition definition, Throwable throwable) {
+    protected void logError(MethodInvocation invocation, LogPack logPack, Throwable throwable) {
         System.out.println(getLoggerName(invocation) + " " + throwable);
     }
 
     @Override
-    protected void logEmergencyOut(MethodInvocation invocation, LogDefinition definition, Throwable throwable) {
-        logError(invocation, definition, throwable);
+    protected void logEmergencyOut(MethodInvocation invocation, LogPack logPack, Throwable throwable) {
+        logError(invocation, logPack, throwable);
     }
 }

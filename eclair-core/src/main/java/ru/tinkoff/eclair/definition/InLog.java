@@ -14,25 +14,25 @@ import static java.util.Objects.isNull;
  * @author Viacheslav Klapatniuk
  */
 @Getter
-public class InLogDefinition implements EventLogDefinition {
+public class InLog implements LogDefinition {
 
     private final LogLevel level;
     private final LogLevel ifEnabledLevel;
     private final LogLevel verboseLevel;
-    private final List<ArgLogDefinition> argLogDefinitions;
+    private final List<ArgLog> argLogs;
 
-    private InLogDefinition(Log.in logIn, List<ArgLogDefinition> argLogDefinitions) {
+    private InLog(Log.in logIn, List<ArgLog> argLogs) {
         this.level = AnnotationAttribute.LEVEL.extract(logIn);
         this.ifEnabledLevel = logIn.ifEnabled();
         this.verboseLevel = logIn.verbose();
-        this.argLogDefinitions = unmodifiableList(argLogDefinitions);
+        this.argLogs = unmodifiableList(argLogs);
     }
 
     /**
      * @param logIn may be {@code null}
-     * @return Instantiated {@link InLogDefinition} or {@code null}
+     * @return Instantiated {@link InLog} or {@code null}
      */
-    public static InLogDefinition newInstance(Log.in logIn, List<ArgLogDefinition> argLogDefinitions) {
-        return isNull(logIn) ? null : new InLogDefinition(logIn, argLogDefinitions);
+    public static InLog newInstance(Log.in logIn, List<ArgLog> argLogs) {
+        return isNull(logIn) ? null : new InLog(logIn, argLogs);
     }
 }

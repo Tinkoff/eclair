@@ -10,13 +10,13 @@ import static org.springframework.core.annotation.AnnotationUtils.synthesizeAnno
 /**
  * @author Viacheslav Klapatniuk
  */
-public class ErrorLogDefinitionFactory {
+public class ErrorLogFactory {
 
-    public static ErrorLogDefinition newInstance(Class<?>[] includes, Class<?>[] excludes) {
+    public static ErrorLog newInstance(Class<?>[] includes, Class<?>[] excludes) {
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("ofType", includes);
         attributes.put("exclude", excludes);
         Log.error logError = synthesizeAnnotation(attributes, Log.error.class, null);
-        return new ErrorLogDefinition(logError);
+        return new ErrorLog(logError);
     }
 }

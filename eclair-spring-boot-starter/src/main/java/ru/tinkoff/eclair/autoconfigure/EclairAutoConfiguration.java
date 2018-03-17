@@ -13,13 +13,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.annotation.Order;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
-import ru.tinkoff.eclair.aop.LogProxyCreator;
-import ru.tinkoff.eclair.format.printer.*;
+import ru.tinkoff.eclair.aop.EclairProxyCreator;
 import ru.tinkoff.eclair.logger.EclairLogger;
 import ru.tinkoff.eclair.logger.SimpleLogger;
 import ru.tinkoff.eclair.logger.facade.JavaLoggerFacadeFactory;
 import ru.tinkoff.eclair.logger.facade.LoggerFacadeFactory;
 import ru.tinkoff.eclair.logger.facade.Slf4JLoggerFacadeFactory;
+import ru.tinkoff.eclair.printer.*;
 import ru.tinkoff.eclair.validate.BeanClassValidator;
 
 import java.util.List;
@@ -86,13 +86,13 @@ public class EclairAutoConfiguration {
     }
 
     @Bean
-    public LogProxyCreator logProxyCreator(List<Printer> printerList,
-                                           Map<String, EclairLogger> loggers,
-                                           GenericApplicationContext genericApplicationContext,
-                                           BeanClassValidator beanClassValidator,
-                                           EclairProperties eclairProperties) {
-        LogProxyCreator logProxyCreator = new LogProxyCreator(printerList, loggers, genericApplicationContext, beanClassValidator);
-        logProxyCreator.setValidate(eclairProperties.isValidate());
-        return logProxyCreator;
+    public EclairProxyCreator eclairProxyCreator(List<Printer> printerList,
+                                                 Map<String, EclairLogger> loggers,
+                                                 GenericApplicationContext genericApplicationContext,
+                                                 BeanClassValidator beanClassValidator,
+                                                 EclairProperties eclairProperties) {
+        EclairProxyCreator eclairProxyCreator = new EclairProxyCreator(printerList, loggers, genericApplicationContext, beanClassValidator);
+        eclairProxyCreator.setValidate(eclairProperties.isValidate());
+        return eclairProxyCreator;
     }
 }

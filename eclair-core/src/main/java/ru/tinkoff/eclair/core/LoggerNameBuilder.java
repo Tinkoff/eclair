@@ -20,8 +20,8 @@ public final class LoggerNameBuilder {
         return instance;
     }
 
-    public String build(MethodInvocation methodInvocation) {
-        Method method = methodInvocation.getMethod();
+    public String build(MethodInvocation invocation) {
+        Method method = invocation.getMethod();
         return build(method.getDeclaringClass().getName(), method.getName());
     }
 
@@ -31,34 +31,38 @@ public final class LoggerNameBuilder {
     }
 
     private StackTraceElement resolveLoggerInvoker() {
-        try {
-            StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-            int length = stackTrace.length;
-            String previousName = "";
-            for (int a = MIN_CURRENT_DEPTH; a < length; a++) {
-                String className = stackTrace[a].getClassName();
-                if (className.equals(previousName)) {
-                    continue;
-                }
-                previousName = className;
-                if (ManualLogger.class.isAssignableFrom(Class.forName(className))) {
-                    for (int b = a + 1; b < length; b++) {
-                        className = stackTrace[b].getClassName();
-                        if (className.equals(previousName)) {
-                            continue;
-                        }
-                        if (!ManualLogger.class.isAssignableFrom(Class.forName(className))) {
-                            return stackTrace[b];
-                        }
-                        previousName = className;
-                    }
-                    break;
-                }
+        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+        int length = stackTrace.length;
+        String previousName = "";
+        for (int a = MIN_CURRENT_DEPTH; a < length; a++) {
+            String className = stackTrace[a].getClassName();
+            if (className.equals(previousName)) {
+                continue;
             }
+            previousName = className;
+            if (ManualLogger.class.isAssignableFrom(forName(className))) {
+                for (int b = a + 1; b < length; b++) {
+                    className = stackTrace[b].getClassName();
+                    if (className.equals(previousName)) {
+                        continue;
+                    }
+                    if (!ManualLogger.class.isAssignableFrom(forName(className))) {
+                        return stackTrace[b];
+                    }
+                    previousName = className;
+                }
+                break;
+            }
+        }
+        throw new IllegalArgumentException("Invalid stacktrace");
+    }
+
+    private Class<?> forName(String className) {
+        try {
+            return Class.forName(className);
         } catch (ClassNotFoundException e) {
             throw new IllegalArgumentException(e);
         }
-        throw new IllegalArgumentException("Invalid stacktrace");
     }
 
     private String build(String className, String methodName) {

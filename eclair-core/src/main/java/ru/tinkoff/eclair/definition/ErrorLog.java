@@ -11,7 +11,7 @@ import java.util.Set;
 /**
  * @author Viacheslav Klapatniuk
  */
-public class ErrorLogDefinition implements EventLogDefinition {
+public class ErrorLog implements LogDefinition {
 
     @Getter
     private final LogLevel level;
@@ -21,7 +21,7 @@ public class ErrorLogDefinition implements EventLogDefinition {
     private final LogLevel verboseLevel;
     private final ErrorFilter errorFilter;
 
-    public ErrorLogDefinition(Log.error logError) {
+    public ErrorLog(Log.error logError) {
         this.level = AnnotationAttribute.LEVEL.extract(logError);
         this.ifEnabledLevel = logError.ifEnabled();
         this.verboseLevel = logError.verbose();

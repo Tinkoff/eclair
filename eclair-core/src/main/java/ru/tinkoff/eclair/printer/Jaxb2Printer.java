@@ -1,4 +1,4 @@
-package ru.tinkoff.eclair.format.printer;
+package ru.tinkoff.eclair.printer;
 
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 

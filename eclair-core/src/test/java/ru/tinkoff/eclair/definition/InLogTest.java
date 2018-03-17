@@ -2,7 +2,7 @@ package ru.tinkoff.eclair.definition;
 
 import org.junit.Test;
 import ru.tinkoff.eclair.annotation.Log;
-import ru.tinkoff.eclair.format.printer.ToStringPrinter;
+import ru.tinkoff.eclair.printer.ToStringPrinter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,22 +21,22 @@ import static org.springframework.core.annotation.AnnotationUtils.synthesizeAnno
 /**
  * @author Viacheslav Klapatniuk
  */
-public class InLogDefinitionTest {
+public class InLogTest {
 
     @Test
     public void newInstance() {
         // given
         Log.in logIn = givenLogIn();
-        ArgLogDefinition argLogDefinition = givenArgLogDefinition();
-        List<ArgLogDefinition> argLogDefinitions = singletonList(argLogDefinition);
+        ArgLog argLog = givenArgLog();
+        List<ArgLog> argLogs = singletonList(argLog);
         // when
-        InLogDefinition definition = InLogDefinition.newInstance(logIn, argLogDefinitions);
+        InLog inLog = InLog.newInstance(logIn, argLogs);
         // then
-        assertThat(definition.getLevel(), is(WARN));
-        assertThat(definition.getIfEnabledLevel(), is(WARN));
-        assertThat(definition.getVerboseLevel(), is(TRACE));
-        assertThat(definition.getArgLogDefinitions(), hasSize(1));
-        assertThat(definition.getArgLogDefinitions().get(0), is(argLogDefinition));
+        assertThat(inLog.getLevel(), is(WARN));
+        assertThat(inLog.getIfEnabledLevel(), is(WARN));
+        assertThat(inLog.getVerboseLevel(), is(TRACE));
+        assertThat(inLog.getArgLogs(), hasSize(1));
+        assertThat(inLog.getArgLogs().get(0), is(argLog));
     }
 
     private Log.in givenLogIn() {
@@ -48,19 +48,19 @@ public class InLogDefinitionTest {
         return synthesizeAnnotation(attributes, Log.in.class, null);
     }
 
-    private ArgLogDefinition givenArgLogDefinition() {
-        return new ArgLogDefinition(synthesizeAnnotation(Log.arg.class), new ToStringPrinter());
+    private ArgLog givenArgLog() {
+        return new ArgLog(synthesizeAnnotation(Log.arg.class), new ToStringPrinter());
     }
 
     @Test
     public void newInstanceByValue() {
         // given
         Log.in logIn = givenLogInByValue();
-        List<ArgLogDefinition> argLogDefinitions = singletonList(givenArgLogDefinition());
+        List<ArgLog> argLogs = singletonList(givenArgLog());
         // when
-        InLogDefinition definition = InLogDefinition.newInstance(logIn, argLogDefinitions);
+        InLog inLog = InLog.newInstance(logIn, argLogs);
         // then
-        assertThat(definition.getLevel(), is(WARN));
+        assertThat(inLog.getLevel(), is(WARN));
     }
 
     private Log.in givenLogInByValue() {
@@ -71,21 +71,21 @@ public class InLogDefinitionTest {
     public void newInstanceNull() {
         // given
         Log.in logIn = null;
-        List<ArgLogDefinition> argLogDefinitions = emptyList();
+        List<ArgLog> argLogs = emptyList();
         // when
-        InLogDefinition definition = InLogDefinition.newInstance(logIn, argLogDefinitions);
+        InLog inLog = InLog.newInstance(logIn, argLogs);
         // then
-        assertThat(definition, nullValue());
+        assertThat(inLog, nullValue());
     }
 
     @Test(expected = UnsupportedOperationException.class)
     public void newInstanceImmutable() {
         // given
         Log.in logIn = givenLogIn();
-        List<ArgLogDefinition> argLogDefinitions = new ArrayList<>();
+        List<ArgLog> argLogs = new ArrayList<>();
         // when
-        InLogDefinition definition = InLogDefinition.newInstance(logIn, argLogDefinitions);
+        InLog inLog = InLog.newInstance(logIn, argLogs);
         // then
-        definition.getArgLogDefinitions().add(givenArgLogDefinition());
+        inLog.getArgLogs().add(givenArgLog());
     }
 }

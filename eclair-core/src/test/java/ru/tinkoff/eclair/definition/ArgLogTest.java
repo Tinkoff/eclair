@@ -2,8 +2,8 @@ package ru.tinkoff.eclair.definition;
 
 import org.junit.Test;
 import ru.tinkoff.eclair.annotation.Log;
-import ru.tinkoff.eclair.format.printer.Printer;
-import ru.tinkoff.eclair.format.printer.ToStringPrinter;
+import ru.tinkoff.eclair.printer.Printer;
+import ru.tinkoff.eclair.printer.ToStringPrinter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +18,7 @@ import static org.springframework.core.annotation.AnnotationUtils.synthesizeAnno
 /**
  * @author Viacheslav Klapatniuk
  */
-public class ArgLogDefinitionTest {
+public class ArgLogTest {
 
     @Test
     public void newInstance() {
@@ -26,10 +26,10 @@ public class ArgLogDefinitionTest {
         Log.arg logArg = givenLogArg();
         Printer printer = givenPrinter();
         // when
-        ArgLogDefinition definition = new ArgLogDefinition(logArg, printer);
+        ArgLog argLog = new ArgLog(logArg, printer);
         // then
-        assertThat(definition.getIfEnabledLevel(), is(WARN));
-        assertThat(definition.getPrinter(), is(printer));
+        assertThat(argLog.getIfEnabledLevel(), is(WARN));
+        assertThat(argLog.getPrinter(), is(printer));
     }
 
     private Log.arg givenLogArg() {
@@ -49,9 +49,9 @@ public class ArgLogDefinitionTest {
         Log.arg logArg = givenLogArgByValue();
         Printer printer = givenPrinter();
         // when
-        ArgLogDefinition definition = new ArgLogDefinition(logArg, printer);
+        ArgLog argLog = new ArgLog(logArg, printer);
         // then
-        assertThat(definition.getIfEnabledLevel(), is(WARN));
+        assertThat(argLog.getIfEnabledLevel(), is(WARN));
     }
 
     private Log.arg givenLogArgByValue() {
@@ -64,8 +64,8 @@ public class ArgLogDefinitionTest {
         Log.arg logArg = null;
         Printer printer = givenPrinter();
         // when
-        ArgLogDefinition definition = new ArgLogDefinition(logArg, printer);
+        ArgLog argLog = new ArgLog(logArg, printer);
         // then
-        assertThat(definition, nullValue());
+        assertThat(argLog, nullValue());
     }
 }

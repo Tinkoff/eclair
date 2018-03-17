@@ -1,4 +1,4 @@
-package ru.tinkoff.eclair.format.printer;
+package ru.tinkoff.eclair.printer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

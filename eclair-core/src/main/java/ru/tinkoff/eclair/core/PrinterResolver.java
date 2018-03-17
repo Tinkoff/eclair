@@ -2,8 +2,8 @@ package ru.tinkoff.eclair.core;
 
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.ListableBeanFactory;
-import ru.tinkoff.eclair.format.printer.Printer;
-import ru.tinkoff.eclair.format.printer.ToStringPrinter;
+import ru.tinkoff.eclair.printer.Printer;
+import ru.tinkoff.eclair.printer.ToStringPrinter;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;

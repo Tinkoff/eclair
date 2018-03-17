@@ -3,7 +3,7 @@ package ru.tinkoff.eclair.core;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.annotation.Mdc;
 import ru.tinkoff.eclair.definition.*;
-import ru.tinkoff.eclair.format.printer.Printer;
+import ru.tinkoff.eclair.printer.Printer;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -29,31 +29,31 @@ public final class AnnotationDefinitionFactory {
         this.printerResolver = printerResolver;
     }
 
-    public InLogDefinition buildInLogDefinition(Set<String> loggerNames, Method method) {
+    public InLog buildInLog(Set<String> loggerNames, Method method) {
         Log.in logIn = annotationExtractor.findLogIn(method, loggerNames);
         List<Log.arg> logArgs = annotationExtractor.findLogArgs(method, loggerNames);
         if (nonNull(logIn)) {
-            return InLogDefinition.newInstance(logIn, buildArgLogDefinitions(logArgs, method, logIn));
+            return InLog.newInstance(logIn, buildArgLogs(logArgs, method, logIn));
         }
         Log log = annotationExtractor.findLog(method, loggerNames);
         if (nonNull(log)) {
             logIn = annotationExtractor.synthesizeLogIn(log);
-            return InLogDefinition.newInstance(logIn, buildArgLogDefinitions(logArgs, method, logIn));
+            return InLog.newInstance(logIn, buildArgLogs(logArgs, method, logIn));
         }
         if (logArgs.isEmpty() || logArgs.stream().noneMatch(Objects::nonNull)) {
             return null;
         }
-        return InLogDefinition.newInstance(DEFAULT_LOG_IN, buildArgLogDefinitions(logArgs, method, null));
+        return InLog.newInstance(DEFAULT_LOG_IN, buildArgLogs(logArgs, method, null));
     }
 
-    private List<ArgLogDefinition> buildArgLogDefinitions(List<Log.arg> logArgs, Method method, Log.in logIn) {
+    private List<ArgLog> buildArgLogs(List<Log.arg> logArgs, Method method, Log.in logIn) {
         Iterator<Log.arg> logArgIterator = logArgs.iterator();
         return Stream.of(method.getParameterTypes())
-                .map(clazz -> buildArgLogDefinition(logArgIterator.next(), clazz, logIn))
+                .map(clazz -> buildArgLog(logArgIterator.next(), clazz, logIn))
                 .collect(toList());
     }
 
-    private ArgLogDefinition buildArgLogDefinition(Log.arg logArg, Class<?> parameterType, Log.in logIn) {
+    private ArgLog buildArgLog(Log.arg logArg, Class<?> parameterType, Log.in logIn) {
         if (isNull(logArg)) {
             if (isNull(logIn)) {
                 return null;
@@ -61,32 +61,32 @@ public final class AnnotationDefinitionFactory {
             logArg = annotationExtractor.synthesizeLogArg(logIn);
         }
         Printer printer = printerResolver.resolve(logArg.printer(), parameterType);
-        return new ArgLogDefinition(logArg, printer);
+        return new ArgLog(logArg, printer);
     }
 
-    public OutLogDefinition buildOutLogDefinition(Set<String> loggerNames, Method method) {
+    public OutLog buildOutLog(Set<String> loggerNames, Method method) {
         Log.out logOut = annotationExtractor.findLogOut(method, loggerNames);
         if (nonNull(logOut)) {
             Printer printer = printerResolver.resolve(logOut.printer(), method.getReturnType());
-            return new OutLogDefinition(logOut, printer);
+            return new OutLog(logOut, printer);
         }
         Log log = annotationExtractor.findLog(method, loggerNames);
         if (nonNull(log)) {
             Log.out syntheticLogOut = annotationExtractor.synthesizeLogOut(log);
-            return new OutLogDefinition(syntheticLogOut, printerResolver.getDefaultPrinter());
+            return new OutLog(syntheticLogOut, printerResolver.getDefaultPrinter());
         }
         return null;
     }
 
-    public Set<ErrorLogDefinition> buildErrorLogDefinitions(Set<String> loggerNames, Method method) {
+    public Set<ErrorLog> buildErrorLogs(Set<String> loggerNames, Method method) {
         return annotationExtractor.findLogErrors(method, loggerNames).stream()
-                .map(ErrorLogDefinition::new)
+                .map(ErrorLog::new)
                 .collect(toCollection(LinkedHashSet::new));
     }
 
-    public MdcPackDefinition buildMdcPackDefinition(Method method) {
-        Set<Mdc> methodMdcAnnotations = annotationExtractor.getMdcs(method);
-        List<Set<Mdc>> argumentsMdcAnnotations = annotationExtractor.getParametersMdcs(method);
-        return MdcPackDefinition.newInstance(method, methodMdcAnnotations, argumentsMdcAnnotations);
+    public MdcPack buildMdcPack(Method method) {
+        Set<Mdc> methodMdcs = annotationExtractor.getMdcs(method);
+        List<Set<Mdc>> parametersMdcs = annotationExtractor.getParametersMdcs(method);
+        return MdcPack.newInstance(method, methodMdcs, parametersMdcs);
     }
 }

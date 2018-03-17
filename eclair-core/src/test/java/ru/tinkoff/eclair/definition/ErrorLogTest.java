@@ -19,21 +19,21 @@ import static org.springframework.core.annotation.AnnotationUtils.synthesizeAnno
  *
  * @author Viacheslav Klapatniuk
  */
-public class ErrorLogDefinitionTest {
+public class ErrorLogTest {
 
     @Test
     public void newInstance() {
         // given
         Log.error logError = givenLogError();
         // when
-        ErrorLogDefinition definition = new ErrorLogDefinition(logError);
+        ErrorLog errorLog = new ErrorLog(logError);
         // then
-        assertThat(definition.getLevel(), is(WARN));
-        assertThat(definition.getIfEnabledLevel(), is(WARN));
-        assertThat(definition.getIncludes(), hasSize(1));
-        assertThat(definition.getIncludes(), Matchers.<Class<?>>contains(RuntimeException.class));
-        assertThat(definition.getExcludes(), hasSize(1));
-        assertThat(definition.getExcludes(), Matchers.<Class<?>>contains(NullPointerException.class));
+        assertThat(errorLog.getLevel(), is(WARN));
+        assertThat(errorLog.getIfEnabledLevel(), is(WARN));
+        assertThat(errorLog.getIncludes(), hasSize(1));
+        assertThat(errorLog.getIncludes(), Matchers.<Class<?>>contains(RuntimeException.class));
+        assertThat(errorLog.getExcludes(), hasSize(1));
+        assertThat(errorLog.getExcludes(), Matchers.<Class<?>>contains(NullPointerException.class));
     }
 
     private Log.error givenLogError() {
@@ -50,9 +50,9 @@ public class ErrorLogDefinitionTest {
         // given
         Log.error logError = givenLogErrorByValue();
         // when
-        ErrorLogDefinition definition = new ErrorLogDefinition(logError);
+        ErrorLog errorLog = new ErrorLog(logError);
         // then
-        assertThat(definition.getLevel(), is(WARN));
+        assertThat(errorLog.getLevel(), is(WARN));
     }
 
     private Log.error givenLogErrorByValue() {
