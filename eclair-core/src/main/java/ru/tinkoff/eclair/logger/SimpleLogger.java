@@ -7,10 +7,7 @@ import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 import ru.tinkoff.eclair.core.LoggerNameBuilder;
-import ru.tinkoff.eclair.definition.ArgLogDefinition;
-import ru.tinkoff.eclair.definition.ErrorLogDefinition;
-import ru.tinkoff.eclair.definition.InLogDefinition;
-import ru.tinkoff.eclair.definition.OutLogDefinition;
+import ru.tinkoff.eclair.definition.*;
 import ru.tinkoff.eclair.logger.facade.LoggerFacadeFactory;
 
 import java.util.List;
@@ -24,7 +21,7 @@ import static org.springframework.boot.logging.LogLevel.OFF;
 /**
  * @author Viacheslav Klapatniuk
  */
-public class SimpleLogger extends EclairLogger implements ManualLogger {
+public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
 
     private static final String IN = ">";
     private static final String OUT = "<";
@@ -87,9 +84,11 @@ public class SimpleLogger extends EclairLogger implements ManualLogger {
     }
 
     @Override
-    protected void logIn(MethodInvocation invocation, InLogDefinition definition, String loggerName) {
-        String message = buildInMessage(invocation, definition, loggerName);
-        loggerFacadeFactory.getLoggerFacade(loggerName).log(definition.getLevel(), message);
+    protected void logIn(MethodInvocation invocation, LogDefinition definition) {
+        InLogDefinition inLogDefinition = definition.getInLogDefinition();
+        String loggerName = getLoggerName(invocation);
+        String message = buildInMessage(invocation, inLogDefinition, loggerName);
+        loggerFacadeFactory.getLoggerFacade(loggerName).log(inLogDefinition.getLevel(), message);
     }
 
     private String buildInMessage(MethodInvocation invocation, InLogDefinition definition, String loggerName) {
@@ -132,9 +131,11 @@ public class SimpleLogger extends EclairLogger implements ManualLogger {
     }
 
     @Override
-    protected void logOut(MethodInvocation invocation, OutLogDefinition definition, Object result, String loggerName) {
-        String message = buildOutMessage(invocation, result, definition, loggerName);
-        loggerFacadeFactory.getLoggerFacade(loggerName).log(definition.getLevel(), message);
+    protected void logOut(MethodInvocation invocation, LogDefinition definition, Object result) {
+        OutLogDefinition outLogDefinition = definition.getOutLogDefinition();
+        String loggerName = getLoggerName(invocation);
+        String message = buildOutMessage(invocation, result, outLogDefinition, loggerName);
+        loggerFacadeFactory.getLoggerFacade(loggerName).log(outLogDefinition.getLevel(), message);
     }
 
     private String buildOutMessage(MethodInvocation invocation, Object result, OutLogDefinition definition, String loggerName) {
@@ -155,9 +156,11 @@ public class SimpleLogger extends EclairLogger implements ManualLogger {
     }
 
     @Override
-    public void logError(MethodInvocation invocation, ErrorLogDefinition definition, Throwable throwable, String loggerName) {
-        String message = buildErrorMessage(throwable, definition, loggerName);
-        loggerFacadeFactory.getLoggerFacade(loggerName).log(definition.getLevel(), message, throwable);
+    public void logError(MethodInvocation invocation, LogDefinition definition, Throwable throwable) {
+        ErrorLogDefinition errorLogDefinition = definition.findErrorLogDefinition(throwable.getClass());
+        String loggerName = getLoggerName(invocation);
+        String message = buildErrorMessage(throwable, errorLogDefinition, loggerName);
+        loggerFacadeFactory.getLoggerFacade(loggerName).log(errorLogDefinition.getLevel(), message, throwable);
     }
 
     private String buildErrorMessage(Throwable throwable, ErrorLogDefinition definition, String loggerName) {
@@ -168,7 +171,8 @@ public class SimpleLogger extends EclairLogger implements ManualLogger {
     }
 
     @Override
-    protected void logEmergencyOut(MethodInvocation invocation, OutLogDefinition definition, Throwable throwable, String loggerName) {
-        loggerFacadeFactory.getLoggerFacade(loggerName).log(definition.getLevel(), ERROR);
+    protected void logEmergencyOut(MethodInvocation invocation, LogDefinition definition, Throwable throwable) {
+        String loggerName = getLoggerName(invocation);
+        loggerFacadeFactory.getLoggerFacade(loggerName).log(definition.getOutLogDefinition().getLevel(), ERROR);
     }
 }
