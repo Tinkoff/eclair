@@ -13,7 +13,9 @@ import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.*;
-import static org.springframework.core.annotation.AnnotationUtils.*;
+import static org.springframework.core.annotation.AnnotatedElementUtils.findMergedRepeatableAnnotations;
+import static org.springframework.core.annotation.AnnotationUtils.getAnnotationAttributes;
+import static org.springframework.core.annotation.AnnotationUtils.synthesizeAnnotation;
 import static ru.tinkoff.eclair.core.AnnotationAttribute.LOGGER;
 
 /**
@@ -58,43 +60,43 @@ public final class AnnotationExtractor {
 
     public boolean hasAnyAnnotation(Method method) {
         return METHOD_TARGET_ANNOTATION_CLASSES.stream()
-                .anyMatch(annotationClass -> !getRepeatableAnnotations(method, annotationClass).isEmpty());
+                .anyMatch(annotationClass -> !findMergedRepeatableAnnotations(method, annotationClass).isEmpty());
     }
 
     public boolean hasAnyAnnotation(Parameter parameter) {
         return PARAMETER_TARGET_ANNOTATION_CLASSES.stream()
-                .anyMatch(annotationClass -> !getRepeatableAnnotations(parameter, annotationClass).isEmpty());
+                .anyMatch(annotationClass -> !findMergedRepeatableAnnotations(parameter, annotationClass).isEmpty());
     }
 
     public Set<Log> getLogs(Method method) {
-        return getRepeatableAnnotations(method, Log.class);
+        return findMergedRepeatableAnnotations(method, Log.class);
     }
 
     public Set<Log.in> getLogIns(Method method) {
-        return getRepeatableAnnotations(method, Log.in.class);
+        return findMergedRepeatableAnnotations(method, Log.in.class);
     }
 
     public Set<Log.out> getLogOuts(Method method) {
-        return getRepeatableAnnotations(method, Log.out.class);
+        return findMergedRepeatableAnnotations(method, Log.out.class);
     }
 
     public Set<Log.error> getLogErrors(Method method) {
-        return getRepeatableAnnotations(method, Log.error.class);
+        return findMergedRepeatableAnnotations(method, Log.error.class);
     }
 
     public Set<Mdc> getMdcs(Method method) {
-        return getRepeatableAnnotations(method, Mdc.class);
+        return findMergedRepeatableAnnotations(method, Mdc.class);
     }
 
     public List<Set<Log.arg>> getLogArgs(Method method) {
         return Stream.of(method.getParameters())
-                .map(parameter -> getRepeatableAnnotations(parameter, Log.arg.class))
+                .map(parameter -> findMergedRepeatableAnnotations(parameter, Log.arg.class))
                 .collect(toList());
     }
 
     public List<Set<Mdc>> getParametersMdcs(Method method) {
         return Stream.of(method.getParameters())
-                .map(parameter -> getRepeatableAnnotations(parameter, Mdc.class))
+                .map(parameter -> findMergedRepeatableAnnotations(parameter, Mdc.class))
                 .collect(toList());
     }
 
@@ -147,6 +149,7 @@ public final class AnnotationExtractor {
 
     Log.arg synthesizeLogArg(Log.in logIn) {
         Map<String, Object> attributes = getAnnotationAttributes(logIn);
+        attributes.put("value", logIn.verbose());
         attributes.put("ifEnabled", logIn.verbose());
         return synthesizeAnnotation(attributes, Log.arg.class, null);
     }

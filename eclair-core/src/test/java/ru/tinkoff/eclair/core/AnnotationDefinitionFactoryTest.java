@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import ru.tinkoff.eclair.annotation.Log;
+import ru.tinkoff.eclair.annotation.Logs;
 import ru.tinkoff.eclair.annotation.Mdc;
 import ru.tinkoff.eclair.definition.ErrorLog;
 import ru.tinkoff.eclair.definition.InLog;
@@ -15,7 +16,10 @@ import ru.tinkoff.eclair.printer.Jaxb2Printer;
 import ru.tinkoff.eclair.printer.Printer;
 
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
@@ -34,7 +38,6 @@ public class AnnotationDefinitionFactoryTest {
     private final Printer xmlPrinter = new Jaxb2Printer(new Jaxb2Marshaller());
     private final Printer jsonPrinter = new JacksonPrinter(new ObjectMapper());
 
-    private PrinterResolver printerResolver;
     private AnnotationDefinitionFactory annotationDefinitionFactory;
 
     @Before
@@ -42,7 +45,7 @@ public class AnnotationDefinitionFactoryTest {
         Map<String, Object> printers = new LinkedHashMap<>();
         printers.put("xml", xmlPrinter);
         printers.put("json", jsonPrinter);
-        printerResolver = new PrinterResolver(new StaticListableBeanFactory(printers), asList(xmlPrinter, jsonPrinter));
+        PrinterResolver printerResolver = new PrinterResolver(new StaticListableBeanFactory(printers), asList(xmlPrinter, jsonPrinter));
         annotationDefinitionFactory = new AnnotationDefinitionFactory(printerResolver);
     }
 
@@ -91,6 +94,17 @@ public class AnnotationDefinitionFactoryTest {
     }
 
     @Test
+    public void buildInLogByLogWithAlias() throws NoSuchMethodException {
+        // given
+        Set<String> loggerNames = singleton("");
+        Method method = LogInLoggableClass.class.getMethod("logWithAlias", String.class, String.class);
+        // when
+        InLog inLog = annotationDefinitionFactory.buildInLog(loggerNames, method);
+        // then
+        assertThat(inLog.getLevel(), is(WARN));
+    }
+
+    @Test
     public void buildInLogEmpty() throws NoSuchMethodException {
         // given
         Set<String> loggerNames = singleton("");
@@ -115,6 +129,28 @@ public class AnnotationDefinitionFactoryTest {
         assertThat(inLog.getArgLogs().get(1), nullValue());
     }
 
+    @Test
+    public void buildInLogByLogIns() throws NoSuchMethodException {
+        // given
+        Set<String> loggerNames = singleton("");
+        Method method = LogInLoggableClass.class.getMethod("logIns");
+        // when
+        InLog inLog = annotationDefinitionFactory.buildInLog(loggerNames, method);
+        // then
+        assertThat(inLog.getLevel(), is(ERROR));
+    }
+
+    @Test
+    public void buildInLogByLogs() throws NoSuchMethodException {
+        // given
+        Set<String> loggerNames = singleton("");
+        Method method = LogInLoggableClass.class.getMethod("logs");
+        // when
+        InLog inLog = annotationDefinitionFactory.buildInLog(loggerNames, method);
+        // then
+        assertThat(inLog.getLevel(), is(ERROR));
+    }
+
     @SuppressWarnings("unused")
     private static class LogInLoggableClass {
 
@@ -131,10 +167,22 @@ public class AnnotationDefinitionFactoryTest {
         public void log(String a, String b) {
         }
 
+        @Log(WARN)
+        public void logWithAlias(String a, String b) {
+        }
+
         public void empty(String a, String b) {
         }
 
         public void logArg(@Log.arg(ifEnabled = WARN) String a, String b) {
+        }
+
+        @Log.ins(@Log.in(ERROR))
+        public void logIns() {
+        }
+
+        @Logs(@Log(ERROR))
+        public void logs() {
         }
     }
 
@@ -160,7 +208,18 @@ public class AnnotationDefinitionFactoryTest {
         assertThat(outLog.getLevel(), is(WARN));
         assertThat(outLog.getIfEnabledLevel(), is(ERROR));
         assertThat(outLog.getVerboseLevel(), is(TRACE));
-        assertThat(outLog.getPrinter(), is(printerResolver.getDefaultPrinter()));
+        assertThat(outLog.getPrinter(), is(jsonPrinter));
+    }
+
+    @Test
+    public void buildOutLogByLogWithAlias() throws NoSuchMethodException {
+        // given
+        Set<String> loggerNames = singleton("");
+        Method method = LogOutLoggableClass.class.getMethod("logWithAlias");
+        // when
+        OutLog outLog = annotationDefinitionFactory.buildOutLog(loggerNames, method);
+        // then
+        assertThat(outLog.getLevel(), is(WARN));
     }
 
     @Test
@@ -172,6 +231,28 @@ public class AnnotationDefinitionFactoryTest {
         OutLog outLog = annotationDefinitionFactory.buildOutLog(loggerNames, method);
         // then
         assertThat(outLog, nullValue());
+    }
+
+    @Test
+    public void buildOutLogByLogOuts() throws NoSuchMethodException {
+        // given
+        Set<String> loggerNames = singleton("");
+        Method method = LogOutLoggableClass.class.getMethod("logOuts");
+        // when
+        OutLog outLog = annotationDefinitionFactory.buildOutLog(loggerNames, method);
+        // then
+        assertThat(outLog.getLevel(), is(ERROR));
+    }
+
+    @Test
+    public void buildOutLogByLogs() throws NoSuchMethodException {
+        // given
+        Set<String> loggerNames = singleton("");
+        Method method = LogOutLoggableClass.class.getMethod("logs");
+        // when
+        OutLog outLog = annotationDefinitionFactory.buildOutLog(loggerNames, method);
+        // then
+        assertThat(outLog.getLevel(), is(ERROR));
     }
 
     @SuppressWarnings("unused")
@@ -186,7 +267,19 @@ public class AnnotationDefinitionFactoryTest {
         public void log() {
         }
 
+        @Log(value = WARN)
+        public void logWithAlias() {
+        }
+
         public void empty() {
+        }
+
+        @Log.outs(@Log.out(ERROR))
+        public void logOuts() {
+        }
+
+        @Logs(@Log(ERROR))
+        public void logs() {
         }
     }
 

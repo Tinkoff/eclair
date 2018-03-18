@@ -316,13 +316,20 @@ public class AnnotationExtractorTest {
         // given
         Method loggedOverriddenMethod = AnnotatedChild.class.getMethod("loggedOverriddenMethod", String.class);
         Method overriddenMethod = AnnotatedChild.class.getMethod("overriddenMethod", String.class);
+        Method overriddenNotGenericMethod = AnnotatedChild.class.getMethod("overriddenNotGenericMethod", String.class);
         // when
         Set<Log> logs = annotationExtractor.getLogs(loggedOverriddenMethod);
         Set<Log> emptyLogs = annotationExtractor.getLogs(overriddenMethod);
+        Set<Log> overriddenLogIns = annotationExtractor.getLogs(overriddenNotGenericMethod);
         // then
         assertThat(logs, hasSize(1));
         assertThat(logs.iterator().next().level(), is(DEBUG));
+
+        // Spring's bug?
         assertThat(emptyLogs, is(empty()));
+
+        assertThat(overriddenLogIns, hasSize(1));
+        assertThat(overriddenLogIns.iterator().next().level(), is(INFO));
     }
 
     @Test
@@ -330,27 +337,41 @@ public class AnnotationExtractorTest {
         // given
         Method loggedOverriddenMethod = AnnotatedChild.class.getMethod("loggedOverriddenMethod", String.class);
         Method overriddenMethod = AnnotatedChild.class.getMethod("overriddenMethod", String.class);
+        Method overriddenNotGenericMethod = AnnotatedChild.class.getMethod("overriddenNotGenericMethod", String.class);
         // when
         Set<Log.in> logIns = annotationExtractor.getLogIns(loggedOverriddenMethod);
         Set<Log.in> emptyLogIns = annotationExtractor.getLogIns(overriddenMethod);
+        Set<Log.in> overriddenLogIns = annotationExtractor.getLogIns(overriddenNotGenericMethod);
         // then
         assertThat(logIns, hasSize(1));
         assertThat(logIns.iterator().next().level(), is(DEBUG));
+
+        // Spring's bug?
         assertThat(emptyLogIns, is(empty()));
+
+        assertThat(overriddenLogIns, hasSize(1));
+        assertThat(overriddenLogIns.iterator().next().level(), is(INFO));
     }
 
     @Test
-    public void getLogOut() throws NoSuchMethodException {
+    public void getLogOuts() throws NoSuchMethodException {
         // given
         Method loggedOverriddenMethod = AnnotatedChild.class.getMethod("loggedOverriddenMethod", String.class);
         Method overriddenMethod = AnnotatedChild.class.getMethod("overriddenMethod", String.class);
+        Method overriddenNotGenericMethod = AnnotatedChild.class.getMethod("overriddenNotGenericMethod", String.class);
         // when
         Set<Log.out> logOuts = annotationExtractor.getLogOuts(loggedOverriddenMethod);
         Set<Log.out> emptyLogOuts = annotationExtractor.getLogOuts(overriddenMethod);
+        Set<Log.out> overriddenLogOuts = annotationExtractor.getLogOuts(overriddenNotGenericMethod);
         // then
         assertThat(logOuts, hasSize(1));
         assertThat(logOuts.iterator().next().level(), is(DEBUG));
+
+        // Spring's bug?
         assertThat(emptyLogOuts, is(empty()));
+
+        assertThat(overriddenLogOuts, hasSize(1));
+        assertThat(overriddenLogOuts.iterator().next().level(), is(INFO));
     }
 
     @Test
@@ -358,13 +379,20 @@ public class AnnotationExtractorTest {
         // given
         Method loggedOverriddenMethod = AnnotatedChild.class.getMethod("loggedOverriddenMethod", String.class);
         Method overriddenMethod = AnnotatedChild.class.getMethod("overriddenMethod", String.class);
+        Method overriddenNotGenericMethod = AnnotatedChild.class.getMethod("overriddenNotGenericMethod", String.class);
         // when
         Set<Log.error> logErrors = annotationExtractor.getLogErrors(loggedOverriddenMethod);
         Set<Log.error> emptyLogErrors = annotationExtractor.getLogErrors(overriddenMethod);
+        Set<Log.error> overriddenLogErrors = annotationExtractor.getLogErrors(overriddenNotGenericMethod);
         // then
         assertThat(logErrors, hasSize(1));
         assertThat(logErrors.iterator().next().level(), is(DEBUG));
+
+        // Spring's bug?
         assertThat(emptyLogErrors, is(empty()));
+
+        assertThat(overriddenLogErrors, hasSize(1));
+        assertThat(overriddenLogErrors.iterator().next().level(), is(INFO));
     }
 
     @Test
@@ -388,13 +416,20 @@ public class AnnotationExtractorTest {
         // given
         Method loggedOverriddenMethod = AnnotatedChild.class.getMethod("loggedOverriddenMethod", String.class);
         Method overriddenMethod = AnnotatedChild.class.getMethod("overriddenMethod", String.class);
+        Method overriddenNotGenericMethod = AnnotatedChild.class.getMethod("overriddenNotGenericMethod", String.class);
         // when
         Set<Mdc> mdcs = annotationExtractor.getMdcs(loggedOverriddenMethod);
         Set<Mdc> emptyMdcs = annotationExtractor.getMdcs(overriddenMethod);
+        Set<Mdc> overriddenMdcs = annotationExtractor.getMdcs(overriddenNotGenericMethod);
         // then
         assertThat(mdcs, hasSize(1));
         assertThat(mdcs.iterator().next().key(), isEmptyString());
+
+        // Spring's bug?
         assertThat(emptyMdcs, is(empty()));
+
+        assertThat(overriddenMdcs, hasSize(1));
+        assertThat(overriddenMdcs.iterator().next().key(), is("key"));
     }
 
     @Test
@@ -402,9 +437,11 @@ public class AnnotationExtractorTest {
         // given
         Method loggedOverriddenMethod = AnnotatedChild.class.getMethod("loggedOverriddenMethod", String.class);
         Method overriddenMethod = AnnotatedChild.class.getMethod("overriddenMethod", String.class);
+        Method overriddenNotGenericMethod = AnnotatedChild.class.getMethod("overriddenNotGenericMethod", String.class);
         // when
         List<Set<Log.arg>> logArgs = annotationExtractor.getLogArgs(loggedOverriddenMethod);
         List<Set<Log.arg>> emptyLogArgs = annotationExtractor.getLogArgs(overriddenMethod);
+        List<Set<Log.arg>> overriddenLogArgs = annotationExtractor.getLogArgs(overriddenNotGenericMethod);
         // then
         assertThat(logArgs, hasSize(1));
         Set<Log.arg> parameterLogArgs = logArgs.iterator().next();
@@ -414,6 +451,10 @@ public class AnnotationExtractorTest {
         assertThat(emptyLogArgs, hasSize(1));
         Set<Log.arg> parameterEmptyLogArgs = emptyLogArgs.iterator().next();
         assertThat(parameterEmptyLogArgs, is(empty()));
+
+        assertThat(overriddenLogArgs, hasSize(1));
+        Set<Log.arg> parameterOverriddenLogArgs = overriddenLogArgs.iterator().next();
+        assertThat(parameterOverriddenLogArgs, is(empty()));
     }
 
     @Test
@@ -421,9 +462,11 @@ public class AnnotationExtractorTest {
         // given
         Method loggedOverriddenMethod = AnnotatedChild.class.getMethod("loggedOverriddenMethod", String.class);
         Method overriddenMethod = AnnotatedChild.class.getMethod("overriddenMethod", String.class);
+        Method overriddenNotGenericMethod = AnnotatedChild.class.getMethod("overriddenNotGenericMethod", String.class);
         // when
         List<Set<Mdc>> parametersMdcs = annotationExtractor.getParametersMdcs(loggedOverriddenMethod);
         List<Set<Mdc>> emptyParametersMdcs = annotationExtractor.getParametersMdcs(overriddenMethod);
+        List<Set<Mdc>> overriddenParametersMdcs = annotationExtractor.getParametersMdcs(overriddenNotGenericMethod);
         // then
         assertThat(parametersMdcs, hasSize(1));
         Set<Mdc> parameterMdcs = parametersMdcs.iterator().next();
@@ -433,6 +476,10 @@ public class AnnotationExtractorTest {
         assertThat(emptyParametersMdcs, hasSize(1));
         Set<Mdc> parameterEmptyParametersMdcs = emptyParametersMdcs.iterator().next();
         assertThat(parameterEmptyParametersMdcs, is(empty()));
+
+        assertThat(overriddenParametersMdcs, hasSize(1));
+        Set<Mdc> parameterOverriddenParametersMdcs = overriddenParametersMdcs.iterator().next();
+        assertThat(parameterOverriddenParametersMdcs, is(empty()));
     }
 
     @SuppressWarnings("unused")
@@ -455,6 +502,15 @@ public class AnnotationExtractorTest {
         public void overriddenMethod(@Log.arg(INFO)
                                      @Mdc(key = "key", value = "") T input) {
         }
+
+        @Log(INFO)
+        @Log.in(INFO)
+        @Log.out(INFO)
+        @Log.error(INFO)
+        @Mdc(key = "key", value = "")
+        public void overriddenNotGenericMethod(@Log.arg(INFO)
+                                               @Mdc(key = "key", value = "") String input) {
+        }
     }
 
     @SuppressWarnings("unused")
@@ -472,6 +528,10 @@ public class AnnotationExtractorTest {
 
         @Override
         public void overriddenMethod(String input) {
+        }
+
+        @Override
+        public void overriddenNotGenericMethod(String input) {
         }
 
         @Log.error(TRACE)

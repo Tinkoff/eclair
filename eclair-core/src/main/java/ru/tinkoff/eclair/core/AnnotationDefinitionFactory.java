@@ -40,10 +40,10 @@ public final class AnnotationDefinitionFactory {
             logIn = annotationExtractor.synthesizeLogIn(log);
             return InLog.newInstance(logIn, buildArgLogs(logArgs, method, logIn));
         }
-        if (logArgs.isEmpty() || logArgs.stream().noneMatch(Objects::nonNull)) {
-            return null;
+        if (!logArgs.isEmpty() && logArgs.stream().anyMatch(Objects::nonNull)) {
+            return InLog.newInstance(DEFAULT_LOG_IN, buildArgLogs(logArgs, method, null));
         }
-        return InLog.newInstance(DEFAULT_LOG_IN, buildArgLogs(logArgs, method, null));
+        return null;
     }
 
     private List<ArgLog> buildArgLogs(List<Log.arg> logArgs, Method method, Log.in logIn) {
@@ -73,7 +73,8 @@ public final class AnnotationDefinitionFactory {
         Log log = annotationExtractor.findLog(method, loggerNames);
         if (nonNull(log)) {
             Log.out syntheticLogOut = annotationExtractor.synthesizeLogOut(log);
-            return new OutLog(syntheticLogOut, printerResolver.getDefaultPrinter());
+            Printer printer = printerResolver.resolve(syntheticLogOut.printer(), method.getReturnType());
+            return new OutLog(syntheticLogOut, printer);
         }
         return null;
     }
