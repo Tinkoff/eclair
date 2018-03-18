@@ -65,8 +65,4 @@ public class PrinterResolver {
                 .findFirst()
                 .orElse(defaultPrinter);
     }
-
-    Printer getDefaultPrinter() {
-        return defaultPrinter;
-    }
 }

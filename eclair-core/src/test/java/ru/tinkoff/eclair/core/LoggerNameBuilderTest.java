@@ -1,6 +1,16 @@
 package ru.tinkoff.eclair.core;
 
+import org.aopalliance.intercept.MethodInvocation;
 import org.junit.Test;
+import org.springframework.boot.logging.LogLevel;
+import ru.tinkoff.eclair.logger.ManualLogger;
+
+import java.lang.reflect.Method;
+
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * TODO: implement
@@ -12,23 +22,27 @@ public class LoggerNameBuilderTest {
     private final LoggerNameBuilder loggerNameBuilder = LoggerNameBuilder.getInstance();
 
     @Test
-    public void buildOuter() throws NoSuchMethodException {
-        /*// given
-        Method method = Outer.class.getMethod("method");
+    public void build() throws NoSuchMethodException {
+        // given
+        Method method = LoggerNameBuilderTest.class.getMethod("build");
+        MethodInvocation invocation = mock(MethodInvocation.class);
+        when(invocation.getMethod()).thenReturn(method);
         // when
-        String name = loggerNameBuilder.build(method);
+        String name = loggerNameBuilder.build(invocation);
         // then
-        assertThat(name, is("ru.tinkoff.eclair.core.Outer.method"));*/
+        assertThat(name, is("ru.tinkoff.eclair.core.LoggerNameBuilderTest.build"));
     }
 
     @Test
     public void buildNested() throws NoSuchMethodException {
-        /*// given
+        // given
         Method method = Nested.class.getMethod("method");
+        MethodInvocation invocation = mock(MethodInvocation.class);
+        when(invocation.getMethod()).thenReturn(method);
         // when
-        String name = loggerNameBuilder.build(method);
+        String name = loggerNameBuilder.build(invocation);
         // then
-        assertThat(name, is("ru.tinkoff.eclair.core.LoggerNameBuilderTest$Nested.method"));*/
+        assertThat(name, is("ru.tinkoff.eclair.core.LoggerNameBuilderTest$Nested.method"));
     }
 
     private static class Nested {
@@ -39,24 +53,32 @@ public class LoggerNameBuilderTest {
     }
 
     @Test
-    public void buildByStacktrace() {
-        /*// given
-        StackTraceElement stackTraceElement = new StackTraceElement(
-                LoggerNameBuilderTest.class.getName(),
-                "buildByStacktrace",
-                null,
-                45
-        );
+    public void buildByInvoker() {
+        // given
+        ManualLogger logger = new TestLogger();
         // when
-        String name = loggerNameBuilder.build(stackTraceElement);
-        // then
-        assertThat(name, is("ru.tinkoff.eclair.core.LoggerNameBuilderTest.buildByStacktrace"));*/
+        logger.log(null, null);
     }
-}
 
-class Outer {
+    private static class TestLogger implements ManualLogger {
 
-    @SuppressWarnings("unused")
-    public void method() {
+        @Override
+        public boolean isLevelEnabled(LogLevel expectedLevel) {
+            return false;
+        }
+
+        @Override
+        public void log(LogLevel level, String format, Object... arguments) {
+            // then
+            String name = LoggerNameBuilder.getInstance().buildByInvoker();
+            assertThat(name, is("ru.tinkoff.eclair.core.LoggerNameBuilderTest.buildByInvoker"));
+        }
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void buildByInvokerInvalid() {
+        // when
+        loggerNameBuilder.buildByInvoker();
+        // then expected exception
     }
 }

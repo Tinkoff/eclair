@@ -10,17 +10,12 @@ import static org.springframework.core.annotation.AnnotationUtils.getValue;
 public enum AnnotationAttribute {
     LEVEL("level"),
     IF_ENABLED("ifEnabled"),
-    LOGGER("logger"),
-    PRINTER("printer");
+    LOGGER("logger");
 
     private final String name;
 
     AnnotationAttribute(String name) {
         this.name = name;
-    }
-
-    public String getName() {
-        return name;
     }
 
     @SuppressWarnings("unchecked")

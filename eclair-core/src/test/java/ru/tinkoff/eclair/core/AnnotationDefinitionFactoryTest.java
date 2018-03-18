@@ -10,6 +10,7 @@ import ru.tinkoff.eclair.annotation.Logs;
 import ru.tinkoff.eclair.annotation.Mdc;
 import ru.tinkoff.eclair.definition.ErrorLog;
 import ru.tinkoff.eclair.definition.InLog;
+import ru.tinkoff.eclair.definition.MdcPack;
 import ru.tinkoff.eclair.definition.OutLog;
 import ru.tinkoff.eclair.printer.JacksonPrinter;
 import ru.tinkoff.eclair.printer.Jaxb2Printer;
@@ -320,19 +321,33 @@ public class AnnotationDefinitionFactoryTest {
         }
     }
 
-    /**
-     * TODO: implement
-     */
     @Test
     public void buildMdcPack() throws NoSuchMethodException {
         // given
-//        Method method = MdcLoggableClass.class.getMethod("mdc", String.class, String.class);
+        Method method = MdcLoggableClass.class.getMethod("mdc", String.class, String.class);
         // when
-//        MdcPack mdcPack = annotationDefinitionFactory.buildMdcPack(method);
+        MdcPack mdcPack = annotationDefinitionFactory.buildMdcPack(method);
         // then
-//        assertThat(mdcPack.getMethod());
+        assertThat(mdcPack.getMethod(), is(method));
+        assertThat(mdcPack.getMethodDefinitions(), hasSize(1));
+        assertThat(mdcPack.getMethodDefinitions().iterator().next().getKey(), is("method"));
+        assertThat(mdcPack.getParameterDefinitions(), hasSize(2));
+        assertThat(mdcPack.getParameterDefinitions().get(0), hasSize(1));
+        assertThat(mdcPack.getParameterDefinitions().get(0).iterator().next().getKey(), is("a"));
+        assertThat(mdcPack.getParameterDefinitions().get(1), is(empty()));
     }
 
+    @Test
+    public void buildMdcPackEmpty() throws NoSuchMethodException {
+        // given
+        Method method = MdcLoggableClass.class.getMethod("empty");
+        // when
+        MdcPack mdcPack = annotationDefinitionFactory.buildMdcPack(method);
+        // then
+        assertThat(mdcPack, nullValue());
+    }
+
+    @SuppressWarnings("unused")
     private static class MdcLoggableClass {
 
         @Mdc(key = "method", value = "")
