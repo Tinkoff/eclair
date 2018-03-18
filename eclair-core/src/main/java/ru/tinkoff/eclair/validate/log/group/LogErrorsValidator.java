@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.core.ErrorFilterFactory;
-import ru.tinkoff.eclair.definition.ErrorFilter;
+import ru.tinkoff.eclair.definition.ErrorLog;
 import ru.tinkoff.eclair.logger.EclairLogger;
 import ru.tinkoff.eclair.validate.log.single.LogErrorValidator;
 
@@ -43,10 +43,10 @@ public class LogErrorsValidator extends LoggerSpecificLogAnnotationsValidator {
                 .filter(entry -> entry.getValue().size() > 1)
                 .forEach(entry -> {
                     List<Log.error> loggerLogErrors = entry.getValue();
-                    Set<ErrorFilter> errorFilters = loggerLogErrors.stream()
+                    Set<ErrorLog.Filter> filters = loggerLogErrors.stream()
                             .map(error -> errorFilterFactory.buildErrorFilter(error.ofType(), error.exclude()))
                             .collect(Collectors.toSet());
-                    if (loggerLogErrors.size() > errorFilters.size()) {
+                    if (loggerLogErrors.size() > filters.size()) {
                         errors.reject("errors.logger.duplicate",
                                 format("Error filters duplicated for logger bean '%s': %s", entry.getKey(), loggerLogErrors));
                     }

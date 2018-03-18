@@ -27,18 +27,22 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
     private static final String ERROR = "!";
     private static final String MANUAL = "-";
 
-    private static final LoggingSystem loggingSystem = LoggingSystem.get(SimpleLogger.class.getClassLoader());
-
-    private final LoggerFacadeFactory loggerFacadeFactory;
-
     private final ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
     private final LoggerNameBuilder loggerNameBuilder = LoggerNameBuilder.getInstance();
+
+    private final LoggerFacadeFactory loggerFacadeFactory;
+    private final LoggingSystem loggingSystem;
 
     @Setter
     private boolean printParameterName = true;
 
     public SimpleLogger(LoggerFacadeFactory loggerFacadeFactory) {
+        this(loggerFacadeFactory, LoggingSystem.get(SimpleLogger.class.getClassLoader()));
+    }
+
+    SimpleLogger(LoggerFacadeFactory loggerFacadeFactory, LoggingSystem loggingSystem) {
         this.loggerFacadeFactory = loggerFacadeFactory;
+        this.loggingSystem = loggingSystem;
     }
 
     @Override
@@ -113,7 +117,6 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
     }
 
     private String buildArgumentsClause(MethodInvocation invocation, InLog inLog, String loggerName) {
-        boolean verboseFound = false;
         StringBuilder builder = new StringBuilder();
         List<ArgLog> argLogs = inLog.getArgLogs();
         Object[] arguments = invocation.getArguments();
@@ -122,6 +125,7 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
             parameterNames = parameterNameDiscoverer.getParameterNames(invocation.getMethod());
         }
         int length = arguments.length;
+        boolean verboseFound = false;
         for (int a = 0; a < length; a++) {
             ArgLog argLog = argLogs.get(a);
             if (nonNull(argLog) && isLevelEnabled(loggerName, argLog.getIfEnabledLevel())) {
@@ -141,10 +145,7 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
                 }
             }
         }
-        if (!verboseFound && length == 0) {
-            verboseFound = isLevelEnabled(loggerName, inLog.getVerboseLevel());
-        }
-        return verboseFound ? " " + builder : "";
+        return builder.length() > 0 ? " " + builder : "";
     }
 
     private String buildResultClause(MethodInvocation invocation, OutLog outLog, Object result, String loggerName) {

@@ -4,6 +4,8 @@ import lombok.Getter;
 import ru.tinkoff.eclair.annotation.Mdc;
 
 /**
+ * TODO: extract instantiation logic to factory, generate 'builder' methods
+ *
  * @author Viacheslav Klapatniuk
  */
 @Getter

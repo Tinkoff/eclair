@@ -1,6 +1,6 @@
 package ru.tinkoff.eclair.core;
 
-import ru.tinkoff.eclair.definition.ErrorFilter;
+import ru.tinkoff.eclair.definition.ErrorLog;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -23,12 +23,12 @@ public final class ErrorFilterFactory {
         return instance;
     }
 
-    public ErrorFilter buildErrorFilter(Class<? extends Throwable>[] rawIncludes, Class<? extends Throwable>[] rawExcludes) {
+    public ErrorLog.Filter buildErrorFilter(Class<? extends Throwable>[] rawIncludes, Class<? extends Throwable>[] rawExcludes) {
         Set<Class<? extends Throwable>> includeCandidates = ClassUtils.reduceDescendants(new HashSet<>(asList(rawIncludes)));
         Set<Class<? extends Throwable>> excludeCandidates = ClassUtils.reduceDescendants(new HashSet<>(asList(rawExcludes)));
         Set<Class<? extends Throwable>> includes = optimizeAndSortIncludes(includeCandidates, excludeCandidates);
         Set<Class<? extends Throwable>> excludes = optimizeAndSortExcludes(includes, excludeCandidates);
-        return new ErrorFilter(includes, excludes);
+        return new ErrorLog.Filter(includes, excludes);
     }
 
     /**

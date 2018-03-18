@@ -14,16 +14,16 @@ import static org.junit.Assert.assertThat;
 /**
  * @author Viacheslav Klapatniuk
  */
-public class ErrorFilterTest {
+public class FilterTest {
 
     @Test(expected = UnsupportedOperationException.class)
     public void getIncludesImmutable() {
         // given
         Set<Class<? extends Throwable>> includes = new HashSet<>();
         // when
-        ErrorFilter errorFilter = new ErrorFilter(includes, emptySet());
+        ErrorLog.Filter filter = new ErrorLog.Filter(includes, emptySet());
         // then
-        errorFilter.getIncludes().add(NullPointerException.class);
+        filter.getIncludes().add(NullPointerException.class);
     }
 
     @Test(expected = UnsupportedOperationException.class)
@@ -31,9 +31,9 @@ public class ErrorFilterTest {
         // given
         Set<Class<? extends Throwable>> excludes = new HashSet<>();
         // when
-        ErrorFilter errorFilter = new ErrorFilter(emptySet(), excludes);
+        ErrorLog.Filter filter = new ErrorLog.Filter(emptySet(), excludes);
         // then
-        errorFilter.getExcludes().add(NullPointerException.class);
+        filter.getExcludes().add(NullPointerException.class);
     }
 
     @Test
@@ -44,12 +44,12 @@ public class ErrorFilterTest {
         Set<Class<? extends Throwable>> excludes =
                 new HashSet<>(asList(IndexOutOfBoundsException.class, RuntimeException.class, NullPointerException.class));
         // when
-        ErrorFilter errorFilter = new ErrorFilter(includes, excludes);
+        ErrorLog.Filter filter = new ErrorLog.Filter(includes, excludes);
         // then
-        Set<Class<? extends Throwable>> includesResult = errorFilter.getIncludes();
+        Set<Class<? extends Throwable>> includesResult = filter.getIncludes();
         assertThat(includesResult, hasSize(4));
         assertThat(includesResult, Matchers.<Class<?>>contains(Throwable.class, Error.class, Exception.class, RuntimeException.class));
-        Set<Class<? extends Throwable>> excludesResult = errorFilter.getExcludes();
+        Set<Class<? extends Throwable>> excludesResult = filter.getExcludes();
         assertThat(excludesResult, hasSize(3));
         assertThat(excludesResult, Matchers.<Class<?>>contains(RuntimeException.class, IndexOutOfBoundsException.class, NullPointerException.class));
     }
@@ -57,13 +57,13 @@ public class ErrorFilterTest {
     @Test
     public void hashCodeEquals() {
         // given
-        ErrorFilter errorFilterA =
-                new ErrorFilter(new HashSet<>(asList(Exception.class, RuntimeException.class)), new HashSet<>(asList(Throwable.class, Exception.class)));
-        ErrorFilter errorFilterB =
-                new ErrorFilter(new HashSet<>(asList(RuntimeException.class, Exception.class)), new HashSet<>(asList(Exception.class, Throwable.class)));
+        ErrorLog.Filter filterA =
+                new ErrorLog.Filter(new HashSet<>(asList(Exception.class, RuntimeException.class)), new HashSet<>(asList(Throwable.class, Exception.class)));
+        ErrorLog.Filter filterB =
+                new ErrorLog.Filter(new HashSet<>(asList(RuntimeException.class, Exception.class)), new HashSet<>(asList(Exception.class, Throwable.class)));
         // when
-        Set<ErrorFilter> errorFilters = new HashSet<>(asList(errorFilterA, errorFilterB));
+        Set<ErrorLog.Filter> filters = new HashSet<>(asList(filterA, filterB));
         // then
-        assertThat(errorFilters, hasSize(1));
+        assertThat(filters, hasSize(1));
     }
 }

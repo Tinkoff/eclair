@@ -14,6 +14,8 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 /**
+ * TODO: extract instantiation logic to factory, generate 'builder' methods
+ *
  * @author Viacheslav Klapatniuk
  */
 @Getter

@@ -7,6 +7,8 @@ import ru.tinkoff.eclair.printer.Printer;
 import ru.tinkoff.eclair.annotation.Log;
 
 /**
+ * TODO: extract instantiation logic to factory, generate 'builder' methods
+ *
  * @author Viacheslav Klapatniuk
  */
 @Getter

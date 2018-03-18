@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.core.ErrorFilterFactory;
-import ru.tinkoff.eclair.definition.ErrorFilter;
+import ru.tinkoff.eclair.definition.ErrorLog;
 
 import java.util.Set;
 
@@ -31,13 +31,13 @@ public class LogErrorValidator extends MethodTargetLogAnnotationValidator {
 
         Class<? extends Throwable>[] ofType = logError.ofType();
         Class<? extends Throwable>[] exclude = logError.exclude();
-        ErrorFilter errorFilter = errorFilterFactory.buildErrorFilter(ofType, exclude);
+        ErrorLog.Filter filter = errorFilterFactory.buildErrorFilter(ofType, exclude);
 
-        Set<Class<? extends Throwable>> includes = errorFilter.getIncludes();
+        Set<Class<? extends Throwable>> includes = filter.getIncludes();
         if (includes.isEmpty()) {
             errors.reject("error.set.empty", "Empty error set defined by annotation: " + logError);
         } else {
-            Set<Class<? extends Throwable>> excludes = errorFilter.getExcludes();
+            Set<Class<? extends Throwable>> excludes = filter.getExcludes();
             if (ofType.length > includes.size() || exclude.length > excludes.size()) {
                 errors.reject("error.set.non.optimal",
                         format("Error set defined by annotation should be optimized: ofType=%s, exclude=%s", includes, excludes));

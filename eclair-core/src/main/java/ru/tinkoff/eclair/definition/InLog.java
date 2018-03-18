@@ -11,6 +11,8 @@ import static java.util.Collections.unmodifiableList;
 import static java.util.Objects.isNull;
 
 /**
+ * TODO: extract instantiation logic to factory, generate 'builder' methods
+ *
  * @author Viacheslav Klapatniuk
  */
 @Getter
