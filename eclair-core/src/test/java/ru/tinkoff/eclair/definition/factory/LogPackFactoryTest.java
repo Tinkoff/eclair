@@ -1,8 +1,9 @@
-package ru.tinkoff.eclair.definition;
+package ru.tinkoff.eclair.definition.factory;
 
 import org.junit.Assert;
 import org.junit.Test;
 import ru.tinkoff.eclair.annotation.Log;
+import ru.tinkoff.eclair.definition.*;
 import ru.tinkoff.eclair.printer.ToStringPrinter;
 
 import java.lang.reflect.Method;
@@ -17,17 +18,17 @@ import static org.springframework.core.annotation.AnnotationUtils.synthesizeAnno
 /**
  * @author Viacheslav Klapatniuk
  */
-public class LogPackTest {
+public class LogPackFactoryTest {
 
     @Test
     public void newInstance() throws NoSuchMethodException {
         // given
-        Method method = LogPackTest.class.getMethod("newInstance");
+        Method method = LogPackFactoryTest.class.getMethod("newInstance");
         InLog inLog = givenInLog();
         OutLog outLog = givenOutLog();
-        Set<ErrorLog> errorLogs = singleton(ErrorLogFactory.newInstance(new Class<?>[]{Throwable.class}, new Class<?>[]{}));
+        Set<ErrorLog> errorLogs = singleton(TestErrorLogFactory.newInstance(new Class<?>[]{Throwable.class}, new Class<?>[]{}));
         // when
-        LogPack logPack = LogPack.newInstance(method, inLog, outLog, errorLogs);
+        LogPack logPack = LogPackFactory.newInstance(method, inLog, outLog, errorLogs);
         // then
         Assert.assertThat(logPack.getMethod(), is(method));
         Assert.assertThat(logPack.getInLog(), is(inLog));
@@ -37,12 +38,12 @@ public class LogPackTest {
     @Test
     public void newInstanceNull() throws NoSuchMethodException {
         // given
-        Method method = LogPackTest.class.getMethod("newInstance");
+        Method method = LogPackFactoryTest.class.getMethod("newInstance");
         InLog inLog = null;
         OutLog outLog = null;
         Set<ErrorLog> errorLogs = emptySet();
         // when
-        LogPack logPack = LogPack.newInstance(method, inLog, outLog, errorLogs);
+        LogPack logPack = LogPackFactory.newInstance(method, inLog, outLog, errorLogs);
         // then
         Assert.assertThat(logPack, nullValue());
     }
@@ -50,13 +51,13 @@ public class LogPackTest {
     @Test
     public void findErrorLog() throws NoSuchMethodException {
         // given
-        Method method = LogPackTest.class.getMethod("newInstance");
+        Method method = LogPackFactoryTest.class.getMethod("newInstance");
         InLog inLog = givenInLog();
         OutLog outLog = givenOutLog();
-        ErrorLog errorLog = ErrorLogFactory.newInstance(new Class<?>[]{Exception.class}, new Class<?>[]{Error.class});
+        ErrorLog errorLog = TestErrorLogFactory.newInstance(new Class<?>[]{Exception.class}, new Class<?>[]{Error.class});
         Set<ErrorLog> errorLogs = singleton(errorLog);
         // when
-        LogPack logPack = LogPack.newInstance(method, inLog, outLog, errorLogs);
+        LogPack logPack = LogPackFactory.newInstance(method, inLog, outLog, errorLogs);
         // then
         Assert.assertThat(logPack.findErrorLog(Throwable.class), nullValue());
         Assert.assertThat(logPack.findErrorLog(RuntimeException.class), is(errorLog));
@@ -66,12 +67,12 @@ public class LogPackTest {
 
     private InLog givenInLog() {
         Log.in logIn = synthesizeAnnotation(Log.in.class);
-        List<ArgLog> argLogs = singletonList(new ArgLog(synthesizeAnnotation(Log.arg.class), new ToStringPrinter()));
-        return InLog.newInstance(logIn, argLogs);
+        List<ArgLog> argLogs = singletonList(ArgLogFactory.newInstance(synthesizeAnnotation(Log.arg.class), new ToStringPrinter()));
+        return InLogFactory.newInstance(logIn, argLogs);
     }
 
     private OutLog givenOutLog() {
         Log.out logOut = synthesizeAnnotation(Log.out.class);
-        return new OutLog(logOut, new ToStringPrinter());
+        return OutLogFactory.newInstance(logOut, new ToStringPrinter());
     }
 }

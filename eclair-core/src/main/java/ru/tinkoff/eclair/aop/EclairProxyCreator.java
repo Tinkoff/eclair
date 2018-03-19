@@ -15,10 +15,8 @@ import ru.tinkoff.eclair.core.AnnotationDefinitionFactory;
 import ru.tinkoff.eclair.core.AnnotationExtractor;
 import ru.tinkoff.eclair.core.LoggerBeanNamesResolver;
 import ru.tinkoff.eclair.core.PrinterResolver;
-import ru.tinkoff.eclair.definition.ErrorLog;
-import ru.tinkoff.eclair.definition.InLog;
-import ru.tinkoff.eclair.definition.LogPack;
-import ru.tinkoff.eclair.definition.OutLog;
+import ru.tinkoff.eclair.definition.*;
+import ru.tinkoff.eclair.definition.factory.LogPackFactory;
 import ru.tinkoff.eclair.logger.EclairLogger;
 import ru.tinkoff.eclair.printer.Printer;
 import ru.tinkoff.eclair.validate.BeanClassValidator;
@@ -153,7 +151,7 @@ public class EclairProxyCreator extends AbstractAutoProxyCreator {
         InLog inLog = annotationDefinitionFactory.buildInLog(loggerNames, method);
         OutLog outLog = annotationDefinitionFactory.buildOutLog(loggerNames, method);
         Set<ErrorLog> errorLogs = annotationDefinitionFactory.buildErrorLogs(loggerNames, method);
-        return LogPack.newInstance(method, inLog, outLog, errorLogs);
+        return LogPackFactory.newInstance(method, inLog, outLog, errorLogs);
     }
 
     private Object[] composeAdvisors(MdcAdvisor mdcAdvisor, List<LogAdvisor> logAdvisors) {

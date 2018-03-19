@@ -1,7 +1,8 @@
-package ru.tinkoff.eclair.definition;
+package ru.tinkoff.eclair.definition.factory;
 
 import org.junit.Test;
 import ru.tinkoff.eclair.annotation.Log;
+import ru.tinkoff.eclair.definition.ArgLog;
 import ru.tinkoff.eclair.printer.Printer;
 import ru.tinkoff.eclair.printer.ToStringPrinter;
 
@@ -18,7 +19,7 @@ import static org.springframework.core.annotation.AnnotationUtils.synthesizeAnno
 /**
  * @author Viacheslav Klapatniuk
  */
-public class ArgLogTest {
+public class ArgLogFactoryTest {
 
     @Test
     public void newInstance() {
@@ -26,7 +27,7 @@ public class ArgLogTest {
         Log.arg logArg = givenLogArg();
         Printer printer = givenPrinter();
         // when
-        ArgLog argLog = new ArgLog(logArg, printer);
+        ArgLog argLog = ArgLogFactory.newInstance(logArg, printer);
         // then
         assertThat(argLog.getIfEnabledLevel(), is(WARN));
         assertThat(argLog.getPrinter(), is(printer));
@@ -49,7 +50,7 @@ public class ArgLogTest {
         Log.arg logArg = givenLogArgByValue();
         Printer printer = givenPrinter();
         // when
-        ArgLog argLog = new ArgLog(logArg, printer);
+        ArgLog argLog = ArgLogFactory.newInstance(logArg, printer);
         // then
         assertThat(argLog.getIfEnabledLevel(), is(WARN));
     }
@@ -58,13 +59,13 @@ public class ArgLogTest {
         return synthesizeAnnotation(singletonMap("value", WARN), Log.arg.class, null);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void newInstanceNull() {
         // given
         Log.arg logArg = null;
         Printer printer = givenPrinter();
         // when
-        ArgLog argLog = new ArgLog(logArg, printer);
+        ArgLog argLog = ArgLogFactory.newInstance(logArg, printer);
         // then
         assertThat(argLog, nullValue());
     }

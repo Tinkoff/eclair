@@ -2,7 +2,7 @@ package ru.tinkoff.eclair.core;
 
 import org.junit.Test;
 import ru.tinkoff.eclair.definition.ErrorLog;
-import ru.tinkoff.eclair.definition.ErrorLogFactory;
+import ru.tinkoff.eclair.definition.factory.TestErrorLogFactory;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -23,7 +23,7 @@ public class ErrorLogResolverTest {
     @Test
     public void resolve() {
         // given
-        ErrorLog aErrorLog = ErrorLogFactory.newInstance(
+        ErrorLog aErrorLog = TestErrorLogFactory.newInstance(
                 new Class<?>[]{NullPointerException.class, IndexOutOfBoundsException.class},
                 new Class<?>[]{StringIndexOutOfBoundsException.class});
         Set<ErrorLog> errorLogs = singleton(aErrorLog);
@@ -37,7 +37,7 @@ public class ErrorLogResolverTest {
     @Test
     public void resolveExclude() {
         // given
-        ErrorLog aErrorLog = ErrorLogFactory.newInstance(new Class<?>[]{Throwable.class}, new Class<?>[]{RuntimeException.class});
+        ErrorLog aErrorLog = TestErrorLogFactory.newInstance(new Class<?>[]{Throwable.class}, new Class<?>[]{RuntimeException.class});
         Set<ErrorLog> errorLogs = singleton(aErrorLog);
         Class<?> causeClass = NullPointerException.class;
         // when
@@ -49,7 +49,7 @@ public class ErrorLogResolverTest {
     @Test
     public void resolveNotFound() {
         // given
-        ErrorLog aErrorLog = ErrorLogFactory.newInstance(new Class<?>[]{Exception.class}, new Class<?>[]{RuntimeException.class});
+        ErrorLog aErrorLog = TestErrorLogFactory.newInstance(new Class<?>[]{Exception.class}, new Class<?>[]{RuntimeException.class});
         Set<ErrorLog> errorLogs = singleton(aErrorLog);
         Class<?> causeClass = Throwable.class;
         // when
@@ -61,10 +61,10 @@ public class ErrorLogResolverTest {
     @Test
     public void resolveMostSpecific() {
         // given
-        ErrorLog aErrorLog = ErrorLogFactory.newInstance(
+        ErrorLog aErrorLog = TestErrorLogFactory.newInstance(
                 new Class<?>[]{NullPointerException.class, IndexOutOfBoundsException.class},
                 new Class<?>[]{StringIndexOutOfBoundsException.class});
-        ErrorLog bErrorLog = ErrorLogFactory.newInstance(
+        ErrorLog bErrorLog = TestErrorLogFactory.newInstance(
                 new Class<?>[]{ArrayIndexOutOfBoundsException.class},
                 new Class<?>[]{});
         Set<ErrorLog> errorLogs = new LinkedHashSet<>(asList(aErrorLog, bErrorLog));

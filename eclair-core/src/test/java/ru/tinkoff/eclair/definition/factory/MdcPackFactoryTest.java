@@ -1,7 +1,9 @@
-package ru.tinkoff.eclair.definition;
+package ru.tinkoff.eclair.definition.factory;
 
 import org.junit.Test;
 import ru.tinkoff.eclair.annotation.Mdc;
+import ru.tinkoff.eclair.definition.MdcDefinition;
+import ru.tinkoff.eclair.definition.MdcPack;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -20,7 +22,7 @@ import static org.springframework.core.annotation.AnnotationUtils.synthesizeAnno
 /**
  * @author Viacheslav Klapatniuk
  */
-public class MdcPackTest {
+public class MdcPackFactoryTest {
 
     @Test
     public void newInstance() throws NoSuchMethodException {
@@ -29,7 +31,7 @@ public class MdcPackTest {
         Set<Mdc> methodMdcs = givenMethodMdcs();
         List<Set<Mdc>> argumentMdcs = givenArgumentMdcs();
         // when
-        MdcPack mdcPack = MdcPack.newInstance(method, methodMdcs, argumentMdcs);
+        MdcPack mdcPack = MdcPackFactory.newInstance(method, methodMdcs, argumentMdcs);
         // then
         assertThat(mdcPack.getMethod(), is(method));
         thenMethodDefinition(mdcPack.getMethodDefinitions());
@@ -37,7 +39,7 @@ public class MdcPackTest {
     }
 
     private Method givenMethod() throws NoSuchMethodException {
-        return MdcPackTest.class.getMethod("annotatedMethod", String.class, String.class);
+        return MdcPackFactoryTest.class.getMethod("annotatedMethod", String.class, String.class);
     }
 
     @SuppressWarnings("unused")
@@ -87,7 +89,7 @@ public class MdcPackTest {
         Set<Mdc> methodMdcs = emptySet();
         List<Set<Mdc>> argumentMdcs = asList(emptySet(), emptySet());
         // when
-        MdcPack mdcPack = MdcPack.newInstance(method, methodMdcs, argumentMdcs);
+        MdcPack mdcPack = MdcPackFactory.newInstance(method, methodMdcs, argumentMdcs);
         // then
         assertThat(mdcPack, nullValue());
     }
@@ -99,9 +101,9 @@ public class MdcPackTest {
         Set<Mdc> methodMdcs = givenMethodMdcs();
         List<Set<Mdc>> argumentMdcs = givenArgumentMdcs();
         // when
-        MdcPack mdcPack = MdcPack.newInstance(method, methodMdcs, argumentMdcs);
+        MdcPack mdcPack = MdcPackFactory.newInstance(method, methodMdcs, argumentMdcs);
         // then
-        mdcPack.getMethodDefinitions().add(new MdcDefinition(givenMdc("")));
+        mdcPack.getMethodDefinitions().add(MdcDefinitionFactory.newInstance(givenMdc("")));
     }
 
     @Test(expected = UnsupportedOperationException.class)
@@ -111,7 +113,7 @@ public class MdcPackTest {
         Set<Mdc> methodMdcs = givenMethodMdcs();
         List<Set<Mdc>> argumentMdcs = givenArgumentMdcs();
         // when
-        MdcPack mdcPack = MdcPack.newInstance(method, methodMdcs, argumentMdcs);
+        MdcPack mdcPack = MdcPackFactory.newInstance(method, methodMdcs, argumentMdcs);
         // then
         mdcPack.getParameterDefinitions().add(emptySet());
     }

@@ -1,7 +1,9 @@
-package ru.tinkoff.eclair.definition;
+package ru.tinkoff.eclair.definition.factory;
 
 import org.junit.Test;
 import ru.tinkoff.eclair.annotation.Log;
+import ru.tinkoff.eclair.definition.ArgLog;
+import ru.tinkoff.eclair.definition.InLog;
 import ru.tinkoff.eclair.printer.ToStringPrinter;
 
 import java.util.ArrayList;
@@ -21,7 +23,7 @@ import static org.springframework.core.annotation.AnnotationUtils.synthesizeAnno
 /**
  * @author Viacheslav Klapatniuk
  */
-public class InLogTest {
+public class InLogFactoryTest {
 
     @Test
     public void newInstance() {
@@ -30,7 +32,7 @@ public class InLogTest {
         ArgLog argLog = givenArgLog();
         List<ArgLog> argLogs = singletonList(argLog);
         // when
-        InLog inLog = InLog.newInstance(logIn, argLogs);
+        InLog inLog = InLogFactory.newInstance(logIn, argLogs);
         // then
         assertThat(inLog.getLevel(), is(WARN));
         assertThat(inLog.getIfEnabledLevel(), is(WARN));
@@ -49,7 +51,7 @@ public class InLogTest {
     }
 
     private ArgLog givenArgLog() {
-        return new ArgLog(synthesizeAnnotation(Log.arg.class), new ToStringPrinter());
+        return ArgLogFactory.newInstance(synthesizeAnnotation(Log.arg.class), new ToStringPrinter());
     }
 
     @Test
@@ -58,7 +60,7 @@ public class InLogTest {
         Log.in logIn = givenLogInByValue();
         List<ArgLog> argLogs = singletonList(givenArgLog());
         // when
-        InLog inLog = InLog.newInstance(logIn, argLogs);
+        InLog inLog = InLogFactory.newInstance(logIn, argLogs);
         // then
         assertThat(inLog.getLevel(), is(WARN));
     }
@@ -73,7 +75,7 @@ public class InLogTest {
         Log.in logIn = null;
         List<ArgLog> argLogs = emptyList();
         // when
-        InLog inLog = InLog.newInstance(logIn, argLogs);
+        InLog inLog = InLogFactory.newInstance(logIn, argLogs);
         // then
         assertThat(inLog, nullValue());
     }
@@ -84,7 +86,7 @@ public class InLogTest {
         Log.in logIn = givenLogIn();
         List<ArgLog> argLogs = new ArrayList<>();
         // when
-        InLog inLog = InLog.newInstance(logIn, argLogs);
+        InLog inLog = InLogFactory.newInstance(logIn, argLogs);
         // then
         inLog.getArgLogs().add(givenArgLog());
     }

@@ -1,8 +1,9 @@
-package ru.tinkoff.eclair.definition;
+package ru.tinkoff.eclair.definition.factory;
 
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import ru.tinkoff.eclair.annotation.Log;
+import ru.tinkoff.eclair.definition.ErrorLog;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,14 +20,14 @@ import static org.springframework.core.annotation.AnnotationUtils.synthesizeAnno
  *
  * @author Viacheslav Klapatniuk
  */
-public class ErrorLogTest {
+public class ErrorLogFactoryTest {
 
     @Test
     public void newInstance() {
         // given
         Log.error logError = givenLogError();
         // when
-        ErrorLog errorLog = new ErrorLog(logError);
+        ErrorLog errorLog = ErrorLogFactory.newInstance(logError);
         // then
         assertThat(errorLog.getLevel(), is(WARN));
         assertThat(errorLog.getIfEnabledLevel(), is(WARN));
@@ -50,7 +51,7 @@ public class ErrorLogTest {
         // given
         Log.error logError = givenLogErrorByValue();
         // when
-        ErrorLog errorLog = new ErrorLog(logError);
+        ErrorLog errorLog = ErrorLogFactory.newInstance(logError);
         // then
         assertThat(errorLog.getLevel(), is(WARN));
     }

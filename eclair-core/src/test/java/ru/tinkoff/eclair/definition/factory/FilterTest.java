@@ -1,7 +1,8 @@
-package ru.tinkoff.eclair.definition;
+package ru.tinkoff.eclair.definition.factory;
 
 import org.hamcrest.Matchers;
 import org.junit.Test;
+import ru.tinkoff.eclair.definition.ErrorLog;
 
 import java.util.HashSet;
 import java.util.Set;

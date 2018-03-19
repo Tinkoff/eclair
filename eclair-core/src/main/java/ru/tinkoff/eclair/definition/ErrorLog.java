@@ -1,12 +1,11 @@
 package ru.tinkoff.eclair.definition;
 
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NonNull;
 import org.springframework.boot.logging.LogLevel;
-import ru.tinkoff.eclair.annotation.Log;
-import ru.tinkoff.eclair.core.AnnotationAttribute;
 import ru.tinkoff.eclair.core.ClassUtils;
-import ru.tinkoff.eclair.core.ErrorFilterFactory;
 
 import java.util.Comparator;
 import java.util.Set;
@@ -17,26 +16,22 @@ import static java.util.Collections.unmodifiableSet;
 import static java.util.Comparator.comparing;
 
 /**
- * TODO: extract instantiation logic to factory, generate 'builder' methods
- *
  * @author Viacheslav Klapatniuk
  */
+@Builder
 public class ErrorLog implements LogDefinition {
 
     @Getter
-    private final LogLevel level;
+    @NonNull
+    private LogLevel level;
     @Getter
-    private final LogLevel ifEnabledLevel;
+    @NonNull
+    private LogLevel ifEnabledLevel;
     @Getter
-    private final LogLevel verboseLevel;
-    private final Filter filter;
-
-    public ErrorLog(Log.error logError) {
-        this.level = AnnotationAttribute.LEVEL.extract(logError);
-        this.ifEnabledLevel = logError.ifEnabled();
-        this.verboseLevel = logError.verbose();
-        this.filter = ErrorFilterFactory.getInstance().buildErrorFilter(logError.ofType(), logError.exclude());
-    }
+    @NonNull
+    private LogLevel verboseLevel;
+    @NonNull
+    private Filter filter;
 
     public Set<Class<? extends Throwable>> getIncludes() {
         return filter.getIncludes();

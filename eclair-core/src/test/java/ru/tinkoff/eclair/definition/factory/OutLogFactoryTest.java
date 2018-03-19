@@ -1,7 +1,8 @@
-package ru.tinkoff.eclair.definition;
+package ru.tinkoff.eclair.definition.factory;
 
 import org.junit.Test;
 import ru.tinkoff.eclair.annotation.Log;
+import ru.tinkoff.eclair.definition.OutLog;
 import ru.tinkoff.eclair.printer.Printer;
 import ru.tinkoff.eclair.printer.ToStringPrinter;
 
@@ -18,7 +19,7 @@ import static org.springframework.core.annotation.AnnotationUtils.synthesizeAnno
 /**
  * @author Viacheslav Klapatniuk
  */
-public class OutLogTest {
+public class OutLogFactoryTest {
 
     @Test
     public void newInstance() {
@@ -26,7 +27,7 @@ public class OutLogTest {
         Log.out logOut = givenLogOut();
         Printer printer = givenPrinter();
         // when
-        OutLog outLog = new OutLog(logOut, printer);
+        OutLog outLog = OutLogFactory.newInstance(logOut, printer);
         // then
         assertThat(outLog.getLevel(), is(WARN));
         assertThat(outLog.getIfEnabledLevel(), is(WARN));
@@ -52,7 +53,7 @@ public class OutLogTest {
         Log.out logOut = givenLogOutByValue();
         Printer printer = givenPrinter();
         // when
-        OutLog outLog = new OutLog(logOut, printer);
+        OutLog outLog = OutLogFactory.newInstance(logOut, printer);
         // then
         assertThat(outLog.getLevel(), is(WARN));
     }

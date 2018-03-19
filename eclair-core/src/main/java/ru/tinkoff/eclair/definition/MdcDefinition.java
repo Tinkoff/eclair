@@ -1,23 +1,20 @@
 package ru.tinkoff.eclair.definition;
 
+import lombok.Builder;
 import lombok.Getter;
-import ru.tinkoff.eclair.annotation.Mdc;
+import lombok.NonNull;
 
 /**
- * TODO: extract instantiation logic to factory, generate 'builder' methods
- *
  * @author Viacheslav Klapatniuk
  */
 @Getter
+@Builder
 public class MdcDefinition {
 
-    private final String key;
-    private final String value;
-    private final boolean global;
-
-    MdcDefinition(Mdc mdc) {
-        this.key = mdc.key();
-        this.value = mdc.value();
-        this.global = mdc.global();
-    }
+    @NonNull
+    private String key;
+    @NonNull
+    private String value;
+    @NonNull
+    private boolean global;
 }

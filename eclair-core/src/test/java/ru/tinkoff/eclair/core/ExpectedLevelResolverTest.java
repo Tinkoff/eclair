@@ -4,7 +4,8 @@ import org.junit.Test;
 import org.springframework.boot.logging.LogLevel;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.definition.LogDefinition;
-import ru.tinkoff.eclair.definition.OutLog;
+import ru.tinkoff.eclair.definition.factory.OutLogFactory;
+import ru.tinkoff.eclair.printer.ToStringPrinter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -55,6 +56,6 @@ public class ExpectedLevelResolverTest {
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("level", level);
         attributes.put("ifEnabled", ifEnabled);
-        return new OutLog(synthesizeAnnotation(attributes, Log.out.class, null), null);
+        return OutLogFactory.newInstance(synthesizeAnnotation(attributes, Log.out.class, null), new ToStringPrinter());
     }
 }

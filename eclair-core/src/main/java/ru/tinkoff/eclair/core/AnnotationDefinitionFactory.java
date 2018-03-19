@@ -3,6 +3,7 @@ package ru.tinkoff.eclair.core;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.annotation.Mdc;
 import ru.tinkoff.eclair.definition.*;
+import ru.tinkoff.eclair.definition.factory.*;
 import ru.tinkoff.eclair.printer.Printer;
 
 import java.lang.reflect.Method;
@@ -33,15 +34,15 @@ public final class AnnotationDefinitionFactory {
         Log.in logIn = annotationExtractor.findLogIn(method, loggerNames);
         List<Log.arg> logArgs = annotationExtractor.findLogArgs(method, loggerNames);
         if (nonNull(logIn)) {
-            return InLog.newInstance(logIn, buildArgLogs(logArgs, method, logIn));
+            return InLogFactory.newInstance(logIn, buildArgLogs(logArgs, method, logIn));
         }
         Log log = annotationExtractor.findLog(method, loggerNames);
         if (nonNull(log)) {
             logIn = annotationExtractor.synthesizeLogIn(log);
-            return InLog.newInstance(logIn, buildArgLogs(logArgs, method, logIn));
+            return InLogFactory.newInstance(logIn, buildArgLogs(logArgs, method, logIn));
         }
         if (!logArgs.isEmpty() && logArgs.stream().anyMatch(Objects::nonNull)) {
-            return InLog.newInstance(DEFAULT_LOG_IN, buildArgLogs(logArgs, method, null));
+            return InLogFactory.newInstance(DEFAULT_LOG_IN, buildArgLogs(logArgs, method, null));
         }
         return null;
     }
@@ -61,33 +62,33 @@ public final class AnnotationDefinitionFactory {
             logArg = annotationExtractor.synthesizeLogArg(logIn);
         }
         Printer printer = printerResolver.resolve(logArg.printer(), parameterType);
-        return new ArgLog(logArg, printer);
+        return ArgLogFactory.newInstance(logArg, printer);
     }
 
     public OutLog buildOutLog(Set<String> loggerNames, Method method) {
         Log.out logOut = annotationExtractor.findLogOut(method, loggerNames);
         if (nonNull(logOut)) {
             Printer printer = printerResolver.resolve(logOut.printer(), method.getReturnType());
-            return new OutLog(logOut, printer);
+            return OutLogFactory.newInstance(logOut, printer);
         }
         Log log = annotationExtractor.findLog(method, loggerNames);
         if (nonNull(log)) {
             Log.out syntheticLogOut = annotationExtractor.synthesizeLogOut(log);
             Printer printer = printerResolver.resolve(syntheticLogOut.printer(), method.getReturnType());
-            return new OutLog(syntheticLogOut, printer);
+            return OutLogFactory.newInstance(syntheticLogOut, printer);
         }
         return null;
     }
 
     public Set<ErrorLog> buildErrorLogs(Set<String> loggerNames, Method method) {
         return annotationExtractor.findLogErrors(method, loggerNames).stream()
-                .map(ErrorLog::new)
+                .map(ErrorLogFactory::newInstance)
                 .collect(toCollection(LinkedHashSet::new));
     }
 
     public MdcPack buildMdcPack(Method method) {
         Set<Mdc> methodMdcs = annotationExtractor.getMdcs(method);
         List<Set<Mdc>> parametersMdcs = annotationExtractor.getParametersMdcs(method);
-        return MdcPack.newInstance(method, methodMdcs, parametersMdcs);
+        return MdcPackFactory.newInstance(method, methodMdcs, parametersMdcs);
     }
 }
