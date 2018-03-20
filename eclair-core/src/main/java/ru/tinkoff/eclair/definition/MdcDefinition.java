@@ -13,8 +13,9 @@ public class MdcDefinition {
 
     @NonNull
     private String key;
+
     @NonNull
     private String value;
-    @NonNull
+
     private boolean global;
 }

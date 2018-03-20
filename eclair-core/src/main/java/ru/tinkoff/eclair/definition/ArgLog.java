@@ -15,6 +15,7 @@ public class ArgLog {
 
     @NonNull
     private LogLevel ifEnabledLevel;
+
     @NonNull
     private Printer printer;
 }

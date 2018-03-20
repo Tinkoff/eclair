@@ -1,5 +1,7 @@
 package ru.tinkoff.eclair.logger;
 
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.Setter;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.boot.logging.LogLevel;
@@ -30,6 +32,7 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
     private final ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
     private final LoggerNameBuilder loggerNameBuilder = LoggerNameBuilder.getInstance();
 
+    @Getter(AccessLevel.PACKAGE)
     private final LoggerFacadeFactory loggerFacadeFactory;
     private final LoggingSystem loggingSystem;
 

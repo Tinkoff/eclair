@@ -17,10 +17,16 @@ public class InLog implements LogDefinition {
 
     @NonNull
     private LogLevel level;
+
     @NonNull
     private LogLevel ifEnabledLevel;
+
+    /**
+     * TODO: not used?
+     */
     @NonNull
     private LogLevel verboseLevel;
+
     @NonNull
     @Singular
     private List<ArgLog> argLogs;

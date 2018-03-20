@@ -4,6 +4,7 @@ import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.annotation.Mdc;
+import ru.tinkoff.eclair.logger.Dto;
 import ru.tinkoff.eclair.logger.ManualLogger;
 
 import java.util.Random;
@@ -163,7 +164,7 @@ public class Example {
      * DEBUG r.t.e.e.Example.verboseDtoToXmlOrJsonOrString <
      *
      * or else Object.toString()
-     * DEBUG r.t.e.e.Example.verboseDtoToXmlOrJsonOrString > dto=ru.tinkoff.eclair.example.Dto@6b884d57, i=0
+     * DEBUG r.t.e.e.Example.verboseDtoToXmlOrJsonOrString > dto=ru.tinkoff.eclair.logger.Dto@6b884d57, i=0
      * DEBUG r.t.e.e.Example.verboseDtoToXmlOrJsonOrString <
      */
     @Log

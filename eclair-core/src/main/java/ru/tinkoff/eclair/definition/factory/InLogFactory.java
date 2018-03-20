@@ -7,7 +7,6 @@ import ru.tinkoff.eclair.definition.InLog;
 
 import java.util.List;
 
-import static java.util.Collections.unmodifiableList;
 import static java.util.Objects.isNull;
 
 /**
@@ -27,7 +26,7 @@ public class InLogFactory {
                 .level(AnnotationAttribute.LEVEL.extract(logIn))
                 .ifEnabledLevel(logIn.ifEnabled())
                 .verboseLevel(logIn.verbose())
-                .argLogs(unmodifiableList(argLogs))
+                .argLogs(argLogs)
                 .build();
     }
 }

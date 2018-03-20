@@ -18,9 +18,11 @@ public class MdcPack {
 
     @NonNull
     private Method method;
+
     @NonNull
     @Singular
     private Set<MdcDefinition> methodDefinitions;
+
     @NonNull
     @Singular
     private List<Set<MdcDefinition>> parameterDefinitions;

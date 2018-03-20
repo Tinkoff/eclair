@@ -28,12 +28,13 @@ public class LogPack {
     @Getter
     @NonNull
     private Method method;
+
     @Getter
-    @NonNull
     private InLog inLog;
+
     @Getter
-    @NonNull
     private OutLog outLog;
+
     @NonNull
     @Singular
     private Set<ErrorLog> errorLogs;

@@ -15,10 +15,13 @@ public class OutLog implements LogDefinition {
 
     @NonNull
     private LogLevel level;
+
     @NonNull
     private LogLevel ifEnabledLevel;
+
     @NonNull
     private LogLevel verboseLevel;
+
     @NonNull
     private Printer printer;
 }

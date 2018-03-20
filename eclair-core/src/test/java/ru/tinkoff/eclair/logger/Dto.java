@@ -1,4 +1,4 @@
-package ru.tinkoff.eclair.example;
+package ru.tinkoff.eclair.logger;
 
 import lombok.Getter;
 import lombok.Setter;

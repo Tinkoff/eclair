@@ -24,12 +24,15 @@ public class ErrorLog implements LogDefinition {
     @Getter
     @NonNull
     private LogLevel level;
+
     @Getter
     @NonNull
     private LogLevel ifEnabledLevel;
+
     @Getter
     @NonNull
     private LogLevel verboseLevel;
+
     @NonNull
     private Filter filter;
 
