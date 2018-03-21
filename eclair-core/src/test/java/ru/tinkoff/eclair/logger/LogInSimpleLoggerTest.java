@@ -301,19 +301,26 @@ public class LogInSimpleLoggerTest {
     @Test
     public void printers() {
         // given, when
+        Printer inLogPrinter = new Printer() {
+            @Override
+            protected String serialize(Object input) {
+                return "!";
+            }
+        };
         Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
         marshaller.setClassesToBeBound(Dto.class);
         SimpleLogger logger = new SimpleLoggerBuilder()
                 .method(methodWithParameters)
                 .arguments("s", 1, new Dto())
                 .levels(DEBUG, OFF, DEBUG)
+                .printer(inLogPrinter)
                 .argLog(DEBUG, new JacksonPrinter(new ObjectMapper()))
-                .argLog(DEBUG, new ToStringPrinter())
+                .argLog(null)
                 .argLog(DEBUG, new Jaxb2Printer(marshaller))
                 .effectiveLevel(DEBUG)
                 .buildAndInvokeAndGet();
         // then
-        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any())).log(DEBUG, "> s=\"s\", i=1, dto=<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><dto><i>0</i></dto>");
+        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any())).log(DEBUG, "> s=\"s\", i=!, dto=<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><dto><i>0</i></dto>");
     }
 
     private class SimpleLoggerBuilder {
