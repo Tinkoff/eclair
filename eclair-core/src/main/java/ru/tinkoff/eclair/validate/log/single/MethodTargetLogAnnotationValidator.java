@@ -8,7 +8,7 @@ import ru.tinkoff.eclair.core.AnnotationAttribute;
 import java.lang.annotation.Annotation;
 
 import static java.lang.String.format;
-import static org.springframework.boot.logging.LogLevel.*;
+import static org.springframework.boot.logging.LogLevel.OFF;
 
 /**
  * TODO: verbose, printer for empty parameter array (or (v|V)oid return type)

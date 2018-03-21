@@ -12,7 +12,6 @@ import ru.tinkoff.eclair.core.LoggerNameBuilder;
 import ru.tinkoff.eclair.definition.*;
 import ru.tinkoff.eclair.logger.facade.LoggerFacadeFactory;
 
-import java.util.List;
 import java.util.function.Supplier;
 
 import static java.util.Objects.isNull;
@@ -89,66 +88,111 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
         return expectedLevel.ordinal() >= actualLevel.ordinal() && actualLevel != OFF;
     }
 
+    /**
+     * Lazy check
+     *
+     * @see SimpleLogger#logIn(org.aopalliance.intercept.MethodInvocation, ru.tinkoff.eclair.definition.LogPack)
+     */
+    @Override
+    protected boolean isLogInNecessary(MethodInvocation invocation, LogPack logPack) {
+        return true;
+    }
+
     @Override
     protected void logIn(MethodInvocation invocation, LogPack logPack) {
-        InLog inLog = logPack.getInLog();
+        LogLevel level;
+        boolean verboseLevelEnabled = false;
         String loggerName = getLoggerName(invocation);
-        String message = IN + buildArgumentsClause(invocation, inLog, loggerName);
-        loggerFacadeFactory.getLoggerFacade(loggerName).log(inLog.getLevel(), message);
+        InLog inLog = logPack.getInLog();
+        boolean inLogIsNull = isNull(inLog);
+
+        if (inLogIsNull) {
+            level = LogLevel.TRACE;
+        } else {
+            level = inLog.getLevel();
+            if (!isLevelEnabled(loggerName, level)) {
+                return;
+            }
+            verboseLevelEnabled = isLevelEnabled(loggerName, inLog.getVerboseLevel());
+        }
+
+        // TODO: cache this data at application start
+        String[] parameterNames = null;
+        if (printParameterName) {
+            parameterNames = parameterNameDiscoverer.getParameterNames(invocation.getMethod());
+        }
+
+        StringBuilder builder = new StringBuilder();
+        boolean verboseFound = false;
+        Object[] arguments = invocation.getArguments();
+        for (int a = 0; a < arguments.length; a++) {
+            ArgLog argLog = logPack.getArgLogs().get(a);
+
+            if (inLogIsNull) {
+                if (isNull(argLog) || !isLevelEnabled(loggerName, argLog.getIfEnabledLevel())) {
+                    continue;
+                }
+                if (argLog.getIfEnabledLevel().ordinal() > level.ordinal()) {
+                    level = argLog.getIfEnabledLevel();
+                }
+            } else if (isNull(argLog)) {
+                if (!verboseLevelEnabled) {
+                    continue;
+                }
+            } else if (!isLevelEnabled(loggerName, argLog.getIfEnabledLevel())) {
+                continue;
+            }
+
+            if (verboseFound) {
+                builder.append(", ");
+            } else {
+                builder.append(" ");
+                verboseFound = true;
+            }
+
+            if (printParameterName && nonNull(parameterNames)) {
+                builder.append(parameterNames[a]).append("=");
+            }
+
+            Object argument = arguments[a];
+            if (isNull(argument)) {
+                builder.append((String) null);
+            } else if (inLogIsNull) {
+                builder.append(argLog.getPrinter().print(argument));
+            } else {
+                builder.append(inLog.getPrinter().print(argument));
+            }
+        }
+
+        if (!inLogIsNull || verboseFound) {
+            String message = IN + builder.toString();
+            loggerFacadeFactory.getLoggerFacade(loggerName).log(level, message);
+        }
+    }
+
+    /**
+     * Lazy check
+     *
+     * @see SimpleLogger#logOut(org.aopalliance.intercept.MethodInvocation, ru.tinkoff.eclair.definition.LogPack, java.lang.Object)
+     * @see SimpleLogger#logError(org.aopalliance.intercept.MethodInvocation, ru.tinkoff.eclair.definition.LogPack, java.lang.Throwable)
+     */
+    @Override
+    protected boolean isLogOutNecessary(MethodInvocation invocation, LogPack logPack) {
+        return true;
     }
 
     @Override
     protected void logOut(MethodInvocation invocation, LogPack logPack, Object result) {
         OutLog outLog = logPack.getOutLog();
+        if (isNull(outLog)) {
+            return;
+        }
         String loggerName = getLoggerName(invocation);
+        if (!isLevelEnabled(loggerName, expectedLevelResolver.apply(logPack.getOutLog()))) {
+            return;
+        }
         String message = OUT + buildResultClause(invocation, outLog, result, loggerName);
         loggerFacadeFactory.getLoggerFacade(loggerName).log(outLog.getLevel(), message);
-    }
-
-    @Override
-    public void logError(MethodInvocation invocation, LogPack logPack, Throwable throwable) {
-        ErrorLog errorLog = logPack.findErrorLog(throwable.getClass());
-        String loggerName = getLoggerName(invocation);
-        String message = ERROR + buildCauseClause(errorLog, throwable, loggerName);
-        loggerFacadeFactory.getLoggerFacade(loggerName).log(errorLog.getLevel(), message, throwable);
-    }
-
-    @Override
-    protected void logEmergencyOut(MethodInvocation invocation, LogPack logPack, Throwable throwable) {
-        String loggerName = getLoggerName(invocation);
-        loggerFacadeFactory.getLoggerFacade(loggerName).log(logPack.getOutLog().getLevel(), ERROR);
-    }
-
-    private String buildArgumentsClause(MethodInvocation invocation, InLog inLog, String loggerName) {
-        StringBuilder builder = new StringBuilder();
-        List<ArgLog> argLogs = inLog.getArgLogs();
-        Object[] arguments = invocation.getArguments();
-        String[] parameterNames = null;
-        if (printParameterName) {
-            parameterNames = parameterNameDiscoverer.getParameterNames(invocation.getMethod());
-        }
-        int length = arguments.length;
-        boolean verboseFound = false;
-        for (int a = 0; a < length; a++) {
-            ArgLog argLog = argLogs.get(a);
-            if (nonNull(argLog) && isLevelEnabled(loggerName, argLog.getIfEnabledLevel())) {
-                if (verboseFound) {
-                    builder.append(", ");
-                } else {
-                    verboseFound = true;
-                }
-                if (printParameterName && nonNull(parameterNames)) {
-                    builder.append(parameterNames[a]).append("=");
-                }
-                Object argument = arguments[a];
-                if (isNull(argument)) {
-                    builder.append((String) null);
-                } else {
-                    builder.append(argLog.getPrinter().print(argument));
-                }
-            }
-        }
-        return builder.length() > 0 ? " " + builder : "";
     }
 
     private String buildResultClause(MethodInvocation invocation, OutLog outLog, Object result, String loggerName) {
@@ -162,6 +206,36 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
             }
         }
         return "";
+    }
+
+    /**
+     * Lazy check
+     *
+     * @see SimpleLogger#logError(org.aopalliance.intercept.MethodInvocation, ru.tinkoff.eclair.definition.LogPack, java.lang.Throwable)
+     */
+    @Override
+    protected boolean isLogErrorNecessary(MethodInvocation invocation, LogPack logPack, Throwable throwable) {
+        return true;
+    }
+
+    @Override
+    public void logError(MethodInvocation invocation, LogPack logPack, Throwable throwable) {
+        ErrorLog errorLog = logPack.findErrorLog(throwable.getClass());
+        if (nonNull(errorLog)) {
+            String loggerName = getLoggerName(invocation);
+            if (isLevelEnabled(loggerName, expectedLevelResolver.apply(errorLog))) {
+                String message = ERROR + buildCauseClause(errorLog, throwable, loggerName);
+                loggerFacadeFactory.getLoggerFacade(loggerName).log(errorLog.getLevel(), message, throwable);
+            }
+        } else {
+            OutLog outLog = logPack.getOutLog();
+            if (nonNull(outLog)) {
+                String loggerName = getLoggerName(invocation);
+                if (isLevelEnabled(loggerName, expectedLevelResolver.apply(outLog))) {
+                    loggerFacadeFactory.getLoggerFacade(loggerName).log(outLog.getLevel(), ERROR);
+                }
+            }
+        }
     }
 
     private String buildCauseClause(ErrorLog errorLog, Throwable throwable, String loggerName) {

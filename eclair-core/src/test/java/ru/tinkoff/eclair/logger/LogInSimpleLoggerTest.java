@@ -119,7 +119,7 @@ public class LogInSimpleLoggerTest {
                 .effectiveLevel(DEBUG)
                 .buildAndInvokeAndGet();
         // then
-        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any())).log(DEBUG, ">");
+        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any())).log(DEBUG, "> s=\"s\", i=1, dto=Dto{i=0, s='null'}");
     }
 
     @Test
@@ -136,7 +136,7 @@ public class LogInSimpleLoggerTest {
                 .effectiveLevel(DEBUG)
                 .buildAndInvokeAndGet();
         // then
-        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any())).log(DEBUG, "> i=1, dto=Dto{i=0, s='null'}");
+        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any())).log(DEBUG, "> s=\"s\", i=1, dto=Dto{i=0, s='null'}");
     }
 
     @Test
@@ -153,7 +153,7 @@ public class LogInSimpleLoggerTest {
                 .effectiveLevel(DEBUG)
                 .buildAndInvokeAndGet();
         // then
-        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any())).log(DEBUG, "> s=\"s\", dto=Dto{i=0, s='null'}");
+        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any())).log(DEBUG, "> s=\"s\", i=1, dto=Dto{i=0, s='null'}");
     }
 
     @Test
@@ -170,7 +170,7 @@ public class LogInSimpleLoggerTest {
                 .effectiveLevel(DEBUG)
                 .buildAndInvokeAndGet();
         // then
-        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any())).log(DEBUG, "> s=\"s\", i=1");
+        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any())).log(DEBUG, "> s=\"s\", i=1, dto=Dto{i=0, s='null'}");
     }
 
     @Test
@@ -195,6 +195,7 @@ public class LogInSimpleLoggerTest {
         private LogLevel level = DEBUG;
         private LogLevel ifEnabledLevel = OFF;
         private LogLevel verboseLevel = DEBUG;
+        private Printer printer = new ToStringPrinter();
         private List<ArgLog> argLogs = new ArrayList<>();
         private LogLevel effectiveLevel;
         private boolean printParameterName = true;
@@ -213,6 +214,11 @@ public class LogInSimpleLoggerTest {
             this.level = level;
             this.ifEnabledLevel = ifEnabledLevel;
             this.verboseLevel = verboseLevel;
+            return this;
+        }
+
+        private SimpleLoggerBuilder printer(Printer printer) {
+            this.printer = printer;
             return this;
         }
 
@@ -258,7 +264,7 @@ public class LogInSimpleLoggerTest {
                     .level(level)
                     .ifEnabledLevel(ifEnabledLevel)
                     .verboseLevel(verboseLevel)
-                    .argLogs(argLogs)
+                    .printer(printer)
                     .build();
             return buildAndInvokeAndGet(inLog);
         }
@@ -269,7 +275,7 @@ public class LogInSimpleLoggerTest {
             SimpleLogger simpleLogger = new SimpleLogger(loggerFacadeFactory(), loggingSystem(effectiveLevel));
             simpleLogger.setPrintParameterName(printParameterName);
             // when
-            simpleLogger.logInIfNecessary(invocation, logPack(inLog));
+            simpleLogger.logInIfNecessary(invocation, logPack(inLog, argLogs));
             return simpleLogger;
         }
 
@@ -290,9 +296,10 @@ public class LogInSimpleLoggerTest {
             return loggingSystem;
         }
 
-        private LogPack logPack(InLog inLog) {
+        private LogPack logPack(InLog inLog, List<ArgLog> argLogs) {
             LogPack logPack = mock(LogPack.class);
             when(logPack.getInLog()).thenReturn(inLog);
+            when(logPack.getArgLogs()).thenReturn(argLogs);
             return logPack;
         }
     }

@@ -8,19 +8,13 @@ import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.annotation.Logs;
 import ru.tinkoff.eclair.annotation.Mdc;
-import ru.tinkoff.eclair.definition.ErrorLog;
-import ru.tinkoff.eclair.definition.InLog;
-import ru.tinkoff.eclair.definition.MdcPack;
-import ru.tinkoff.eclair.definition.OutLog;
+import ru.tinkoff.eclair.definition.*;
 import ru.tinkoff.eclair.printer.JacksonPrinter;
 import ru.tinkoff.eclair.printer.Jaxb2Printer;
 import ru.tinkoff.eclair.printer.Printer;
 
 import java.lang.reflect.Method;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
@@ -59,23 +53,6 @@ public class AnnotationDefinitionFactoryTest {
         InLog inLog = annotationDefinitionFactory.buildInLog(loggerNames, method);
         // then
         assertThat(inLog.getLevel(), is(INFO));
-        assertThat(inLog.getArgLogs(), hasSize(2));
-        assertThat(inLog.getArgLogs().get(0).getPrinter(), is(jsonPrinter));
-        assertThat(inLog.getArgLogs().get(1).getPrinter(), is(jsonPrinter));
-    }
-
-    @Test
-    public void buildInLogByLogInLogArg() throws NoSuchMethodException {
-        // given
-        Set<String> loggerNames = singleton("");
-        Method method = LogInLoggableClass.class.getMethod("logInLogArg", String.class, String.class);
-        // when
-        InLog inLog = annotationDefinitionFactory.buildInLog(loggerNames, method);
-        // then
-        assertThat(inLog.getLevel(), is(INFO));
-        assertThat(inLog.getArgLogs().get(0).getIfEnabledLevel(), is(WARN));
-        assertThat(inLog.getArgLogs().get(0).getPrinter(), is(xmlPrinter));
-        assertThat(inLog.getArgLogs().get(1).getPrinter(), is(jsonPrinter));
     }
 
     @Test
@@ -87,11 +64,6 @@ public class AnnotationDefinitionFactoryTest {
         InLog inLog = annotationDefinitionFactory.buildInLog(loggerNames, method);
         // then
         assertThat(inLog.getLevel(), is(WARN));
-        assertThat(inLog.getIfEnabledLevel(), is(ERROR));
-        assertThat(inLog.getVerboseLevel(), is(TRACE));
-        assertThat(inLog.getArgLogs(), hasSize(2));
-        assertThat(inLog.getArgLogs().get(0).getPrinter(), is(jsonPrinter));
-        assertThat(inLog.getArgLogs().get(1).getPrinter(), is(jsonPrinter));
     }
 
     @Test
@@ -117,17 +89,16 @@ public class AnnotationDefinitionFactoryTest {
     }
 
     @Test
-    public void buildInLogByLogArg() throws NoSuchMethodException {
+    public void buildArgLogs() throws NoSuchMethodException {
         // given
         Set<String> loggerNames = singleton("");
         Method method = LogInLoggableClass.class.getMethod("logArg", String.class, String.class);
         // when
-        InLog inLog = annotationDefinitionFactory.buildInLog(loggerNames, method);
+        List<ArgLog> argLogs = annotationDefinitionFactory.buildArgLogs(loggerNames, method);
         // then
-        assertThat(inLog.getLevel(), is(DEBUG));
-        assertThat(inLog.getArgLogs(), hasSize(2));
-        assertThat(inLog.getArgLogs().get(0).getIfEnabledLevel(), is(WARN));
-        assertThat(inLog.getArgLogs().get(1), nullValue());
+        assertThat(argLogs, hasSize(2));
+        assertThat(argLogs.get(0).getIfEnabledLevel(), is(WARN));
+        assertThat(argLogs.get(1), nullValue());
     }
 
     @Test
@@ -155,16 +126,12 @@ public class AnnotationDefinitionFactoryTest {
     @SuppressWarnings("unused")
     private static class LogInLoggableClass {
 
-        @Log.in(level = INFO, printer = "json")
+        @Log.in(INFO)
         @Log(WARN)
         public void logIn(String a, String b) {
         }
 
-        @Log.in(level = INFO, printer = "json")
-        public void logInLogArg(@Log.arg(ifEnabled = WARN, printer = "xml") String a, String b) {
-        }
-
-        @Log(level = WARN, ifEnabled = ERROR, verbose = TRACE, printer = "json")
+        @Log(level = WARN)
         public void log(String a, String b) {
         }
 

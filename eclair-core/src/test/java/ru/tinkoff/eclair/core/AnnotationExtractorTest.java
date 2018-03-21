@@ -48,6 +48,7 @@ public class AnnotationExtractorTest {
         assertThat(methods, containsInAnyOrder(childMethod, parentMethod, interfaceMethod));
     }
 
+    @SuppressWarnings("unused")
     private interface Interface<T extends Throwable> {
 
         default void interfaceMethod() {
@@ -57,6 +58,7 @@ public class AnnotationExtractorTest {
         }
     }
 
+    @SuppressWarnings("unused")
     private static class Parent<T extends RuntimeException> implements Interface<T> {
 
         public void parentMethod() {
@@ -713,21 +715,5 @@ public class AnnotationExtractorTest {
         assertThat(logOut.verbose(), is(INFO));
         assertThat(logOut.printer(), is("printer"));
         assertThat(logOut.logger(), is("logger"));
-    }
-
-    @Test
-    public void synthesizeLogArg() {
-        // given
-        Map<String, Object> attributes = new HashMap<>();
-        attributes.put("verbose", INFO);
-        attributes.put("printer", "printer");
-        attributes.put("logger", "logger");
-        Log.in logIn = AnnotationUtils.synthesizeAnnotation(attributes, Log.in.class, null);
-        // when
-        Log.arg logArg = annotationExtractor.synthesizeLogArg(logIn);
-        // then
-        assertThat(logArg.ifEnabled(), is(INFO));
-        assertThat(logArg.printer(), is("printer"));
-        assertThat(logArg.logger(), is("logger"));
     }
 }

@@ -149,9 +149,10 @@ public class EclairProxyCreator extends AbstractAutoProxyCreator {
 
     private LogPack getLogPack(Set<String> loggerNames, Method method) {
         InLog inLog = annotationDefinitionFactory.buildInLog(loggerNames, method);
+        List<ArgLog> argLogs = annotationDefinitionFactory.buildArgLogs(loggerNames, method);
         OutLog outLog = annotationDefinitionFactory.buildOutLog(loggerNames, method);
         Set<ErrorLog> errorLogs = annotationDefinitionFactory.buildErrorLogs(loggerNames, method);
-        return LogPackFactory.newInstance(method, inLog, outLog, errorLogs);
+        return LogPackFactory.newInstance(method, inLog, argLogs, outLog, errorLogs);
     }
 
     private Object[] composeAdvisors(MdcAdvisor mdcAdvisor, List<LogAdvisor> logAdvisors) {

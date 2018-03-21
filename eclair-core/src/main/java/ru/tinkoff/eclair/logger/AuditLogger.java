@@ -34,9 +34,4 @@ public class AuditLogger extends EclairLogger {
     protected void logError(MethodInvocation invocation, LogPack logPack, Throwable throwable) {
         System.out.println(getLoggerName(invocation) + " " + throwable);
     }
-
-    @Override
-    protected void logEmergencyOut(MethodInvocation invocation, LogPack logPack, Throwable throwable) {
-        logError(invocation, logPack, throwable);
-    }
 }

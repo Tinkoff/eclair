@@ -7,21 +7,21 @@ import ru.tinkoff.eclair.definition.factory.*;
 import ru.tinkoff.eclair.printer.Printer;
 
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
-import static org.springframework.core.annotation.AnnotationUtils.synthesizeAnnotation;
 
 /**
  * @author Viacheslav Klapatniuk
  */
 public final class AnnotationDefinitionFactory {
-
-    private static final Log.in DEFAULT_LOG_IN = synthesizeAnnotation(Log.in.class);
 
     private final AnnotationExtractor annotationExtractor = AnnotationExtractor.getInstance();
     private final PrinterResolver printerResolver;
@@ -32,34 +32,30 @@ public final class AnnotationDefinitionFactory {
 
     public InLog buildInLog(Set<String> loggerNames, Method method) {
         Log.in logIn = annotationExtractor.findLogIn(method, loggerNames);
-        List<Log.arg> logArgs = annotationExtractor.findLogArgs(method, loggerNames);
         if (nonNull(logIn)) {
-            return InLogFactory.newInstance(logIn, buildArgLogs(logArgs, method, logIn));
+            Printer printer = printerResolver.resolve(logIn.printer(), method.getReturnType());
+            return InLogFactory.newInstance(logIn, printer);
         }
         Log log = annotationExtractor.findLog(method, loggerNames);
         if (nonNull(log)) {
             logIn = annotationExtractor.synthesizeLogIn(log);
-            return InLogFactory.newInstance(logIn, buildArgLogs(logArgs, method, logIn));
-        }
-        if (!logArgs.isEmpty() && logArgs.stream().anyMatch(Objects::nonNull)) {
-            return InLogFactory.newInstance(DEFAULT_LOG_IN, buildArgLogs(logArgs, method, null));
+            Printer printer = printerResolver.resolve(logIn.printer(), method.getReturnType());
+            return InLogFactory.newInstance(logIn, printer);
         }
         return null;
     }
 
-    private List<ArgLog> buildArgLogs(List<Log.arg> logArgs, Method method, Log.in logIn) {
+    public List<ArgLog> buildArgLogs(Set<String> loggerNames, Method method) {
+        List<Log.arg> logArgs = annotationExtractor.findLogArgs(method, loggerNames);
         Iterator<Log.arg> logArgIterator = logArgs.iterator();
         return Stream.of(method.getParameterTypes())
-                .map(clazz -> buildArgLog(logArgIterator.next(), clazz, logIn))
+                .map(clazz -> buildArgLog(logArgIterator.next(), clazz))
                 .collect(toList());
     }
 
-    private ArgLog buildArgLog(Log.arg logArg, Class<?> parameterType, Log.in logIn) {
+    private ArgLog buildArgLog(Log.arg logArg, Class<?> parameterType) {
         if (isNull(logArg)) {
-            if (isNull(logIn)) {
-                return null;
-            }
-            logArg = annotationExtractor.synthesizeLogArg(logIn);
+            return null;
         }
         Printer printer = printerResolver.resolve(logArg.printer(), parameterType);
         return ArgLogFactory.newInstance(logArg, printer);

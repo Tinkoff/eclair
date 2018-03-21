@@ -9,6 +9,7 @@ import ru.tinkoff.eclair.core.ErrorLogResolver;
 import ru.tinkoff.eclair.definition.factory.ErrorLogFactory;
 
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,6 +32,10 @@ public class LogPack {
 
     @Getter
     private InLog inLog;
+
+    @Getter
+    @Singular
+    private List<ArgLog> argLogs;
 
     @Getter
     private OutLog outLog;

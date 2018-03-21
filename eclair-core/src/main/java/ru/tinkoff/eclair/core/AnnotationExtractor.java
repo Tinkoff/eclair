@@ -146,11 +146,4 @@ public final class AnnotationExtractor {
     Log.out synthesizeLogOut(Log log) {
         return synthesizeAnnotation(getAnnotationAttributes(log), Log.out.class, null);
     }
-
-    Log.arg synthesizeLogArg(Log.in logIn) {
-        Map<String, Object> attributes = getAnnotationAttributes(logIn);
-        attributes.put("value", logIn.verbose());
-        attributes.put("ifEnabled", logIn.verbose());
-        return synthesizeAnnotation(attributes, Log.arg.class, null);
-    }
 }
