@@ -1,15 +1,19 @@
 package ru.tinkoff.eclair.logger;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.aopalliance.intercept.MethodInvocation;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.boot.logging.LogLevel;
 import org.springframework.boot.logging.LoggerConfiguration;
 import org.springframework.boot.logging.LoggingSystem;
+import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import ru.tinkoff.eclair.definition.ArgLog;
 import ru.tinkoff.eclair.definition.InLog;
 import ru.tinkoff.eclair.definition.LogPack;
 import ru.tinkoff.eclair.logger.facade.LoggerFacadeFactory;
+import ru.tinkoff.eclair.printer.JacksonPrinter;
+import ru.tinkoff.eclair.printer.Jaxb2Printer;
 import ru.tinkoff.eclair.printer.Printer;
 import ru.tinkoff.eclair.printer.ToStringPrinter;
 
@@ -123,6 +127,20 @@ public class LogInSimpleLoggerTest {
     }
 
     @Test
+    public void argLogsAreNullIfEnabledSmallerThanEffectiveLevel() {
+        // given, when
+        SimpleLogger logger = new SimpleLoggerBuilder()
+                .method(methodWithParameters)
+                .arguments("s", 1, new Dto())
+                .levels(DEBUG, TRACE, DEBUG)
+                .argLogs(null, null, null)
+                .effectiveLevel(DEBUG)
+                .buildAndInvokeAndGet();
+        // then
+        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any()), never()).log(any(), any());
+    }
+
+    @Test
     public void firstArgLogIsNull() {
         // given, when
         Printer printer = new ToStringPrinter();
@@ -186,6 +204,116 @@ public class LogInSimpleLoggerTest {
                 .buildAndInvokeAndGet();
         // then
         verify(logger.getLoggerFacadeFactory().getLoggerFacade(any())).log(INFO, "> i=1");
+    }
+
+    @Test
+    public void inLogIsNullFirstArgLogIsNullLastArgLogNotEnabled() {
+        // given, when
+        Printer printer = new ToStringPrinter();
+        SimpleLogger logger = new SimpleLoggerBuilder()
+                .method(methodWithParameters)
+                .arguments("s", 1, new Dto())
+                .argLog(null)
+                .argLog(INFO, printer)
+                .argLog(DEBUG, printer)
+                .effectiveLevel(INFO)
+                .buildAndInvokeAndGet(null);
+        // then
+        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any())).log(INFO, "> i=1");
+    }
+
+    @Test
+    public void inLogIsNullMaximumArgLogEnabledLevelFound() {
+        // given, when
+        Printer printer = new ToStringPrinter();
+        SimpleLogger logger = new SimpleLoggerBuilder()
+                .method(methodWithParameters)
+                .arguments("s", 1, new Dto())
+                .argLog(null)
+                .argLog(DEBUG, printer)
+                .argLog(INFO, printer)
+                .effectiveLevel(DEBUG)
+                .buildAndInvokeAndGet(null);
+        // then
+        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any())).log(INFO, "> i=1, dto=Dto{i=0, s='null'}");
+    }
+
+    @Test
+    public void argLogsAreNullInLogIfEnabledLevelDenied() {
+        // given, when
+        SimpleLogger logger = new SimpleLoggerBuilder()
+                .method(methodWithParameters)
+                .arguments("s", 1, new Dto())
+                .levels(INFO, DEBUG, DEBUG)
+                .argLogs(null, null, null)
+                .effectiveLevel(INFO)
+                .buildAndInvokeAndGet();
+        // then
+        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any()), never()).log(any(), any());
+    }
+
+    @Test
+    public void argLogsIfEnabledLevelsAreDenied() {
+        // given, when
+        Printer printer = new ToStringPrinter();
+        SimpleLogger logger = new SimpleLoggerBuilder()
+                .method(methodWithParameters)
+                .levels(INFO, OFF, DEBUG/*?*/)
+                .arguments("s", 1, new Dto())
+                .argLog(DEBUG, printer)
+                .argLog(DEBUG, printer)
+                .argLog(DEBUG, printer)
+                .argLogs(null, null, null)
+                .effectiveLevel(INFO)
+                .buildAndInvokeAndGet();
+        // then
+        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any())).log(INFO, ">");
+    }
+
+    @Test
+    public void argLogsAreNullInLogVerboseLevelDenied() {
+        // given, when
+        SimpleLogger logger = new SimpleLoggerBuilder()
+                .method(methodWithParameters)
+                .arguments("s", 1, new Dto())
+                .levels(INFO, OFF, DEBUG)
+                .argLogs(null, null, null)
+                .effectiveLevel(INFO)
+                .buildAndInvokeAndGet();
+        // then
+        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any())).log(INFO, ">");
+    }
+
+    @Test
+    public void argumentsAreNull() {
+        // given, when
+        SimpleLogger logger = new SimpleLoggerBuilder()
+                .method(methodWithParameters)
+                .arguments(null, null, null)
+                .levels(DEBUG, OFF, DEBUG)
+                .argLogs(null, null, null)
+                .effectiveLevel(DEBUG)
+                .buildAndInvokeAndGet();
+        // then
+        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any())).log(DEBUG, "> s=null, i=null, dto=null");
+    }
+
+    @Test
+    public void printers() {
+        // given, when
+        Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
+        marshaller.setClassesToBeBound(Dto.class);
+        SimpleLogger logger = new SimpleLoggerBuilder()
+                .method(methodWithParameters)
+                .arguments("s", 1, new Dto())
+                .levels(DEBUG, OFF, DEBUG)
+                .argLog(DEBUG, new JacksonPrinter(new ObjectMapper()))
+                .argLog(DEBUG, new ToStringPrinter())
+                .argLog(DEBUG, new Jaxb2Printer(marshaller))
+                .effectiveLevel(DEBUG)
+                .buildAndInvokeAndGet();
+        // then
+        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any())).log(DEBUG, "> s=\"s\", i=1, dto=<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><dto><i>0</i></dto>");
     }
 
     private class SimpleLoggerBuilder {

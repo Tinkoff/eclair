@@ -109,10 +109,10 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
         if (inLogIsNull) {
             level = LogLevel.TRACE;
         } else {
-            level = inLog.getLevel();
-            if (!isLevelEnabled(loggerName, level)) {
+            if (!isLevelEnabled(loggerName, expectedLevelResolver.apply(inLog))) {
                 return;
             }
+            level = inLog.getLevel();
             verboseLevelEnabled = isLevelEnabled(loggerName, inLog.getVerboseLevel());
         }
 
@@ -157,7 +157,7 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
             Object argument = arguments[a];
             if (isNull(argument)) {
                 builder.append((String) null);
-            } else if (inLogIsNull) {
+            } else if (nonNull(argLog)) {
                 builder.append(argLog.getPrinter().print(argument));
             } else {
                 builder.append(inLog.getPrinter().print(argument));
