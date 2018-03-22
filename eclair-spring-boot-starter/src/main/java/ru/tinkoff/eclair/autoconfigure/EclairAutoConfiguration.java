@@ -20,6 +20,7 @@ import ru.tinkoff.eclair.logger.facade.JavaLoggerFacadeFactory;
 import ru.tinkoff.eclair.logger.facade.LoggerFacadeFactory;
 import ru.tinkoff.eclair.logger.facade.Slf4JLoggerFacadeFactory;
 import ru.tinkoff.eclair.printer.*;
+import ru.tinkoff.eclair.printer.processor.JaxbElementWrapper;
 import ru.tinkoff.eclair.validate.BeanClassValidator;
 
 import java.util.List;
@@ -46,8 +47,9 @@ public class EclairAutoConfiguration {
     @ConditionalOnMissingBean
     @ConditionalOnSingleCandidate(Jaxb2Marshaller.class)
     @Order(100)
-    public WrappingJaxb2Printer jaxb2Printer(Jaxb2Marshaller jaxb2Marshaller) {
-        return new WrappingJaxb2Printer(jaxb2Marshaller);
+    public Printer jaxb2Printer(Jaxb2Marshaller jaxb2Marshaller) {
+        return new Jaxb2Printer(jaxb2Marshaller)
+                .addPreProcessor(new JaxbElementWrapper(jaxb2Marshaller));
     }
 
     @Bean

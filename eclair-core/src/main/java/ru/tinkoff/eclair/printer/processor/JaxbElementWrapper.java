@@ -1,4 +1,4 @@
-package ru.tinkoff.eclair.printer;
+package ru.tinkoff.eclair.printer.processor;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.core.io.Resource;
@@ -30,28 +30,27 @@ import static org.springframework.core.annotation.AnnotationUtils.findAnnotation
 import static org.springframework.util.StringUtils.hasText;
 
 /**
- * TODO: add tests
- *
  * @author Viacheslav Klapatniuk
  */
-public class WrappingJaxb2Printer extends Jaxb2Printer {
+public class JaxbElementWrapper implements PrinterPreProcessor {
 
     private static final Object EMPTY_METHOD = new Object();
     private static final ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
     private static final MetadataReaderFactory metadataReaderFactory = new CachingMetadataReaderFactory(resourcePatternResolver);
 
     private final Map<Class<?>, Object> wrapperMethodCache = new ConcurrentHashMap<>();
+    private final Jaxb2Marshaller jaxb2Marshaller;
 
-    public WrappingJaxb2Printer(Jaxb2Marshaller jaxb2Marshaller) {
-        super(jaxb2Marshaller);
+    public JaxbElementWrapper(Jaxb2Marshaller jaxb2Marshaller) {
+        this.jaxb2Marshaller = jaxb2Marshaller;
     }
 
     @Override
-    public String serialize(Object input) {
+    public Object process(Object input) {
         if (isNull(findAnnotation(input.getClass(), XmlRootElement.class))) {
-            input = wrap(jaxb2Marshaller, input);
+            return wrap(jaxb2Marshaller, input);
         }
-        return super.serialize(input);
+        return input;
     }
 
     private Object wrap(Jaxb2Marshaller jaxb2Marshaller, Object input) {
