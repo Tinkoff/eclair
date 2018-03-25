@@ -7,11 +7,15 @@ import ru.tinkoff.eclair.annotation.Mdc;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
+import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.*;
 import static org.springframework.core.annotation.AnnotatedElementUtils.findMergedRepeatableAnnotations;
 import static org.springframework.core.annotation.AnnotationUtils.getAnnotationAttributes;
@@ -42,6 +46,7 @@ public final class AnnotationExtractor {
             Mdc.class
     );
 
+    private static final ReversedBridgeMethodResolver bridgeMethodResolver = ReversedBridgeMethodResolver.getInstance();
     private static final AnnotationExtractor instance = new AnnotationExtractor();
 
     private AnnotationExtractor() {
@@ -69,67 +74,86 @@ public final class AnnotationExtractor {
     }
 
     public Set<Log> getLogs(Method method) {
-        return findMergedRepeatableAnnotations(method, Log.class);
+        return findAnnotationOnMethodOrBridge(method, Log.class);
     }
 
     public Set<Log.in> getLogIns(Method method) {
-        return findMergedRepeatableAnnotations(method, Log.in.class);
+        return findAnnotationOnMethodOrBridge(method, Log.in.class);
     }
 
     public Set<Log.out> getLogOuts(Method method) {
-        return findMergedRepeatableAnnotations(method, Log.out.class);
+        return findAnnotationOnMethodOrBridge(method, Log.out.class);
     }
 
     public Set<Log.error> getLogErrors(Method method) {
-        return findMergedRepeatableAnnotations(method, Log.error.class);
+        return findAnnotationOnMethodOrBridge(method, Log.error.class);
     }
 
     public Set<Mdc> getMdcs(Method method) {
-        return findMergedRepeatableAnnotations(method, Mdc.class);
+        return findAnnotationOnMethodOrBridge(method, Mdc.class);
+    }
+
+    private <T extends Annotation> Set<T> findAnnotationOnMethodOrBridge(Method method, Class<T> annotationClass) {
+        Set<T> logs = findAnnotationOnMethod(method, annotationClass);
+        if (logs.isEmpty()) {
+            Method bridgeMethod = bridgeMethodResolver.findBridgeMethod(method);
+            if (nonNull(bridgeMethod)) {
+                return findAnnotationOnMethod(bridgeMethod, annotationClass);
+            }
+        }
+        return logs;
+    }
+
+    private <T extends Annotation> Set<T> findAnnotationOnMethod(Method method, Class<T> annotationClass) {
+        return findMergedRepeatableAnnotations(method, annotationClass);
     }
 
     public List<Set<Log.arg>> getLogArgs(Method method) {
         return Stream.of(method.getParameters())
-                .map(parameter -> findMergedRepeatableAnnotations(parameter, Log.arg.class))
+                .map(parameter -> findAnnotationOnParameter(parameter, Log.arg.class))
                 .collect(toList());
     }
 
     public List<Set<Mdc>> getParametersMdcs(Method method) {
         return Stream.of(method.getParameters())
-                .map(parameter -> findMergedRepeatableAnnotations(parameter, Mdc.class))
+                .map(parameter -> findAnnotationOnParameter(parameter, Mdc.class))
                 .collect(toList());
     }
 
+    private <T extends Annotation> Set<T>  findAnnotationOnParameter(Parameter parameter, Class<T> annotationClass) {
+        return findMergedRepeatableAnnotations(parameter, annotationClass);
+    }
+
     Log findLog(Method method, Set<String> loggers) {
-        return findAnnotation(getLogs(method), loggers);
+        return filterAndFindFirstAnnotation(getLogs(method), loggers);
     }
 
     Log.in findLogIn(Method method, Set<String> loggers) {
-        return findAnnotation(getLogIns(method), loggers);
+        return filterAndFindFirstAnnotation(getLogIns(method), loggers);
     }
 
     Log.out findLogOut(Method method, Set<String> loggers) {
-        return findAnnotation(getLogOuts(method), loggers);
+        return filterAndFindFirstAnnotation(getLogOuts(method), loggers);
     }
 
     Set<Log.error> findLogErrors(Method method, Set<String> loggers) {
-        return findAnnotations(getLogErrors(method), loggers);
+        return filterAnnotations(getLogErrors(method), loggers);
     }
 
     List<Log.arg> findLogArgs(Method method, Set<String> loggers) {
         return getLogArgs(method).stream()
-                .map(logArgs -> findAnnotation(logArgs, loggers))
+                .map(logArgs -> filterAndFindFirstAnnotation(logArgs, loggers))
                 .collect(toList());
     }
 
-    private <T extends Annotation> T findAnnotation(Collection<T> annotations, Set<?> loggers) {
+    private <T extends Annotation> T filterAndFindFirstAnnotation(Collection<T> annotations, Set<?> loggers) {
         return annotations.stream()
                 .filter(getLoggerPredicate(loggers))
                 .findFirst()
                 .orElse(null);
     }
 
-    private <T extends Annotation> Set<T> findAnnotations(Collection<T> annotations, Set<?> loggers) {
+    private <T extends Annotation> Set<T> filterAnnotations(Collection<T> annotations, Set<?> loggers) {
         return annotations.stream()
                 .filter(getLoggerPredicate(loggers))
                 .collect(toCollection(LinkedHashSet::new));

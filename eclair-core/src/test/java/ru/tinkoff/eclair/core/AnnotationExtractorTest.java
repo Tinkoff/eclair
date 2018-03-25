@@ -321,14 +321,14 @@ public class AnnotationExtractorTest {
         Method overriddenNotGenericMethod = AnnotatedChild.class.getMethod("overriddenNotGenericMethod", String.class);
         // when
         Set<Log> logs = annotationExtractor.getLogs(loggedOverriddenMethod);
-        Set<Log> emptyLogs = annotationExtractor.getLogs(overriddenMethod);
+        Set<Log> bridgedLogs = annotationExtractor.getLogs(overriddenMethod);
         Set<Log> overriddenLogIns = annotationExtractor.getLogs(overriddenNotGenericMethod);
         // then
         assertThat(logs, hasSize(1));
         assertThat(logs.iterator().next().level(), is(DEBUG));
 
-        // Spring's bug?
-        assertThat(emptyLogs, is(empty()));
+        assertThat(bridgedLogs, hasSize(1));
+        assertThat(bridgedLogs.iterator().next().level(), is(INFO));
 
         assertThat(overriddenLogIns, hasSize(1));
         assertThat(overriddenLogIns.iterator().next().level(), is(INFO));
@@ -342,14 +342,14 @@ public class AnnotationExtractorTest {
         Method overriddenNotGenericMethod = AnnotatedChild.class.getMethod("overriddenNotGenericMethod", String.class);
         // when
         Set<Log.in> logIns = annotationExtractor.getLogIns(loggedOverriddenMethod);
-        Set<Log.in> emptyLogIns = annotationExtractor.getLogIns(overriddenMethod);
+        Set<Log.in> bridgedLogIns = annotationExtractor.getLogIns(overriddenMethod);
         Set<Log.in> overriddenLogIns = annotationExtractor.getLogIns(overriddenNotGenericMethod);
         // then
         assertThat(logIns, hasSize(1));
         assertThat(logIns.iterator().next().level(), is(DEBUG));
 
-        // Spring's bug?
-        assertThat(emptyLogIns, is(empty()));
+        assertThat(bridgedLogIns, hasSize(1));
+        assertThat(bridgedLogIns.iterator().next().level(), is(INFO));
 
         assertThat(overriddenLogIns, hasSize(1));
         assertThat(overriddenLogIns.iterator().next().level(), is(INFO));
@@ -363,14 +363,14 @@ public class AnnotationExtractorTest {
         Method overriddenNotGenericMethod = AnnotatedChild.class.getMethod("overriddenNotGenericMethod", String.class);
         // when
         Set<Log.out> logOuts = annotationExtractor.getLogOuts(loggedOverriddenMethod);
-        Set<Log.out> emptyLogOuts = annotationExtractor.getLogOuts(overriddenMethod);
+        Set<Log.out> bridgedLogOuts = annotationExtractor.getLogOuts(overriddenMethod);
         Set<Log.out> overriddenLogOuts = annotationExtractor.getLogOuts(overriddenNotGenericMethod);
         // then
         assertThat(logOuts, hasSize(1));
         assertThat(logOuts.iterator().next().level(), is(DEBUG));
 
-        // Spring's bug?
-        assertThat(emptyLogOuts, is(empty()));
+        assertThat(bridgedLogOuts, hasSize(1));
+        assertThat(bridgedLogOuts.iterator().next().level(), is(INFO));
 
         assertThat(overriddenLogOuts, hasSize(1));
         assertThat(overriddenLogOuts.iterator().next().level(), is(INFO));
@@ -384,14 +384,14 @@ public class AnnotationExtractorTest {
         Method overriddenNotGenericMethod = AnnotatedChild.class.getMethod("overriddenNotGenericMethod", String.class);
         // when
         Set<Log.error> logErrors = annotationExtractor.getLogErrors(loggedOverriddenMethod);
-        Set<Log.error> emptyLogErrors = annotationExtractor.getLogErrors(overriddenMethod);
+        Set<Log.error> bridgedLogErrors = annotationExtractor.getLogErrors(overriddenMethod);
         Set<Log.error> overriddenLogErrors = annotationExtractor.getLogErrors(overriddenNotGenericMethod);
         // then
         assertThat(logErrors, hasSize(1));
         assertThat(logErrors.iterator().next().level(), is(DEBUG));
 
-        // Spring's bug?
-        assertThat(emptyLogErrors, is(empty()));
+        assertThat(bridgedLogErrors, hasSize(1));
+        assertThat(bridgedLogErrors.iterator().next().level(), is(INFO));
 
         assertThat(overriddenLogErrors, hasSize(1));
         assertThat(overriddenLogErrors.iterator().next().level(), is(INFO));
@@ -414,21 +414,21 @@ public class AnnotationExtractorTest {
     }
 
     @Test
-    public void getLogMdcs() throws NoSuchMethodException {
+    public void getMdcs() throws NoSuchMethodException {
         // given
         Method loggedOverriddenMethod = AnnotatedChild.class.getMethod("loggedOverriddenMethod", String.class);
         Method overriddenMethod = AnnotatedChild.class.getMethod("overriddenMethod", String.class);
         Method overriddenNotGenericMethod = AnnotatedChild.class.getMethod("overriddenNotGenericMethod", String.class);
         // when
         Set<Mdc> mdcs = annotationExtractor.getMdcs(loggedOverriddenMethod);
-        Set<Mdc> emptyMdcs = annotationExtractor.getMdcs(overriddenMethod);
+        Set<Mdc> bridgedMdcs = annotationExtractor.getMdcs(overriddenMethod);
         Set<Mdc> overriddenMdcs = annotationExtractor.getMdcs(overriddenNotGenericMethod);
         // then
         assertThat(mdcs, hasSize(1));
         assertThat(mdcs.iterator().next().key(), isEmptyString());
 
-        // Spring's bug?
-        assertThat(emptyMdcs, is(empty()));
+        assertThat(bridgedMdcs, hasSize(1));
+        assertThat(bridgedMdcs.iterator().next().key(), is("key"));
 
         assertThat(overriddenMdcs, hasSize(1));
         assertThat(overriddenMdcs.iterator().next().key(), is("key"));

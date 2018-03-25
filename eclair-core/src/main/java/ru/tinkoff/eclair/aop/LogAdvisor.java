@@ -4,6 +4,7 @@ import org.aopalliance.aop.Advice;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.support.StaticMethodMatcherPointcutAdvisor;
+import org.springframework.core.BridgeMethodResolver;
 import ru.tinkoff.eclair.definition.LogPack;
 import ru.tinkoff.eclair.logger.EclairLogger;
 
@@ -38,7 +39,7 @@ final class LogAdvisor extends StaticMethodMatcherPointcutAdvisor implements Met
 
     @Override
     public boolean matches(Method method, Class<?> targetClass) {
-        return logPacks.containsKey(method);
+        return logPacks.containsKey(method) || logPacks.containsKey(BridgeMethodResolver.findBridgedMethod(method));
     }
 
     /**
