@@ -11,6 +11,7 @@ import org.springframework.boot.logging.java.JavaLoggingSystem;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import ru.tinkoff.eclair.aop.EclairProxyCreator;
@@ -44,7 +45,7 @@ public class EclairAutoConfiguration {
 
     @Bean
     @ConditionalOnClass(Jaxb2Marshaller.class)
-    @ConditionalOnMissingBean
+    @ConditionalOnMissingBean(Jaxb2Printer.class)
     @ConditionalOnSingleCandidate(Jaxb2Marshaller.class)
     @Order(100)
     public Printer jaxb2Printer(Jaxb2Marshaller jaxb2Marshaller) {
@@ -94,6 +95,8 @@ public class EclairAutoConfiguration {
                                                  BeanClassValidator beanClassValidator,
                                                  EclairProperties eclairProperties) {
         EclairProxyCreator eclairProxyCreator = new EclairProxyCreator(printerList, loggers, genericApplicationContext, beanClassValidator);
+        eclairProxyCreator.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        eclairProxyCreator.setFrozen(false);
         eclairProxyCreator.setValidate(eclairProperties.isValidate());
         return eclairProxyCreator;
     }

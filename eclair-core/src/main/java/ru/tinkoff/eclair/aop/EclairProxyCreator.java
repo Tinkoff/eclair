@@ -61,7 +61,6 @@ public class EclairProxyCreator extends AbstractAutoProxyCreator {
         this.loggers = initLoggers(loggers);
         this.applicationContext = applicationContext;
         this.beanClassValidator = beanClassValidator;
-        setFrozen(true);
     }
 
     private Map<String, EclairLogger> initLoggers(Map<String, EclairLogger> loggers) {
@@ -77,21 +76,7 @@ public class EclairProxyCreator extends AbstractAutoProxyCreator {
 
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) {
-        Class<?> beanClass = bean.getClass();
-        beanClassCache.put(beanName, beanClass);
-        if (nonNull(advisorsCache.get(beanClass))) {
-            return bean;
-        }
-        if (!beanClassValidator.supports(beanClass)) {
-            advisorsCache.put(beanClass, EMPTY_ARRAY);
-            return bean;
-        }
-        if (validate) {
-            validateBeanClass(beanClass, beanName);
-        }
-        MdcAdvisor mdcAdvisor = getMdcAdvisor(beanClass);
-        List<LogAdvisor> logAdvisors = getLoggingAdvisors(beanClass);
-        advisorsCache.put(beanClass, composeAdvisors(mdcAdvisor, logAdvisors));
+        beanClassCache.putIfAbsent(beanName, bean.getClass());
         return bean;
     }
 
@@ -107,12 +92,23 @@ public class EclairProxyCreator extends AbstractAutoProxyCreator {
 
     @Override
     protected Object[] getAdvicesAndAdvisorsForBean(Class<?> beanClass, String beanName, TargetSource customTargetSource) throws BeansException {
-        Class<?> targetClass = beanClassCache.get(beanName);
-        if (isNull(targetClass)) {
-            return null;
+        Class<?> targetClass = beanClassCache.computeIfAbsent(beanName, s -> beanClass);
+        Object[] cachedAdvisors = advisorsCache.get(targetClass);
+        if (nonNull(cachedAdvisors)) {
+            return cachedAdvisors.length == 0 ? AbstractAutoProxyCreator.DO_NOT_PROXY : cachedAdvisors;
         }
-        Object[] cached = advisorsCache.get(targetClass);
-        return (isNull(cached) || cached.length == 0) ? null : cached;
+        if (!beanClassValidator.supports(targetClass)) {
+            advisorsCache.put(targetClass, EMPTY_ARRAY);
+            return AbstractAutoProxyCreator.DO_NOT_PROXY;
+        }
+        if (validate) {
+            validateBeanClass(targetClass, beanName);
+        }
+        MdcAdvisor mdcAdvisor = getMdcAdvisor(targetClass);
+        List<LogAdvisor> logAdvisors = getLoggingAdvisors(targetClass);
+        Object[] composedAdvisors = composeAdvisors(mdcAdvisor, logAdvisors);
+        advisorsCache.put(targetClass, composedAdvisors);
+        return composedAdvisors.length == 0 ? AbstractAutoProxyCreator.DO_NOT_PROXY : composedAdvisors;
     }
 
     @Override

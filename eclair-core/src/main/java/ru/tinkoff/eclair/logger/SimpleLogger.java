@@ -11,6 +11,9 @@ import org.springframework.core.ParameterNameDiscoverer;
 import ru.tinkoff.eclair.core.LoggerNameBuilder;
 import ru.tinkoff.eclair.definition.*;
 import ru.tinkoff.eclair.logger.facade.LoggerFacadeFactory;
+import ru.tinkoff.eclair.logger.facade.Slf4JLoggerFacadeFactory;
+import ru.tinkoff.eclair.printer.Printer;
+import ru.tinkoff.eclair.printer.ToStringPrinter;
 
 import java.util.function.Supplier;
 
@@ -28,6 +31,8 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
     private static final String ERROR = "!";
     private static final String MANUAL = "-";
 
+    private static final Printer defaultPrinter = new ToStringPrinter();
+
     private final ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
     private final LoggerNameBuilder loggerNameBuilder = LoggerNameBuilder.getInstance();
 
@@ -37,6 +42,10 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
 
     @Setter
     private boolean printParameterName = true;
+
+    public SimpleLogger() {
+        this(new Slf4JLoggerFacadeFactory());
+    }
 
     public SimpleLogger(LoggerFacadeFactory loggerFacadeFactory) {
         this(loggerFacadeFactory, LoggingSystem.get(SimpleLogger.class.getClassLoader()));
@@ -158,9 +167,9 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
             if (isNull(argument)) {
                 builder.append((String) null);
             } else if (nonNull(argLog)) {
-                builder.append(argLog.getPrinter().print(argument));
+                builder.append(printArgument(argLog.getPrinter(), argument));
             } else {
-                builder.append(inLog.getPrinter().print(argument));
+                builder.append(printArgument(inLog.getPrinter(), argument));
             }
         }
 
@@ -198,7 +207,7 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
     private String buildResultClause(MethodInvocation invocation, OutLog outLog, Object result, String loggerName) {
         if (isLevelEnabled(loggerName, outLog.getVerboseLevel())) {
             if (nonNull(result)) {
-                return " " + outLog.getPrinter().print(result);
+                return " " + printArgument(outLog.getPrinter(), result);
             }
             Class<?> returnType = invocation.getMethod().getReturnType();
             if (returnType != void.class && returnType != Void.class) {
@@ -243,5 +252,13 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
             return " " + throwable.toString();
         }
         return "";
+    }
+
+    private String printArgument(Printer printer, Object argument) {
+        try {
+            return printer.print(argument);
+        } catch (Exception e) {
+            return defaultPrinter.print(argument);
+        }
     }
 }

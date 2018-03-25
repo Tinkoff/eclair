@@ -2,7 +2,7 @@ package ru.tinkoff.eclair.printer.processor;
 
 import lombok.Setter;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -24,6 +24,8 @@ import java.util.List;
 import static java.util.Arrays.asList;
 
 /**
+ * TODO: add tests
+ *
  * @author Viacheslav Klapatniuk
  */
 public class XPathMasker implements PrinterPostProcessor {
@@ -32,26 +34,29 @@ public class XPathMasker implements PrinterPostProcessor {
     private final XPathFactory xPathfactory = XPathFactory.newInstance();
     private final TransformerFactory transformerFactory = TransformerFactory.newInstance();
 
-    private final List<String> expressions;
+    private final List<String> xPathExpressions;
 
     @Setter
-    private String textContent;
+    private String replacement;
 
-    public XPathMasker(String... expressions) {
-        this.expressions = asList(expressions);
+    public XPathMasker(String... xPathExpressions) {
+        this.xPathExpressions = asList(xPathExpressions);
     }
 
     @Override
     public String process(String string) {
-        if (expressions.isEmpty()) {
+        if (xPathExpressions.isEmpty()) {
             return string;
         }
         InputStream stream = new ByteArrayInputStream(string.getBytes());
         try {
             Document document = documentBuilderFactory.newDocumentBuilder().parse(stream);
             XPath xPath = xPathfactory.newXPath();
-            for (String expression : expressions) {
-                ((Node) xPath.compile(expression).evaluate(document, XPathConstants.NODE)).setTextContent(textContent);
+            for (String xPathExpression : xPathExpressions) {
+                NodeList nodeList = (NodeList) xPath.compile(xPathExpression).evaluate(document, XPathConstants.NODESET);
+                for (int a = 0; a < nodeList.getLength(); a++) {
+                    nodeList.item(a).setTextContent(replacement);
+                }
             }
             StringWriter writer = new StringWriter();
             transformerFactory.newTransformer().transform(new DOMSource(document), new StreamResult(writer));
