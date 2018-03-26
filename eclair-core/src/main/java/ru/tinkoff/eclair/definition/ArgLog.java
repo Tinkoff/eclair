@@ -11,10 +11,16 @@ import ru.tinkoff.eclair.printer.Printer;
  */
 @Getter
 @Builder
-public class ArgLog {
+public class ArgLog implements LogDefinition {
+
+    @NonNull
+    private LogLevel level;
 
     @NonNull
     private LogLevel ifEnabledLevel;
+
+    @NonNull
+    private LogLevel verboseLevel;
 
     @NonNull
     private Printer printer;

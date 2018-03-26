@@ -2,7 +2,6 @@ package ru.tinkoff.eclair.logger;
 
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Setter;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.boot.logging.LogLevel;
 import org.springframework.boot.logging.LoggingSystem;
@@ -37,9 +36,6 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
     @Getter(AccessLevel.PACKAGE)
     private final LoggerFacadeFactory loggerFacadeFactory;
     private final LoggingSystem loggingSystem;
-
-    @Setter
-    private boolean printParameterName = true;
 
     public SimpleLogger() {
         this(new Slf4JLoggerFacadeFactory());
@@ -131,17 +127,17 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
             ArgLog argLog = logPack.getArgLogs().get(a);
 
             if (inLogIsNull) {
-                if (isNull(argLog) || !isLevelEnabled(loggerName, argLog.getIfEnabledLevel())) {
+                if (isNull(argLog) || !isLevelEnabled(loggerName, expectedLevelResolver.apply(argLog))) {
                     continue;
                 }
-                if (argLog.getIfEnabledLevel().ordinal() > level.ordinal()) {
-                    level = argLog.getIfEnabledLevel();
+                if (argLog.getLevel().ordinal() > level.ordinal()) {
+                    level = argLog.getLevel();
                 }
             } else if (isNull(argLog)) {
                 if (!verboseLevelEnabled) {
                     continue;
                 }
-            } else if (!isLevelEnabled(loggerName, argLog.getIfEnabledLevel())) {
+            } else if (!isLevelEnabled(loggerName, expectedLevelResolver.apply(argLog))) {
                 continue;
             }
 
@@ -152,7 +148,7 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
                 verboseFound = true;
             }
 
-            if (printParameterName) {
+            if (isNull(argLog) || isLevelEnabled(loggerName, argLog.getVerboseLevel())) {
                 String parameterName = parameterNames.get(a);
                 if (nonNull(parameterName)) {
                     builder.append(parameterName).append("=");

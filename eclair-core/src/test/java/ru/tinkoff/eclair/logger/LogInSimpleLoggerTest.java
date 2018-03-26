@@ -98,22 +98,6 @@ public class LogInSimpleLoggerTest {
     }
 
     @Test
-    public void notPrintParameterNames() {
-        // given, when
-        Printer printer = new ToStringPrinter();
-        SimpleLogger logger = new SimpleLoggerBuilder()
-                .method(methodWithParameters)
-                .arguments("s", 1, new Dto())
-                .levels(DEBUG, OFF, DEBUG)
-                .argLogs(DEBUG, printer, DEBUG, printer, DEBUG, printer)
-                .effectiveLevel(DEBUG)
-                .printParameterName(false)
-                .buildAndInvokeAndGet();
-        // then
-        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any())).log(DEBUG, "> \"s\", 1, Dto{i=0, s='null'}");
-    }
-
-    @Test
     public void argLogsAreNull() {
         // given, when
         SimpleLogger logger = new SimpleLoggerBuilder()
@@ -126,6 +110,22 @@ public class LogInSimpleLoggerTest {
                 .buildAndInvokeAndGet();
         // then
         verify(logger.getLoggerFacadeFactory().getLoggerFacade(any())).log(DEBUG, "> s=\"s\", i=1, dto=Dto{i=0, s='null'}");
+    }
+
+    @Test
+    public void argLogsWithoutParameterNames() {
+        // given, when
+        Printer printer = new ToStringPrinter();
+        SimpleLogger logger = new SimpleLoggerBuilder()
+                .method(methodWithParameters)
+                .arguments("s", 1, new Dto())
+                .argLog(DEBUG, OFF, TRACE, printer)
+                .argLog(DEBUG, OFF, TRACE, printer)
+                .argLog(DEBUG, OFF, TRACE, printer)
+                .effectiveLevel(DEBUG)
+                .buildAndInvokeAndGet(null);
+        // then
+        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any())).log(DEBUG, "> \"s\", 1, Dto{i=0, s='null'}");
     }
 
     @Test
@@ -152,8 +152,8 @@ public class LogInSimpleLoggerTest {
                 .arguments("s", 1, new Dto())
                 .levels(DEBUG, OFF, DEBUG)
                 .argLog(null)
-                .argLog(DEBUG, printer)
-                .argLog(DEBUG, printer)
+                .argLog(DEBUG, OFF, DEBUG, printer)
+                .argLog(DEBUG, OFF, DEBUG, printer)
                 .effectiveLevel(DEBUG)
                 .buildAndInvokeAndGet();
         // then
@@ -169,9 +169,9 @@ public class LogInSimpleLoggerTest {
                 .parameterNames("s", "i", "dto")
                 .arguments("s", 1, new Dto())
                 .levels(DEBUG, OFF, DEBUG)
-                .argLog(DEBUG, printer)
+                .argLog(DEBUG, OFF, DEBUG, printer)
                 .argLog(null)
-                .argLog(DEBUG, printer)
+                .argLog(DEBUG, OFF, DEBUG, printer)
                 .effectiveLevel(DEBUG)
                 .buildAndInvokeAndGet();
         // then
@@ -187,8 +187,8 @@ public class LogInSimpleLoggerTest {
                 .parameterNames("s", "i", "dto")
                 .arguments("s", 1, new Dto())
                 .levels(DEBUG, OFF, DEBUG)
-                .argLog(DEBUG, printer)
-                .argLog(DEBUG, printer)
+                .argLog(DEBUG, OFF, DEBUG, printer)
+                .argLog(DEBUG, OFF, DEBUG, printer)
                 .argLog(null)
                 .effectiveLevel(DEBUG)
                 .buildAndInvokeAndGet();
@@ -205,7 +205,9 @@ public class LogInSimpleLoggerTest {
                 .parameterNames("s", "i", "dto")
                 .arguments("s", 1, new Dto())
                 .levels(INFO, OFF, DEBUG)
-                .argLogs(DEBUG, printer, INFO, printer, TRACE, printer)
+                .argLog(DEBUG, OFF, DEBUG, printer)
+                .argLog(INFO, OFF, INFO, printer)
+                .argLog(TRACE, OFF, DEBUG, printer)
                 .effectiveLevel(INFO)
                 .buildAndInvokeAndGet();
         // then
@@ -221,8 +223,8 @@ public class LogInSimpleLoggerTest {
                 .parameterNames("s", "i", "dto")
                 .arguments("s", 1, new Dto())
                 .argLog(null)
-                .argLog(INFO, printer)
-                .argLog(DEBUG, printer)
+                .argLog(INFO, OFF, INFO, printer)
+                .argLog(DEBUG, OFF, DEBUG, printer)
                 .effectiveLevel(INFO)
                 .buildAndInvokeAndGet(null);
         // then
@@ -238,8 +240,8 @@ public class LogInSimpleLoggerTest {
                 .parameterNames("s", "i", "dto")
                 .arguments("s", 1, new Dto())
                 .argLog(null)
-                .argLog(DEBUG, printer)
-                .argLog(INFO, printer)
+                .argLog(DEBUG, OFF, DEBUG, printer)
+                .argLog(INFO, OFF, DEBUG, printer)
                 .effectiveLevel(DEBUG)
                 .buildAndInvokeAndGet(null);
         // then
@@ -266,11 +268,11 @@ public class LogInSimpleLoggerTest {
         Printer printer = new ToStringPrinter();
         SimpleLogger logger = new SimpleLoggerBuilder()
                 .method(methodWithParameters)
-                .levels(INFO, OFF, DEBUG/*?*/)
+                .levels(INFO, OFF, DEBUG)
                 .arguments("s", 1, new Dto())
-                .argLog(DEBUG, printer)
-                .argLog(DEBUG, printer)
-                .argLog(DEBUG, printer)
+                .argLog(DEBUG, OFF, DEBUG, printer)
+                .argLog(DEBUG, OFF, DEBUG, printer)
+                .argLog(DEBUG, OFF, DEBUG, printer)
                 .argLogs(null, null, null)
                 .effectiveLevel(INFO)
                 .buildAndInvokeAndGet();
@@ -324,9 +326,9 @@ public class LogInSimpleLoggerTest {
                 .arguments("s", 1, new Dto())
                 .levels(DEBUG, OFF, DEBUG)
                 .printer(inLogPrinter)
-                .argLog(DEBUG, new JacksonPrinter(new ObjectMapper()))
+                .argLog(DEBUG, OFF, DEBUG, new JacksonPrinter(new ObjectMapper()))
                 .argLog(null)
-                .argLog(DEBUG, new Jaxb2Printer(marshaller))
+                .argLog(DEBUG, OFF, DEBUG, new Jaxb2Printer(marshaller))
                 .effectiveLevel(DEBUG)
                 .buildAndInvokeAndGet();
         // then
@@ -343,7 +345,6 @@ public class LogInSimpleLoggerTest {
         private Printer printer = new ToStringPrinter();
         private List<ArgLog> argLogs = new ArrayList<>();
         private LogLevel effectiveLevel;
-        private boolean printParameterName = true;
         private List<String> parameterNames;
 
         private SimpleLoggerBuilder method(Method method) {
@@ -368,9 +369,11 @@ public class LogInSimpleLoggerTest {
             return this;
         }
 
-        private SimpleLoggerBuilder argLog(LogLevel ifEnabledLevel, Printer printer) {
+        private SimpleLoggerBuilder argLog(LogLevel level, LogLevel ifEnabledLevel, LogLevel verboseLevel, Printer printer) {
             this.argLogs.add(ArgLog.builder()
+                    .level(level)
                     .ifEnabledLevel(ifEnabledLevel)
+                    .verboseLevel(verboseLevel)
                     .printer(printer)
                     .build());
             return this;
@@ -381,14 +384,6 @@ public class LogInSimpleLoggerTest {
             return this;
         }
 
-        private SimpleLoggerBuilder argLogs(LogLevel ifEnabledLevel0, Printer printer0,
-                                            LogLevel ifEnabledLevel1, Printer printer1,
-                                            LogLevel ifEnabledLevel2, Printer printer2) {
-            return argLog(ifEnabledLevel0, printer0)
-                    .argLog(ifEnabledLevel1, printer1)
-                    .argLog(ifEnabledLevel2, printer2);
-        }
-
         private SimpleLoggerBuilder argLogs(ArgLog argLog0, ArgLog argLog1, ArgLog argLog2) {
             return argLog(argLog0)
                     .argLog(argLog1)
@@ -397,11 +392,6 @@ public class LogInSimpleLoggerTest {
 
         private SimpleLoggerBuilder effectiveLevel(LogLevel effectiveLevel) {
             this.effectiveLevel = effectiveLevel;
-            return this;
-        }
-
-        private SimpleLoggerBuilder printParameterName(boolean printParameterName) {
-            this.printParameterName = printParameterName;
             return this;
         }
 
@@ -424,7 +414,6 @@ public class LogInSimpleLoggerTest {
             // given
             MethodInvocation invocation = methodInvocation(method, arguments.toArray());
             SimpleLogger simpleLogger = new SimpleLogger(loggerFacadeFactory(), loggingSystem(effectiveLevel));
-            simpleLogger.setPrintParameterName(printParameterName);
             // when
             simpleLogger.logInIfNecessary(invocation, logPack(inLog, argLogs, parameterNames));
             return simpleLogger;

@@ -34,7 +34,7 @@ public abstract class LevelSensitiveLogger extends EclairLogger {
             }
         }
         return logPack.getArgLogs().stream()
-                .anyMatch(argLog -> nonNull(argLog) && isLevelEnabled(loggerName, argLog.getIfEnabledLevel()));
+                .anyMatch(argLog -> nonNull(argLog) && isLevelEnabled(loggerName, expectedLevelResolver.apply(argLog)));
     }
 
     /**

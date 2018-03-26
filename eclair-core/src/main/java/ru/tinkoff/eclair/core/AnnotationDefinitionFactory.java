@@ -46,14 +46,14 @@ public final class AnnotationDefinitionFactory {
     }
 
     public List<ArgLog> buildArgLogs(Set<String> loggerNames, Method method) {
-        List<Log.arg> logArgs = annotationExtractor.findLogArgs(method, loggerNames);
-        Iterator<Log.arg> logArgIterator = logArgs.iterator();
+        List<Log> logArgs = annotationExtractor.findLogArgs(method, loggerNames);
+        Iterator<Log> logArgIterator = logArgs.iterator();
         return Stream.of(method.getParameterTypes())
                 .map(clazz -> buildArgLog(logArgIterator.next(), clazz))
                 .collect(toList());
     }
 
-    private ArgLog buildArgLog(Log.arg logArg, Class<?> parameterType) {
+    private ArgLog buildArgLog(Log logArg, Class<?> parameterType) {
         if (isNull(logArg)) {
             return null;
         }

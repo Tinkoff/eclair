@@ -297,10 +297,10 @@ public class AnnotationExtractorTest {
         public void mdc() {
         }
 
-        public void logArgs(@Log.args(@Log.arg) String input) {
+        public void logArgs(@Logs(@Log) String input) {
         }
 
-        public void logArg(@Log.arg String input) {
+        public void logArg(@Log String input) {
         }
 
         public void parameterMdcs(@Mdcs(@Mdc(key = "", value = "")) String input) {
@@ -441,21 +441,21 @@ public class AnnotationExtractorTest {
         Method overriddenMethod = AnnotatedChild.class.getMethod("overriddenMethod", String.class);
         Method overriddenNotGenericMethod = AnnotatedChild.class.getMethod("overriddenNotGenericMethod", String.class);
         // when
-        List<Set<Log.arg>> logArgs = annotationExtractor.getLogArgs(loggedOverriddenMethod);
-        List<Set<Log.arg>> emptyLogArgs = annotationExtractor.getLogArgs(overriddenMethod);
-        List<Set<Log.arg>> overriddenLogArgs = annotationExtractor.getLogArgs(overriddenNotGenericMethod);
+        List<Set<Log>> logArgs = annotationExtractor.getLogArgs(loggedOverriddenMethod);
+        List<Set<Log>> emptyLogArgs = annotationExtractor.getLogArgs(overriddenMethod);
+        List<Set<Log>> overriddenLogArgs = annotationExtractor.getLogArgs(overriddenNotGenericMethod);
         // then
         assertThat(logArgs, hasSize(1));
-        Set<Log.arg> parameterLogArgs = logArgs.iterator().next();
+        Set<Log> parameterLogArgs = logArgs.iterator().next();
         assertThat(parameterLogArgs, hasSize(1));
-        assertThat(parameterLogArgs.iterator().next().ifEnabled(), is(DEBUG));
+        assertThat(parameterLogArgs.iterator().next().level(), is(DEBUG));
 
         assertThat(emptyLogArgs, hasSize(1));
-        Set<Log.arg> parameterEmptyLogArgs = emptyLogArgs.iterator().next();
+        Set<Log> parameterEmptyLogArgs = emptyLogArgs.iterator().next();
         assertThat(parameterEmptyLogArgs, is(empty()));
 
         assertThat(overriddenLogArgs, hasSize(1));
-        Set<Log.arg> parameterOverriddenLogArgs = overriddenLogArgs.iterator().next();
+        Set<Log> parameterOverriddenLogArgs = overriddenLogArgs.iterator().next();
         assertThat(parameterOverriddenLogArgs, is(empty()));
     }
 
@@ -492,7 +492,7 @@ public class AnnotationExtractorTest {
         @Log.out(INFO)
         @Log.error(INFO)
         @Mdc(key = "key", value = "")
-        public void loggedOverriddenMethod(@Log.arg(INFO)
+        public void loggedOverriddenMethod(@Log(INFO)
                                            @Mdc(key = "key", value = "") T input) {
         }
 
@@ -501,7 +501,7 @@ public class AnnotationExtractorTest {
         @Log.out(INFO)
         @Log.error(INFO)
         @Mdc(key = "key", value = "")
-        public void overriddenMethod(@Log.arg(INFO)
+        public void overriddenMethod(@Log(INFO)
                                      @Mdc(key = "key", value = "") T input) {
         }
 
@@ -510,7 +510,7 @@ public class AnnotationExtractorTest {
         @Log.out(INFO)
         @Log.error(INFO)
         @Mdc(key = "key", value = "")
-        public void overriddenNotGenericMethod(@Log.arg(INFO)
+        public void overriddenNotGenericMethod(@Log(INFO)
                                                @Mdc(key = "key", value = "") String input) {
         }
     }
@@ -524,7 +524,7 @@ public class AnnotationExtractorTest {
         @Log.error(DEBUG)
         @Mdc(key = "", value = "")
         @Override
-        public void loggedOverriddenMethod(@Log.arg(DEBUG)
+        public void loggedOverriddenMethod(@Log(DEBUG)
                                            @Mdc(key = "", value = "") String input) {
         }
 
@@ -623,9 +623,9 @@ public class AnnotationExtractorTest {
         Set<String> loggerNames = new HashSet<>(asList("", "logger"));
         Set<String> unknownLoggerNames = singleton("b");
         // when
-        List<Log.arg> logArgs = annotationExtractor.findLogArgs(method, loggerNames);
-        List<Log.arg> loggerLogArgs = annotationExtractor.findLogArgs(loggerMethod, loggerNames);
-        List<Log.arg> notFoundLogArgs = annotationExtractor.findLogArgs(method, unknownLoggerNames);
+        List<Log> logArgs = annotationExtractor.findLogArgs(method, loggerNames);
+        List<Log> loggerLogArgs = annotationExtractor.findLogArgs(loggerMethod, loggerNames);
+        List<Log> notFoundLogArgs = annotationExtractor.findLogArgs(method, unknownLoggerNames);
         // then
         assertThat(logArgs, hasSize(1));
         assertThat(logArgs.get(0), notNullValue());
@@ -654,7 +654,7 @@ public class AnnotationExtractorTest {
         public void logErrors() {
         }
 
-        public void logArgs(@Log.arg String input) {
+        public void logArgs(@Log String input) {
         }
 
         @Log(logger = "logger")
@@ -673,7 +673,7 @@ public class AnnotationExtractorTest {
         public void loggerLogErrors() {
         }
 
-        public void loggerLogArgs(@Log.arg(logger = "logger") String input) {
+        public void loggerLogArgs(@Log(logger = "logger") String input) {
         }
     }
 

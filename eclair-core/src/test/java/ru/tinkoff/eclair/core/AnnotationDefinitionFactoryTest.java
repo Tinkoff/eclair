@@ -142,7 +142,7 @@ public class AnnotationDefinitionFactoryTest {
         public void empty(String a, String b) {
         }
 
-        public void logArg(@Log.arg(ifEnabled = WARN) String a, String b) {
+        public void logArg(@Log(ifEnabled = WARN) String a, String b) {
         }
 
         @Log.ins(@Log.in(ERROR))

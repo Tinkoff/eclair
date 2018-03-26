@@ -10,9 +10,11 @@ import ru.tinkoff.eclair.printer.Printer;
  */
 public class ArgLogFactory {
 
-    public static ArgLog newInstance(Log.arg logArg, Printer printer) {
+    public static ArgLog newInstance(Log logArg, Printer printer) {
         return ArgLog.builder()
-                .ifEnabledLevel(AnnotationAttribute.IF_ENABLED.extract(logArg))
+                .level(AnnotationAttribute.LEVEL.extract(logArg))
+                .ifEnabledLevel(logArg.ifEnabled())
+                .verboseLevel(logArg.verbose())
                 .printer(printer)
                 .build();
     }

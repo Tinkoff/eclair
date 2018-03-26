@@ -66,7 +66,7 @@ class BeanMethodValidator implements Validator {
         Set<Mdc> mdcs = annotationExtractor.getMdcs(method);
         methodAnnotationFound |= !mdcs.isEmpty();
 
-        List<Set<Log.arg>> parameterLogArgs = annotationExtractor.getLogArgs(method);
+        List<Set<Log>> parameterLogArgs = annotationExtractor.getLogArgs(method);
         boolean argAnnotationFound = !parameterLogArgs.stream().allMatch(Set::isEmpty);
 
         List<Set<Mdc>> parameterMdcs = annotationExtractor.getParametersMdcs(method);

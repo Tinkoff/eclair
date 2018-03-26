@@ -281,20 +281,20 @@ public class Example {
     /**
      * DEBUG ru.tinkoff.eclair.example.Example.verbose > dto=Dto{i=0, s='null'}
      */
-    public void verbose(@Log.arg Dto dto, String s, Integer i) {
+    public void verbose(@Log Dto dto, String s, Integer i) {
     }
 
     /**
      * INFO  ru.tinkoff.eclair.example.Example.levelVerbose > dto=Dto{i=0, s='null'}
      */
-    public void levelVerbose(@Log.arg(INFO) Dto dto, String s, Integer i) {
+    public void levelVerbose(@Log(INFO) Dto dto, String s, Integer i) {
     }
 
     /**
      * DEBUG r.t.e.example.Example.verboseToVariousPrinters > xmlDto=<dto><i>0</i></dto>, jsonDto={"i":0,"s":null}
      */
-    public void verboseToVariousPrinters(@Log.arg(printer = "xml") Dto xmlDto,
-                                         @Log.arg(printer = "json") Dto jsonDto,
+    public void verboseToVariousPrinters(@Log(printer = "xml") Dto xmlDto,
+                                         @Log(printer = "json") Dto jsonDto,
                                          Integer i) {
     }
 
@@ -312,9 +312,9 @@ public class Example {
      * INFO  r.t.eclair.example.Example.inEventWithLevelVerbose > d=0.0, s="s", i=0
      */
     @Log.in(INFO)
-    public void inEventWithLevelVerbose(@Log.arg(INFO) Double d,
-                                        @Log.arg(DEBUG) String s,
-                                        @Log.arg(TRACE) Integer i) {
+    public void inEventWithLevelVerbose(@Log(INFO) Double d,
+                                        @Log(DEBUG) String s,
+                                        @Log(TRACE) Integer i) {
     }
 
     // TODO: add example with several mask expressions
@@ -351,8 +351,8 @@ public class Example {
     @Log.out(level = TRACE, verbose = TRACE)
     @Log.error(level = WARN, ofType = RuntimeException.class, exclude = NullPointerException.class)
     @Log.error(level = ERROR, ofType = {Error.class, Exception.class})
-    public Dto mix(@Log.arg(printer = "xml") Dto xmlDto,
-                   @Log.arg(ifEnabled = TRACE, printer = "json") Dto jsonDto,
+    public Dto mix(@Log(printer = "xml") Dto xmlDto,
+                   @Log(ifEnabled = TRACE, printer = "json") Dto jsonDto,
                    Integer i) {
         throw new IllegalArgumentException("message");
     }
@@ -607,8 +607,8 @@ public class Example {
     /**
      * TODO: add javadoc
      */
-    public void logArgMultiLogger(@Log.arg(logger = "simpleLogger")
-                                  @Log.arg(logger = "auditLogger") Dto dto) {
+    public void logArgMultiLogger(@Log(logger = "simpleLogger")
+                                  @Log(logger = "auditLogger") Dto dto) {
     }
 
     /**

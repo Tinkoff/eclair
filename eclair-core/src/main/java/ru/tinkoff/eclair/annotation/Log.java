@@ -8,10 +8,13 @@ import java.lang.annotation.*;
 import static org.springframework.boot.logging.LogLevel.*;
 
 /**
+ * TODO: implement {@link ElementType#TYPE}
+ * TODO: add tests of meta-annotations
+ *
  * @author Viacheslav Klapatniuk
  */
 @Repeatable(Logs.class)
-@Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
+@Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Log {
 
@@ -119,29 +122,5 @@ public @interface Log {
 
         @SuppressWarnings("unused")
         error[] value();
-    }
-
-    @Repeatable(args.class)
-    @Target({ElementType.PARAMETER, ElementType.ANNOTATION_TYPE})
-    @Retention(RetentionPolicy.RUNTIME)
-    @interface arg {
-
-        @AliasFor("ifEnabled")
-        LogLevel value() default DEBUG;
-
-        @AliasFor("value")
-        LogLevel ifEnabled() default DEBUG;
-
-        String printer() default "";
-
-        String logger() default "";
-    }
-
-    @Target({ElementType.PARAMETER, ElementType.ANNOTATION_TYPE})
-    @Retention(RetentionPolicy.RUNTIME)
-    @interface args {
-
-        @SuppressWarnings("unused")
-        arg[] value();
     }
 }

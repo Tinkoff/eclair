@@ -13,7 +13,7 @@ public class LogArgValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return clazz == Log.arg.class;
+        return clazz == Log.class;
     }
 
     /**

@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * @author Viacheslav Klapatniuk
  */
-@Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
+@Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Logs {
 

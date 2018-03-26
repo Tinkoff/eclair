@@ -116,7 +116,7 @@ public class LogPackFactoryTest {
     }
 
     private ArgLog givenArgLog() {
-        return ArgLogFactory.newInstance(synthesizeAnnotation(Log.arg.class), new ToStringPrinter());
+        return ArgLogFactory.newInstance(synthesizeAnnotation(Log.class), new ToStringPrinter());
     }
 
     private OutLog givenOutLog() {
