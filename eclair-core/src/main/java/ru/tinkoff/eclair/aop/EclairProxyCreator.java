@@ -11,10 +11,7 @@ import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
-import ru.tinkoff.eclair.core.AnnotationDefinitionFactory;
-import ru.tinkoff.eclair.core.AnnotationExtractor;
-import ru.tinkoff.eclair.core.LoggerBeanNamesResolver;
-import ru.tinkoff.eclair.core.PrinterResolver;
+import ru.tinkoff.eclair.core.*;
 import ru.tinkoff.eclair.definition.*;
 import ru.tinkoff.eclair.definition.factory.LogPackFactory;
 import ru.tinkoff.eclair.logger.EclairLogger;
@@ -50,6 +47,7 @@ public class EclairProxyCreator extends AbstractAutoProxyCreator {
     private final AnnotationDefinitionFactory annotationDefinitionFactory;
     private final LoggerBeanNamesResolver loggerBeanNamesResolver = LoggerBeanNamesResolver.getInstance();
     private final AnnotationExtractor annotationExtractor = AnnotationExtractor.getInstance();
+    private final ParameterNameResolver parameterNameResolver = ParameterNameResolver.getInstance();
 
     private boolean validate = false;
 
@@ -144,11 +142,12 @@ public class EclairProxyCreator extends AbstractAutoProxyCreator {
     }
 
     private LogPack getLogPack(Set<String> loggerNames, Method method) {
+        List<String> parameterNames = parameterNameResolver.tryToResolve(method);
         InLog inLog = annotationDefinitionFactory.buildInLog(loggerNames, method);
         List<ArgLog> argLogs = annotationDefinitionFactory.buildArgLogs(loggerNames, method);
         OutLog outLog = annotationDefinitionFactory.buildOutLog(loggerNames, method);
         Set<ErrorLog> errorLogs = annotationDefinitionFactory.buildErrorLogs(loggerNames, method);
-        return LogPackFactory.newInstance(method, inLog, argLogs, outLog, errorLogs);
+        return LogPackFactory.newInstance(method, parameterNames, inLog, argLogs, outLog, errorLogs);
     }
 
     private Object[] composeAdvisors(MdcAdvisor mdcAdvisor, List<LogAdvisor> logAdvisors) {

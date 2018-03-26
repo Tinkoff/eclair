@@ -31,9 +31,15 @@ public class LogPack {
     private Method method;
 
     @Getter
+    @NonNull
+    @Singular
+    private List<String> parameterNames;
+
+    @Getter
     private InLog inLog;
 
     @Getter
+    @NonNull
     @Singular
     private List<ArgLog> argLogs;
 

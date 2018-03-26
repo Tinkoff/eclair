@@ -6,8 +6,6 @@ import lombok.Setter;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.boot.logging.LogLevel;
 import org.springframework.boot.logging.LoggingSystem;
-import org.springframework.core.DefaultParameterNameDiscoverer;
-import org.springframework.core.ParameterNameDiscoverer;
 import ru.tinkoff.eclair.core.LoggerNameBuilder;
 import ru.tinkoff.eclair.definition.*;
 import ru.tinkoff.eclair.logger.facade.LoggerFacadeFactory;
@@ -15,6 +13,7 @@ import ru.tinkoff.eclair.logger.facade.Slf4JLoggerFacadeFactory;
 import ru.tinkoff.eclair.printer.Printer;
 import ru.tinkoff.eclair.printer.ToStringPrinter;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 import static java.util.Objects.isNull;
@@ -33,7 +32,6 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
 
     private static final Printer defaultPrinter = new ToStringPrinter();
 
-    private final ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
     private final LoggerNameBuilder loggerNameBuilder = LoggerNameBuilder.getInstance();
 
     @Getter(AccessLevel.PACKAGE)
@@ -125,15 +123,10 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
             verboseLevelEnabled = isLevelEnabled(loggerName, inLog.getVerboseLevel());
         }
 
-        // TODO: cache this data at application start
-        String[] parameterNames = null;
-        if (printParameterName) {
-            parameterNames = parameterNameDiscoverer.getParameterNames(invocation.getMethod());
-        }
-
         StringBuilder builder = new StringBuilder();
         boolean verboseFound = false;
         Object[] arguments = invocation.getArguments();
+        List<String> parameterNames = logPack.getParameterNames();
         for (int a = 0; a < arguments.length; a++) {
             ArgLog argLog = logPack.getArgLogs().get(a);
 
@@ -159,8 +152,11 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
                 verboseFound = true;
             }
 
-            if (printParameterName && nonNull(parameterNames)) {
-                builder.append(parameterNames[a]).append("=");
+            if (printParameterName) {
+                String parameterName = parameterNames.get(a);
+                if (nonNull(parameterName)) {
+                    builder.append(parameterName).append("=");
+                }
             }
 
             Object argument = arguments[a];

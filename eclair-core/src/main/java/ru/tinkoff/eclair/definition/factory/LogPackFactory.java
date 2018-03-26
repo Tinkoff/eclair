@@ -20,6 +20,7 @@ public class LogPackFactory {
      * @return Instantiated {@link InLog} or {@code null}
      */
     public static LogPack newInstance(Method method,
+                                      List<String> parameterNames,
                                       InLog inLog,
                                       List<ArgLog> argLogs,
                                       OutLog outLog,
@@ -29,6 +30,7 @@ public class LogPackFactory {
         }
         return LogPack.builder()
                 .method(method)
+                .parameterNames(parameterNames)
                 .inLog(inLog)
                 .argLogs(argLogs)
                 .outLog(outLog)
