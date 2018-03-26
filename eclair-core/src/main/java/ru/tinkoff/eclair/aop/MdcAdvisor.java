@@ -5,6 +5,7 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.slf4j.MDC;
 import org.springframework.aop.support.StaticMethodMatcherPointcutAdvisor;
+import org.springframework.core.BridgeMethodResolver;
 import ru.tinkoff.eclair.core.ExpressionEvaluator;
 import ru.tinkoff.eclair.definition.MdcDefinition;
 import ru.tinkoff.eclair.definition.MdcPack;
@@ -41,7 +42,7 @@ final class MdcAdvisor extends StaticMethodMatcherPointcutAdvisor implements Met
 
     @Override
     public boolean matches(Method method, Class<?> targetClass) {
-        return mdcPacks.containsKey(method);
+        return mdcPacks.containsKey(method) || mdcPacks.containsKey(BridgeMethodResolver.findBridgedMethod(method));
     }
 
     /**
