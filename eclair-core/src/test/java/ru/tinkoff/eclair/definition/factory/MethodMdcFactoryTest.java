@@ -2,8 +2,8 @@ package ru.tinkoff.eclair.definition.factory;
 
 import org.junit.Test;
 import ru.tinkoff.eclair.annotation.Mdc;
-import ru.tinkoff.eclair.definition.MdcDefinition;
-import ru.tinkoff.eclair.definition.MdcPack;
+import ru.tinkoff.eclair.definition.ParameterMdc;
+import ru.tinkoff.eclair.definition.MethodMdc;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -22,7 +22,7 @@ import static org.springframework.core.annotation.AnnotationUtils.synthesizeAnno
 /**
  * @author Viacheslav Klapatniuk
  */
-public class MdcPackFactoryTest {
+public class MethodMdcFactoryTest {
 
     @Test
     public void newInstance() throws NoSuchMethodException {
@@ -31,15 +31,15 @@ public class MdcPackFactoryTest {
         Set<Mdc> methodMdcs = givenMethodMdcs();
         List<Set<Mdc>> argumentMdcs = givenArgumentMdcs();
         // when
-        MdcPack mdcPack = MdcPackFactory.newInstance(method, methodMdcs, argumentMdcs);
+        MethodMdc methodMdc = MethodMdcFactory.newInstance(method, methodMdcs, argumentMdcs);
         // then
-        assertThat(mdcPack.getMethod(), is(method));
-        thenMethodDefinition(mdcPack.getMethodDefinitions());
-        thenParameterDefinitions(mdcPack.getParameterDefinitions());
+        assertThat(methodMdc.getMethod(), is(method));
+        thenMethodDefinition(methodMdc.getMethodDefinitions());
+        thenParameterDefinitions(methodMdc.getParameterDefinitions());
     }
 
     private Method givenMethod() throws NoSuchMethodException {
-        return MdcPackFactoryTest.class.getMethod("annotatedMethod", String.class, String.class);
+        return MethodMdcFactoryTest.class.getMethod("annotatedMethod", String.class, String.class);
     }
 
     @SuppressWarnings("unused")
@@ -61,23 +61,23 @@ public class MdcPackFactoryTest {
         return synthesizeAnnotation(attributes, Mdc.class, null);
     }
 
-    private void thenMethodDefinition(Set<MdcDefinition> definitions) {
+    private void thenMethodDefinition(Set<ParameterMdc> definitions) {
         assertThat(definitions, hasSize(1));
         assertThat(definitions.iterator().next(), notNullValue());
     }
 
-    private void thenParameterDefinitions(List<Set<MdcDefinition>> definitions) {
+    private void thenParameterDefinitions(List<Set<ParameterMdc>> definitions) {
         assertThat(definitions, hasSize(2));
         thenAParameterDefinition(definitions.get(0));
         thenBParameterDefinition(definitions.get(1));
     }
 
-    private void thenAParameterDefinition(Set<MdcDefinition> definitions) {
+    private void thenAParameterDefinition(Set<ParameterMdc> definitions) {
         assertThat(definitions, hasSize(1));
         assertThat(definitions.iterator().next().getKey(), is("a"));
     }
 
-    private void thenBParameterDefinition(Set<MdcDefinition> definitions) {
+    private void thenBParameterDefinition(Set<ParameterMdc> definitions) {
         assertThat(definitions, hasSize(1));
         assertThat(definitions.iterator().next().getKey(), is("b"));
     }
@@ -89,9 +89,9 @@ public class MdcPackFactoryTest {
         Set<Mdc> methodMdcs = emptySet();
         List<Set<Mdc>> argumentMdcs = asList(emptySet(), emptySet());
         // when
-        MdcPack mdcPack = MdcPackFactory.newInstance(method, methodMdcs, argumentMdcs);
+        MethodMdc methodMdc = MethodMdcFactory.newInstance(method, methodMdcs, argumentMdcs);
         // then
-        assertThat(mdcPack, nullValue());
+        assertThat(methodMdc, nullValue());
     }
 
     @Test(expected = UnsupportedOperationException.class)
@@ -101,9 +101,9 @@ public class MdcPackFactoryTest {
         Set<Mdc> methodMdcs = givenMethodMdcs();
         List<Set<Mdc>> argumentMdcs = givenArgumentMdcs();
         // when
-        MdcPack mdcPack = MdcPackFactory.newInstance(method, methodMdcs, argumentMdcs);
+        MethodMdc methodMdc = MethodMdcFactory.newInstance(method, methodMdcs, argumentMdcs);
         // then
-        mdcPack.getMethodDefinitions().add(MdcDefinitionFactory.newInstance(givenMdc("")));
+        methodMdc.getMethodDefinitions().add(ParameterMdcFactory.newInstance(givenMdc("")));
     }
 
     @Test(expected = UnsupportedOperationException.class)
@@ -113,8 +113,8 @@ public class MdcPackFactoryTest {
         Set<Mdc> methodMdcs = givenMethodMdcs();
         List<Set<Mdc>> argumentMdcs = givenArgumentMdcs();
         // when
-        MdcPack mdcPack = MdcPackFactory.newInstance(method, methodMdcs, argumentMdcs);
+        MethodMdc methodMdc = MethodMdcFactory.newInstance(method, methodMdcs, argumentMdcs);
         // then
-        mdcPack.getParameterDefinitions().add(emptySet());
+        methodMdc.getParameterDefinitions().add(emptySet());
     }
 }

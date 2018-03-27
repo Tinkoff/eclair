@@ -12,23 +12,23 @@ import static java.util.Objects.isNull;
 /**
  * @author Viacheslav Klapatniuk
  */
-public class LogPackFactory {
+public class MethodLogFactory {
 
     /**
      * @param inLog  may be {@code null}
      * @param outLog may be {@code null}
      * @return Instantiated {@link InLog} or {@code null}
      */
-    public static LogPack newInstance(Method method,
-                                      List<String> parameterNames,
-                                      InLog inLog,
-                                      List<ParameterLog> parameterLogs,
-                                      OutLog outLog,
-                                      Set<ErrorLog> errorLogs) {
+    public static MethodLog newInstance(Method method,
+                                        List<String> parameterNames,
+                                        InLog inLog,
+                                        List<ParameterLog> parameterLogs,
+                                        OutLog outLog,
+                                        Set<ErrorLog> errorLogs) {
         if (isNull(inLog) && parameterLogs.stream().allMatch(Objects::isNull) && isNull(outLog) && errorLogs.isEmpty()) {
             return null;
         }
-        return LogPack.builder()
+        return MethodLog.builder()
                 .method(method)
                 .parameterNames(parameterNames)
                 .inLog(inLog)

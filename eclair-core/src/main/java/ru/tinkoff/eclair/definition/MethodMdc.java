@@ -14,16 +14,16 @@ import java.util.Set;
  */
 @Getter
 @Builder
-public class MdcPack {
+public class MethodMdc {
 
     @NonNull
     private Method method;
 
     @NonNull
     @Singular
-    private Set<MdcDefinition> methodDefinitions;
+    private Set<ParameterMdc> methodDefinitions;
 
     @NonNull
     @Singular
-    private List<Set<MdcDefinition>> parameterDefinitions;
+    private List<Set<ParameterMdc>> parameterDefinitions;
 }

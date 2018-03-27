@@ -92,20 +92,20 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
     /**
      * Lazy check
      *
-     * @see SimpleLogger#logIn(org.aopalliance.intercept.MethodInvocation, ru.tinkoff.eclair.definition.LogPack)
+     * @see SimpleLogger#logIn(org.aopalliance.intercept.MethodInvocation, MethodLog)
      */
     @Override
-    protected boolean isLogInNecessary(MethodInvocation invocation, LogPack logPack) {
+    protected boolean isLogInNecessary(MethodInvocation invocation, MethodLog methodLog) {
         return true;
     }
 
     @Override
-    protected void logIn(MethodInvocation invocation, LogPack logPack) {
+    protected void logIn(MethodInvocation invocation, MethodLog methodLog) {
         String loggerName = getLoggerName(invocation);
         LogLevel level = null;
 
         // initialize 'inLog' attributes
-        InLog inLog = logPack.getInLog();
+        InLog inLog = methodLog.getInLog();
         boolean isInLogLogEnabled = false;
         boolean isInLogVerboseLogEnabled = false;
         if (nonNull(inLog)) {
@@ -121,7 +121,7 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
         boolean isParameterLogVerboseFound = false;
         Object[] arguments = invocation.getArguments();
         for (int a = 0; a < arguments.length; a++) {
-            ParameterLog parameterLog = logPack.getParameterLogs().get(a);
+            ParameterLog parameterLog = methodLog.getParameterLogs().get(a);
             boolean isParameterLogDefined = nonNull(parameterLog);
 
             // filter argument
@@ -149,7 +149,7 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
 
             // print parameter name
             if (!isParameterLogDefined || isLogEnabled(loggerName, parameterLog.getVerboseLevel())) {
-                String parameterName = logPack.getParameterNames().get(a);
+                String parameterName = methodLog.getParameterNames().get(a);
                 if (nonNull(parameterName)) {
                     builder.append(parameterName).append("=");
                 }
@@ -175,22 +175,22 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
     /**
      * Lazy check
      *
-     * @see SimpleLogger#logOut(org.aopalliance.intercept.MethodInvocation, ru.tinkoff.eclair.definition.LogPack, java.lang.Object)
-     * @see SimpleLogger#logError(org.aopalliance.intercept.MethodInvocation, ru.tinkoff.eclair.definition.LogPack, java.lang.Throwable)
+     * @see SimpleLogger#logOut(org.aopalliance.intercept.MethodInvocation, MethodLog, java.lang.Object)
+     * @see SimpleLogger#logError(org.aopalliance.intercept.MethodInvocation, MethodLog, java.lang.Throwable)
      */
     @Override
-    protected boolean isLogOutNecessary(MethodInvocation invocation, LogPack logPack) {
+    protected boolean isLogOutNecessary(MethodInvocation invocation, MethodLog methodLog) {
         return true;
     }
 
     @Override
-    protected void logOut(MethodInvocation invocation, LogPack logPack, Object result) {
-        OutLog outLog = logPack.getOutLog();
+    protected void logOut(MethodInvocation invocation, MethodLog methodLog, Object result) {
+        OutLog outLog = methodLog.getOutLog();
         if (isNull(outLog)) {
             return;
         }
         String loggerName = getLoggerName(invocation);
-        if (!isLogEnabled(loggerName, expectedLevelResolver.apply(logPack.getOutLog()))) {
+        if (!isLogEnabled(loggerName, expectedLevelResolver.apply(methodLog.getOutLog()))) {
             return;
         }
         String message = OUT + buildResultClause(invocation, outLog, result, loggerName);
@@ -213,16 +213,16 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
     /**
      * Lazy check
      *
-     * @see SimpleLogger#logError(org.aopalliance.intercept.MethodInvocation, ru.tinkoff.eclair.definition.LogPack, java.lang.Throwable)
+     * @see SimpleLogger#logError(org.aopalliance.intercept.MethodInvocation, MethodLog, java.lang.Throwable)
      */
     @Override
-    protected boolean isLogErrorNecessary(MethodInvocation invocation, LogPack logPack, Throwable throwable) {
+    protected boolean isLogErrorNecessary(MethodInvocation invocation, MethodLog methodLog, Throwable throwable) {
         return true;
     }
 
     @Override
-    public void logError(MethodInvocation invocation, LogPack logPack, Throwable throwable) {
-        ErrorLog errorLog = logPack.findErrorLog(throwable.getClass());
+    public void logError(MethodInvocation invocation, MethodLog methodLog, Throwable throwable) {
+        ErrorLog errorLog = methodLog.findErrorLog(throwable.getClass());
         if (nonNull(errorLog)) {
             String loggerName = getLoggerName(invocation);
             if (isLogEnabled(loggerName, expectedLevelResolver.apply(errorLog))) {
@@ -230,7 +230,7 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
                 loggerFacadeFactory.getLoggerFacade(loggerName).log(errorLog.getLevel(), message, throwable);
             }
         } else {
-            OutLog outLog = logPack.getOutLog();
+            OutLog outLog = methodLog.getOutLog();
             if (nonNull(outLog)) {
                 String loggerName = getLoggerName(invocation);
                 if (isLogEnabled(loggerName, expectedLevelResolver.apply(outLog))) {

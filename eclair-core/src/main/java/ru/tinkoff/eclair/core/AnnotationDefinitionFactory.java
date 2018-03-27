@@ -82,9 +82,9 @@ public final class AnnotationDefinitionFactory {
                 .collect(toCollection(LinkedHashSet::new));
     }
 
-    public MdcPack buildMdcPack(Method method) {
+    public MethodMdc buildMethodMdc(Method method) {
         Set<Mdc> methodMdcs = annotationExtractor.getMdcs(method);
         List<Set<Mdc>> parametersMdcs = annotationExtractor.getParametersMdcs(method);
-        return MdcPackFactory.newInstance(method, methodMdcs, parametersMdcs);
+        return MethodMdcFactory.newInstance(method, methodMdcs, parametersMdcs);
     }
 }

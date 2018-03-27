@@ -2,7 +2,7 @@ package ru.tinkoff.eclair.logger;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.core.Ordered;
-import ru.tinkoff.eclair.definition.LogPack;
+import ru.tinkoff.eclair.definition.MethodLog;
 
 import java.util.Objects;
 
@@ -20,48 +20,48 @@ public abstract class EclairLogger implements Ordered {
 
     protected abstract String getLoggerName(MethodInvocation invocation);
 
-    public void logInIfNecessary(MethodInvocation invocation, LogPack logPack) {
-        if (isLogInNecessary(invocation, logPack)) {
-            logIn(invocation, logPack);
+    public void logInIfNecessary(MethodInvocation invocation, MethodLog methodLog) {
+        if (isLogInNecessary(invocation, methodLog)) {
+            logIn(invocation, methodLog);
         }
     }
 
     /**
      * Could be overridden for lazy optimal check
      */
-    protected boolean isLogInNecessary(MethodInvocation invocation, LogPack logPack) {
-        return nonNull(logPack.getInLog()) || logPack.getParameterLogs().stream().anyMatch(Objects::nonNull);
+    protected boolean isLogInNecessary(MethodInvocation invocation, MethodLog methodLog) {
+        return nonNull(methodLog.getInLog()) || methodLog.getParameterLogs().stream().anyMatch(Objects::nonNull);
     }
 
-    protected abstract void logIn(MethodInvocation invocation, LogPack logPack);
+    protected abstract void logIn(MethodInvocation invocation, MethodLog methodLog);
 
-    public void logOutIfNecessary(MethodInvocation invocation, LogPack logPack, Object result) {
-        if (isLogOutNecessary(invocation, logPack)) {
-            logOut(invocation, logPack, result);
+    public void logOutIfNecessary(MethodInvocation invocation, MethodLog methodLog, Object result) {
+        if (isLogOutNecessary(invocation, methodLog)) {
+            logOut(invocation, methodLog, result);
         }
     }
 
     /**
      * Could be overridden for lazy optimal check
      */
-    protected boolean isLogOutNecessary(MethodInvocation invocation, LogPack logPack) {
-        return nonNull(logPack.getOutLog());
+    protected boolean isLogOutNecessary(MethodInvocation invocation, MethodLog methodLog) {
+        return nonNull(methodLog.getOutLog());
     }
 
-    protected abstract void logOut(MethodInvocation invocation, LogPack logPack, Object result);
+    protected abstract void logOut(MethodInvocation invocation, MethodLog methodLog, Object result);
 
-    public void logErrorIfNecessary(MethodInvocation invocation, LogPack logPack, Throwable throwable) {
-        if (isLogErrorNecessary(invocation, logPack, throwable) || isLogOutNecessary(invocation, logPack)) {
-            logError(invocation, logPack, throwable);
+    public void logErrorIfNecessary(MethodInvocation invocation, MethodLog methodLog, Throwable throwable) {
+        if (isLogErrorNecessary(invocation, methodLog, throwable) || isLogOutNecessary(invocation, methodLog)) {
+            logError(invocation, methodLog, throwable);
         }
     }
 
     /**
      * Could be overridden for lazy optimal check
      */
-    protected boolean isLogErrorNecessary(MethodInvocation invocation, LogPack logPack, Throwable throwable) {
-        return nonNull(logPack.findErrorLog(throwable.getClass()));
+    protected boolean isLogErrorNecessary(MethodInvocation invocation, MethodLog methodLog, Throwable throwable) {
+        return nonNull(methodLog.findErrorLog(throwable.getClass()));
     }
 
-    protected abstract void logError(MethodInvocation invocation, LogPack logPack, Throwable throwable);
+    protected abstract void logError(MethodInvocation invocation, MethodLog methodLog, Throwable throwable);
 }

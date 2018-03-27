@@ -13,7 +13,7 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import ru.tinkoff.eclair.core.*;
 import ru.tinkoff.eclair.definition.*;
-import ru.tinkoff.eclair.definition.factory.LogPackFactory;
+import ru.tinkoff.eclair.definition.factory.MethodLogFactory;
 import ru.tinkoff.eclair.logger.EclairLogger;
 import ru.tinkoff.eclair.printer.Printer;
 import ru.tinkoff.eclair.validate.BeanClassValidator;
@@ -116,7 +116,7 @@ public class EclairProxyCreator extends AbstractAutoProxyCreator {
 
     private MdcAdvisor getMdcAdvisor(Class<?> beanClass) {
         return MdcAdvisor.newInstance(annotationExtractor.getCandidateMethods(beanClass).stream()
-                .map(annotationDefinitionFactory::buildMdcPack)
+                .map(annotationDefinitionFactory::buildMethodMdc)
                 .filter(Objects::nonNull)
                 .collect(toList()));
     }
@@ -129,25 +129,25 @@ public class EclairProxyCreator extends AbstractAutoProxyCreator {
     }
 
     private LogAdvisor getLogAdvisor(Class<?> beanClass, String loggerName, EclairLogger eclairLogger) {
-        List<LogPack> logPacks = getLogPacks(beanClass, loggerName);
-        return LogAdvisor.newInstance(eclairLogger, logPacks);
+        List<MethodLog> methodLogs = getMethodLogs(beanClass, loggerName);
+        return LogAdvisor.newInstance(eclairLogger, methodLogs);
     }
 
-    private List<LogPack> getLogPacks(Class<?> beanClass, String loggerName) {
+    private List<MethodLog> getMethodLogs(Class<?> beanClass, String loggerName) {
         Set<String> loggerNames = loggerBeanNamesResolver.resolve(applicationContext, loggerName);
         return annotationExtractor.getCandidateMethods(beanClass).stream()
-                .map(method -> getLogPack(loggerNames, method))
+                .map(method -> getMethodLog(loggerNames, method))
                 .filter(Objects::nonNull)
                 .collect(toList());
     }
 
-    private LogPack getLogPack(Set<String> loggerNames, Method method) {
+    private MethodLog getMethodLog(Set<String> loggerNames, Method method) {
         List<String> parameterNames = parameterNameResolver.tryToResolve(method);
         InLog inLog = annotationDefinitionFactory.buildInLog(loggerNames, method);
         List<ParameterLog> parameterLogs = annotationDefinitionFactory.buildParameterLogs(loggerNames, method);
         OutLog outLog = annotationDefinitionFactory.buildOutLog(loggerNames, method);
         Set<ErrorLog> errorLogs = annotationDefinitionFactory.buildErrorLogs(loggerNames, method);
-        return LogPackFactory.newInstance(method, parameterNames, inLog, parameterLogs, outLog, errorLogs);
+        return MethodLogFactory.newInstance(method, parameterNames, inLog, parameterLogs, outLog, errorLogs);
     }
 
     private Object[] composeAdvisors(MdcAdvisor mdcAdvisor, List<LogAdvisor> logAdvisors) {

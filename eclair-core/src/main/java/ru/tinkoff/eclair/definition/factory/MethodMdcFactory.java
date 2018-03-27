@@ -1,7 +1,7 @@
 package ru.tinkoff.eclair.definition.factory;
 
 import ru.tinkoff.eclair.annotation.Mdc;
-import ru.tinkoff.eclair.definition.MdcPack;
+import ru.tinkoff.eclair.definition.MethodMdc;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
@@ -15,19 +15,19 @@ import static java.util.stream.Collectors.toSet;
 /**
  * @author Viacheslav Klapatniuk
  */
-public class MdcPackFactory {
+public class MethodMdcFactory {
 
-    public static MdcPack newInstance(Method method,
-                                      Set<Mdc> methodMdcs,
-                                      List<Set<Mdc>> argumentMdcs) {
+    public static MethodMdc newInstance(Method method,
+                                        Set<Mdc> methodMdcs,
+                                        List<Set<Mdc>> argumentMdcs) {
         if (methodMdcs.isEmpty() && argumentMdcs.stream().allMatch(Collection::isEmpty)) {
             return null;
         }
-        return MdcPack.builder()
+        return MethodMdc.builder()
                 .method(method)
-                .methodDefinitions(methodMdcs.stream().map(MdcDefinitionFactory::newInstance).collect(toSet()))
+                .methodDefinitions(methodMdcs.stream().map(ParameterMdcFactory::newInstance).collect(toSet()))
                 .parameterDefinitions(argumentMdcs.stream()
-                        .map(mdcs -> unmodifiableSet(mdcs.stream().map(MdcDefinitionFactory::newInstance).collect(toSet())))
+                        .map(mdcs -> unmodifiableSet(mdcs.stream().map(ParameterMdcFactory::newInstance).collect(toSet())))
                         .collect(toList()))
                 .build();
     }

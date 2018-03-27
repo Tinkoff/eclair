@@ -5,7 +5,7 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.support.StaticMethodMatcherPointcutAdvisor;
 import org.springframework.core.BridgeMethodResolver;
-import ru.tinkoff.eclair.definition.LogPack;
+import ru.tinkoff.eclair.definition.MethodLog;
 import ru.tinkoff.eclair.logger.EclairLogger;
 
 import java.lang.reflect.Method;
@@ -21,15 +21,15 @@ import static java.util.stream.Collectors.toMap;
 final class LogAdvisor extends StaticMethodMatcherPointcutAdvisor implements MethodInterceptor {
 
     private final EclairLogger eclairLogger;
-    private final Map<Method, LogPack> logPacks;
+    private final Map<Method, MethodLog> methodLogs;
 
-    private LogAdvisor(EclairLogger eclairLogger, List<LogPack> logPacks) {
+    private LogAdvisor(EclairLogger eclairLogger, List<MethodLog> methodLogs) {
         this.eclairLogger = eclairLogger;
-        this.logPacks = logPacks.stream().collect(toMap(LogPack::getMethod, identity()));
+        this.methodLogs = methodLogs.stream().collect(toMap(MethodLog::getMethod, identity()));
     }
 
-    static LogAdvisor newInstance(EclairLogger eclairLogger, List<LogPack> logPacks) {
-        return logPacks.isEmpty() ? null : new LogAdvisor(eclairLogger, logPacks);
+    static LogAdvisor newInstance(EclairLogger eclairLogger, List<MethodLog> methodLogs) {
+        return methodLogs.isEmpty() ? null : new LogAdvisor(eclairLogger, methodLogs);
     }
 
     @Override
@@ -39,7 +39,7 @@ final class LogAdvisor extends StaticMethodMatcherPointcutAdvisor implements Met
 
     @Override
     public boolean matches(Method method, Class<?> targetClass) {
-        return logPacks.containsKey(method) || logPacks.containsKey(BridgeMethodResolver.findBridgedMethod(method));
+        return methodLogs.containsKey(method) || methodLogs.containsKey(BridgeMethodResolver.findBridgedMethod(method));
     }
 
     /**
@@ -52,16 +52,16 @@ final class LogAdvisor extends StaticMethodMatcherPointcutAdvisor implements Met
 
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
-        LogPack logPack = logPacks.get(invocation.getMethod());
-        eclairLogger.logInIfNecessary(invocation, logPack);
+        MethodLog methodLog = methodLogs.get(invocation.getMethod());
+        eclairLogger.logInIfNecessary(invocation, methodLog);
         Object result;
         try {
             result = invocation.proceed();
         } catch (Throwable throwable) {
-            eclairLogger.logErrorIfNecessary(invocation, logPack, throwable);
+            eclairLogger.logErrorIfNecessary(invocation, methodLog, throwable);
             throw throwable;
         }
-        eclairLogger.logOutIfNecessary(invocation, logPack, result);
+        eclairLogger.logOutIfNecessary(invocation, methodLog, result);
         return result;
     }
 }

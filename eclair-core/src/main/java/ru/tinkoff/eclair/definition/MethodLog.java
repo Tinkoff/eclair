@@ -22,7 +22,7 @@ import static org.springframework.core.annotation.AnnotationUtils.synthesizeAnno
  * @author Viacheslav Klapatniuk
  */
 @Builder
-public class LogPack {
+public class MethodLog {
 
     private static final ErrorLog EMPTY = ErrorLogFactory.newInstance(synthesizeAnnotation(Log.error.class));
 

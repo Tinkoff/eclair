@@ -5,7 +5,7 @@ import org.springframework.boot.logging.LogLevel;
 import ru.tinkoff.eclair.core.ExpectedLevelResolver;
 import ru.tinkoff.eclair.definition.ErrorLog;
 import ru.tinkoff.eclair.definition.LogDefinition;
-import ru.tinkoff.eclair.definition.LogPack;
+import ru.tinkoff.eclair.definition.MethodLog;
 
 import java.util.function.Function;
 
@@ -26,14 +26,14 @@ public abstract class LevelSensitiveLogger extends EclairLogger {
      * Could be overridden for lazy optimal check
      */
     @Override
-    protected boolean isLogInNecessary(MethodInvocation invocation, LogPack logPack) {
+    protected boolean isLogInNecessary(MethodInvocation invocation, MethodLog methodLog) {
         String loggerName = getLoggerName(invocation);
-        if (nonNull(logPack.getInLog())) {
-            if (isLogEnabled(loggerName, expectedLevelResolver.apply(logPack.getInLog()))) {
+        if (nonNull(methodLog.getInLog())) {
+            if (isLogEnabled(loggerName, expectedLevelResolver.apply(methodLog.getInLog()))) {
                 return true;
             }
         }
-        return logPack.getParameterLogs().stream()
+        return methodLog.getParameterLogs().stream()
                 .anyMatch(parameterLog -> nonNull(parameterLog) && isLogEnabled(loggerName, expectedLevelResolver.apply(parameterLog)));
     }
 
@@ -41,17 +41,17 @@ public abstract class LevelSensitiveLogger extends EclairLogger {
      * Could be overridden for lazy optimal check
      */
     @Override
-    protected boolean isLogOutNecessary(MethodInvocation invocation, LogPack logPack) {
-        return super.isLogOutNecessary(invocation, logPack) &&
-                isLogEnabled(getLoggerName(invocation), expectedLevelResolver.apply(logPack.getOutLog()));
+    protected boolean isLogOutNecessary(MethodInvocation invocation, MethodLog methodLog) {
+        return super.isLogOutNecessary(invocation, methodLog) &&
+                isLogEnabled(getLoggerName(invocation), expectedLevelResolver.apply(methodLog.getOutLog()));
     }
 
     /**
      * Could be overridden for lazy optimal check
      */
     @Override
-    protected boolean isLogErrorNecessary(MethodInvocation invocation, LogPack logPack, Throwable throwable) {
-        ErrorLog errorLog = logPack.findErrorLog(throwable.getClass());
+    protected boolean isLogErrorNecessary(MethodInvocation invocation, MethodLog methodLog, Throwable throwable) {
+        ErrorLog errorLog = methodLog.findErrorLog(throwable.getClass());
         return nonNull(errorLog) && isLogEnabled(getLoggerName(invocation), expectedLevelResolver.apply(errorLog));
     }
 }

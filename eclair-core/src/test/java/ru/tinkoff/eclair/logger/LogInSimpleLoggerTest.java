@@ -10,7 +10,7 @@ import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import ru.tinkoff.eclair.definition.ParameterLog;
 import ru.tinkoff.eclair.definition.InLog;
-import ru.tinkoff.eclair.definition.LogPack;
+import ru.tinkoff.eclair.definition.MethodLog;
 import ru.tinkoff.eclair.logger.facade.LoggerFacadeFactory;
 import ru.tinkoff.eclair.printer.JacksonPrinter;
 import ru.tinkoff.eclair.printer.Jaxb2Printer;
@@ -499,7 +499,7 @@ public class LogInSimpleLoggerTest {
             MethodInvocation invocation = methodInvocation(method, arguments.toArray());
             SimpleLogger simpleLogger = new SimpleLogger(loggerFacadeFactory(), loggingSystem(effectiveLevel));
             // when
-            simpleLogger.logInIfNecessary(invocation, logPack(inLog, parameterLogs, parameterNames));
+            simpleLogger.logInIfNecessary(invocation, methodLog(inLog, parameterLogs, parameterNames));
             return simpleLogger;
         }
 
@@ -520,12 +520,12 @@ public class LogInSimpleLoggerTest {
             return loggingSystem;
         }
 
-        private LogPack logPack(InLog inLog, List<ParameterLog> parameterLogs, List<String> parameterNames) {
-            LogPack logPack = mock(LogPack.class);
-            when(logPack.getInLog()).thenReturn(inLog);
-            when(logPack.getParameterLogs()).thenReturn(parameterLogs);
-            when(logPack.getParameterNames()).thenReturn(parameterNames);
-            return logPack;
+        private MethodLog methodLog(InLog inLog, List<ParameterLog> parameterLogs, List<String> parameterNames) {
+            MethodLog methodLog = mock(MethodLog.class);
+            when(methodLog.getInLog()).thenReturn(inLog);
+            when(methodLog.getParameterLogs()).thenReturn(parameterLogs);
+            when(methodLog.getParameterNames()).thenReturn(parameterNames);
+            return methodLog;
         }
     }
 }

@@ -2,7 +2,7 @@ package ru.tinkoff.eclair.definition.factory;
 
 import org.junit.Test;
 import ru.tinkoff.eclair.annotation.Mdc;
-import ru.tinkoff.eclair.definition.MdcDefinition;
+import ru.tinkoff.eclair.definition.ParameterMdc;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,14 +15,14 @@ import static org.springframework.core.annotation.AnnotationUtils.synthesizeAnno
 /**
  * @author Viacheslav Klapatniuk
  */
-public class MdcDefinitionFactoryTest {
+public class ParameterMdcFactoryTest {
 
     @Test
     public void newInstance() {
         // given
         Mdc mdc = givenMdc();
         // when
-        MdcDefinition definition = MdcDefinitionFactory.newInstance(mdc);
+        ParameterMdc definition = ParameterMdcFactory.newInstance(mdc);
         // then
         assertThat(definition.getKey(), is("key"));
         assertThat(definition.getValue(), is("value"));

@@ -9,7 +9,7 @@ import lombok.NonNull;
  */
 @Getter
 @Builder
-public class MdcDefinition {
+public class ParameterMdc {
 
     @NonNull
     private String key;

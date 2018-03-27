@@ -289,29 +289,29 @@ public class AnnotationDefinitionFactoryTest {
     }
 
     @Test
-    public void buildMdcPack() throws NoSuchMethodException {
+    public void buildMethodMdc() throws NoSuchMethodException {
         // given
         Method method = MdcLoggableClass.class.getMethod("mdc", String.class, String.class);
         // when
-        MdcPack mdcPack = annotationDefinitionFactory.buildMdcPack(method);
+        MethodMdc methodMdc = annotationDefinitionFactory.buildMethodMdc(method);
         // then
-        assertThat(mdcPack.getMethod(), is(method));
-        assertThat(mdcPack.getMethodDefinitions(), hasSize(1));
-        assertThat(mdcPack.getMethodDefinitions().iterator().next().getKey(), is("method"));
-        assertThat(mdcPack.getParameterDefinitions(), hasSize(2));
-        assertThat(mdcPack.getParameterDefinitions().get(0), hasSize(1));
-        assertThat(mdcPack.getParameterDefinitions().get(0).iterator().next().getKey(), is("a"));
-        assertThat(mdcPack.getParameterDefinitions().get(1), is(empty()));
+        assertThat(methodMdc.getMethod(), is(method));
+        assertThat(methodMdc.getMethodDefinitions(), hasSize(1));
+        assertThat(methodMdc.getMethodDefinitions().iterator().next().getKey(), is("method"));
+        assertThat(methodMdc.getParameterDefinitions(), hasSize(2));
+        assertThat(methodMdc.getParameterDefinitions().get(0), hasSize(1));
+        assertThat(methodMdc.getParameterDefinitions().get(0).iterator().next().getKey(), is("a"));
+        assertThat(methodMdc.getParameterDefinitions().get(1), is(empty()));
     }
 
     @Test
-    public void buildMdcPackEmpty() throws NoSuchMethodException {
+    public void buildMethodMdcEmpty() throws NoSuchMethodException {
         // given
         Method method = MdcLoggableClass.class.getMethod("empty");
         // when
-        MdcPack mdcPack = annotationDefinitionFactory.buildMdcPack(method);
+        MethodMdc methodMdc = annotationDefinitionFactory.buildMethodMdc(method);
         // then
-        assertThat(mdcPack, nullValue());
+        assertThat(methodMdc, nullValue());
     }
 
     @SuppressWarnings("unused")
