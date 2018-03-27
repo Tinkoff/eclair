@@ -22,17 +22,17 @@ public class LogPackFactory {
     public static LogPack newInstance(Method method,
                                       List<String> parameterNames,
                                       InLog inLog,
-                                      List<ArgLog> argLogs,
+                                      List<ParameterLog> parameterLogs,
                                       OutLog outLog,
                                       Set<ErrorLog> errorLogs) {
-        if (isNull(inLog) && argLogs.stream().allMatch(Objects::isNull) && isNull(outLog) && errorLogs.isEmpty()) {
+        if (isNull(inLog) && parameterLogs.stream().allMatch(Objects::isNull) && isNull(outLog) && errorLogs.isEmpty()) {
             return null;
         }
         return LogPack.builder()
                 .method(method)
                 .parameterNames(parameterNames)
                 .inLog(inLog)
-                .argLogs(argLogs)
+                .parameterLogs(parameterLogs)
                 .outLog(outLog)
                 .errorLogs(errorLogs)
                 .build();

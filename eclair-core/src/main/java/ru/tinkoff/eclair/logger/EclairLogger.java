@@ -30,7 +30,7 @@ public abstract class EclairLogger implements Ordered {
      * Could be overridden for lazy optimal check
      */
     protected boolean isLogInNecessary(MethodInvocation invocation, LogPack logPack) {
-        return nonNull(logPack.getInLog()) || logPack.getArgLogs().stream().anyMatch(Objects::nonNull);
+        return nonNull(logPack.getInLog()) || logPack.getParameterLogs().stream().anyMatch(Objects::nonNull);
     }
 
     protected abstract void logIn(MethodInvocation invocation, LogPack logPack);

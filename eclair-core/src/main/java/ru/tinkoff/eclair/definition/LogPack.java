@@ -41,7 +41,7 @@ public class LogPack {
     @Getter
     @NonNull
     @Singular
-    private List<ArgLog> argLogs;
+    private List<ParameterLog> parameterLogs;
 
     @Getter
     private OutLog outLog;

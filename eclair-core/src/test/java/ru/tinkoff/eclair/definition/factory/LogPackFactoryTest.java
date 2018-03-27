@@ -30,19 +30,19 @@ public class LogPackFactoryTest {
         Method method = LogPackFactoryTest.class.getMethod("newInstance");
         List<String> parameterNames = singletonList("parameterName");
         InLog inLog = givenInLog();
-        ArgLog argLog = givenArgLog();
-        List<ArgLog> argLogs = singletonList(argLog);
+        ParameterLog parameterLog = givenParameterLog();
+        List<ParameterLog> parameterLogs = singletonList(parameterLog);
         OutLog outLog = givenOutLog();
         Set<ErrorLog> errorLogs = singleton(TestErrorLogFactory.newInstance(new Class<?>[]{Throwable.class}, new Class<?>[]{}));
         // when
-        LogPack logPack = LogPackFactory.newInstance(method, parameterNames, inLog, argLogs, outLog, errorLogs);
+        LogPack logPack = LogPackFactory.newInstance(method, parameterNames, inLog, parameterLogs, outLog, errorLogs);
         // then
         assertThat(logPack.getMethod(), is(method));
         assertThat(logPack.getParameterNames(), hasSize(1));
         assertThat(logPack.getParameterNames().get(0), is("parameterName"));
         assertThat(logPack.getInLog(), is(inLog));
-        assertThat(logPack.getArgLogs(), hasSize(1));
-        assertThat(logPack.getArgLogs().get(0), is(argLog));
+        assertThat(logPack.getParameterLogs(), hasSize(1));
+        assertThat(logPack.getParameterLogs().get(0), is(parameterLog));
         assertThat(logPack.getOutLog(), is(outLog));
     }
 
@@ -52,27 +52,27 @@ public class LogPackFactoryTest {
         Method method = LogPackFactoryTest.class.getMethod("newInstance");
         List<String> parameterNames = emptyList();
         InLog inLog = null;
-        List<ArgLog> argLogs = asList(null, null, null);
+        List<ParameterLog> parameterLogs = asList(null, null, null);
         OutLog outLog = null;
         Set<ErrorLog> errorLogs = emptySet();
         // when
-        LogPack logPack = LogPackFactory.newInstance(method, parameterNames, inLog, argLogs, outLog, errorLogs);
+        LogPack logPack = LogPackFactory.newInstance(method, parameterNames, inLog, parameterLogs, outLog, errorLogs);
         // then
         assertThat(logPack, nullValue());
     }
 
     @Test(expected = UnsupportedOperationException.class)
-    public void newInstanceArgLogsImmutable() throws NoSuchMethodException {
+    public void newInstanceParameterLogsImmutable() throws NoSuchMethodException {
         // given
         Method method = LogPackFactoryTest.class.getMethod("newInstance");
         List<String> parameterNames = emptyList();
         InLog inLog = givenInLog();
-        List<ArgLog> argLogs = new ArrayList<>();
+        List<ParameterLog> parameterLogs = new ArrayList<>();
         OutLog outLog = givenOutLog();
         Set<ErrorLog> errorLogs = new HashSet<>();
         // when
-        LogPack logPack = LogPackFactory.newInstance(method, parameterNames, inLog, argLogs, outLog, errorLogs);
-        logPack.getArgLogs().add(givenArgLog());
+        LogPack logPack = LogPackFactory.newInstance(method, parameterNames, inLog, parameterLogs, outLog, errorLogs);
+        logPack.getParameterLogs().add(givenParameterLog());
         // then expected exception
     }
 
@@ -82,11 +82,11 @@ public class LogPackFactoryTest {
         Method method = LogPackFactoryTest.class.getMethod("newInstance");
         List<String> parameterNames = emptyList();
         InLog inLog = givenInLog();
-        List<ArgLog> argLogs = new ArrayList<>();
+        List<ParameterLog> parameterLogs = new ArrayList<>();
         OutLog outLog = givenOutLog();
         Set<ErrorLog> errorLogs = new HashSet<>();
         // when
-        LogPack logPack = LogPackFactory.newInstance(method, parameterNames, inLog, argLogs, outLog, errorLogs);
+        LogPack logPack = LogPackFactory.newInstance(method, parameterNames, inLog, parameterLogs, outLog, errorLogs);
         logPack.getParameterNames().add("name");
         // then expected exception
     }
@@ -97,12 +97,12 @@ public class LogPackFactoryTest {
         Method method = LogPackFactoryTest.class.getMethod("newInstance");
         List<String> parameterNames = emptyList();
         InLog inLog = givenInLog();
-        List<ArgLog> argLogs = emptyList();
+        List<ParameterLog> parameterLogs = emptyList();
         OutLog outLog = givenOutLog();
         ErrorLog errorLog = TestErrorLogFactory.newInstance(new Class<?>[]{Exception.class}, new Class<?>[]{Error.class});
         Set<ErrorLog> errorLogs = singleton(errorLog);
         // when
-        LogPack logPack = LogPackFactory.newInstance(method, parameterNames, inLog, argLogs, outLog, errorLogs);
+        LogPack logPack = LogPackFactory.newInstance(method, parameterNames, inLog, parameterLogs, outLog, errorLogs);
         // then
         assertThat(logPack.findErrorLog(Throwable.class), nullValue());
         assertThat(logPack.findErrorLog(RuntimeException.class), is(errorLog));
@@ -115,8 +115,8 @@ public class LogPackFactoryTest {
         return InLogFactory.newInstance(logIn, new ToStringPrinter());
     }
 
-    private ArgLog givenArgLog() {
-        return ArgLogFactory.newInstance(synthesizeAnnotation(Log.class), new ToStringPrinter());
+    private ParameterLog givenParameterLog() {
+        return ParameterLogFactory.newInstance(synthesizeAnnotation(Log.class), new ToStringPrinter());
     }
 
     private OutLog givenOutLog() {

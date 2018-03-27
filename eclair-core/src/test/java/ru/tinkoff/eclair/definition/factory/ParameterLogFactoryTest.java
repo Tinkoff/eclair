@@ -2,7 +2,7 @@ package ru.tinkoff.eclair.definition.factory;
 
 import org.junit.Test;
 import ru.tinkoff.eclair.annotation.Log;
-import ru.tinkoff.eclair.definition.ArgLog;
+import ru.tinkoff.eclair.definition.ParameterLog;
 import ru.tinkoff.eclair.printer.Printer;
 import ru.tinkoff.eclair.printer.ToStringPrinter;
 
@@ -21,7 +21,7 @@ import static org.springframework.core.annotation.AnnotationUtils.synthesizeAnno
 /**
  * @author Viacheslav Klapatniuk
  */
-public class ArgLogFactoryTest {
+public class ParameterLogFactoryTest {
 
     @Test
     public void newInstance() {
@@ -29,12 +29,12 @@ public class ArgLogFactoryTest {
         Log log = givenLog();
         Printer printer = givenPrinter();
         // when
-        ArgLog argLog = ArgLogFactory.newInstance(log, printer);
+        ParameterLog parameterLog = ParameterLogFactory.newInstance(log, printer);
         // then
-        assertThat(argLog.getLevel(), is(INFO));
-        assertThat(argLog.getIfEnabledLevel(), is(WARN));
-        assertThat(argLog.getVerboseLevel(), is(ERROR));
-        assertThat(argLog.getPrinter(), is(printer));
+        assertThat(parameterLog.getLevel(), is(INFO));
+        assertThat(parameterLog.getIfEnabledLevel(), is(WARN));
+        assertThat(parameterLog.getVerboseLevel(), is(ERROR));
+        assertThat(parameterLog.getPrinter(), is(printer));
     }
 
     private Log givenLog() {
@@ -59,9 +59,9 @@ public class ArgLogFactoryTest {
         Log log = givenLogByValue();
         Printer printer = givenPrinter();
         // when
-        ArgLog argLog = ArgLogFactory.newInstance(log, printer);
+        ParameterLog parameterLog = ParameterLogFactory.newInstance(log, printer);
         // then
-        assertThat(argLog.getLevel(), is(WARN));
+        assertThat(parameterLog.getLevel(), is(WARN));
     }
 
     private Log givenLogByValue() {
@@ -74,8 +74,8 @@ public class ArgLogFactoryTest {
         Log log = null;
         Printer printer = givenPrinter();
         // when
-        ArgLog argLog = ArgLogFactory.newInstance(log, printer);
+        ParameterLog parameterLog = ParameterLogFactory.newInstance(log, printer);
         // then
-        assertThat(argLog, nullValue());
+        assertThat(parameterLog, nullValue());
     }
 }

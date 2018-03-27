@@ -89,16 +89,16 @@ public class AnnotationDefinitionFactoryTest {
     }
 
     @Test
-    public void buildArgLogs() throws NoSuchMethodException {
+    public void buildParameterLogs() throws NoSuchMethodException {
         // given
         Set<String> loggerNames = singleton("");
         Method method = LogInLoggableClass.class.getMethod("parameterLog", String.class, String.class);
         // when
-        List<ArgLog> argLogs = annotationDefinitionFactory.buildArgLogs(loggerNames, method);
+        List<ParameterLog> parameterLogs = annotationDefinitionFactory.buildParameterLogs(loggerNames, method);
         // then
-        assertThat(argLogs, hasSize(2));
-        assertThat(argLogs.get(0).getIfEnabledLevel(), is(WARN));
-        assertThat(argLogs.get(1), nullValue());
+        assertThat(parameterLogs, hasSize(2));
+        assertThat(parameterLogs.get(0).getIfEnabledLevel(), is(WARN));
+        assertThat(parameterLogs.get(1), nullValue());
     }
 
     @Test

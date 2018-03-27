@@ -11,7 +11,7 @@ import ru.tinkoff.eclair.printer.Printer;
  */
 @Getter
 @Builder
-public class ArgLog implements LogDefinition {
+public class ParameterLog implements LogDefinition {
 
     @NonNull
     private LogLevel level;

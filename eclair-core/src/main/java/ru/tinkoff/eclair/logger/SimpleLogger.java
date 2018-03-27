@@ -118,21 +118,21 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
         }
 
         StringBuilder builder = new StringBuilder();
-        boolean isArgLogVerboseFound = false;
+        boolean isParameterLogVerboseFound = false;
         Object[] arguments = invocation.getArguments();
         for (int a = 0; a < arguments.length; a++) {
-            ArgLog argLog = logPack.getArgLogs().get(a);
-            boolean isArgLogDefined = nonNull(argLog);
+            ParameterLog parameterLog = logPack.getParameterLogs().get(a);
+            boolean isParameterLogDefined = nonNull(parameterLog);
 
             // filter argument
-            if (isArgLogDefined) {
-                LogLevel argLogLevel = argLog.getLevel();
-                if (argLogLevel == OFF || !isLogEnabled(loggerName, expectedLevelResolver.apply(argLog))) {
+            if (isParameterLogDefined) {
+                LogLevel parameterLogLevel = parameterLog.getLevel();
+                if (parameterLogLevel == OFF || !isLogEnabled(loggerName, expectedLevelResolver.apply(parameterLog))) {
                     continue;
                 }
                 if (!isInLogLogEnabled) {
-                    if (isNull(level) || argLogLevel.ordinal() > level.ordinal()) {
-                        level = argLogLevel;
+                    if (isNull(level) || parameterLogLevel.ordinal() > level.ordinal()) {
+                        level = parameterLogLevel;
                     }
                 }
             } else if (!isInLogVerboseLogEnabled) {
@@ -140,15 +140,15 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
             }
 
             // print delimiter
-            if (isArgLogVerboseFound) {
+            if (isParameterLogVerboseFound) {
                 builder.append(", ");
             } else {
                 builder.append(" ");
-                isArgLogVerboseFound = true;
+                isParameterLogVerboseFound = true;
             }
 
             // print parameter name
-            if (!isArgLogDefined || isLogEnabled(loggerName, argLog.getVerboseLevel())) {
+            if (!isParameterLogDefined || isLogEnabled(loggerName, parameterLog.getVerboseLevel())) {
                 String parameterName = logPack.getParameterNames().get(a);
                 if (nonNull(parameterName)) {
                     builder.append(parameterName).append("=");
@@ -159,14 +159,14 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
             Object argument = arguments[a];
             if (isNull(argument)) {
                 builder.append((String) null);
-            } else if (isArgLogDefined) {
-                builder.append(printArgument(argLog.getPrinter(), argument));
+            } else if (isParameterLogDefined) {
+                builder.append(printArgument(parameterLog.getPrinter(), argument));
             } else {
                 builder.append(printArgument(inLog.getPrinter(), argument));
             }
         }
 
-        if (isInLogLogEnabled || isArgLogVerboseFound) {
+        if (isInLogLogEnabled || isParameterLogVerboseFound) {
             String message = IN + builder.toString();
             loggerFacadeFactory.getLoggerFacade(loggerName).log(level, message);
         }
