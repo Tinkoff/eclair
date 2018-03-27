@@ -13,6 +13,8 @@ public interface ManualLogger {
 
     void log(LogLevel level, String format, Object... arguments);
 
+    void log(LogLevel level, LogLevel ifEnabledLevel, String format, Object... arguments);
+
     default boolean isTraceEnabled() {
         return isLevelEnabled(TRACE);
     }
@@ -54,62 +56,42 @@ public interface ManualLogger {
     }
 
     default void debugIfTraceEnabled(String format, Object... arguments) {
-        if (isTraceEnabled()) {
-            debug(format, arguments);
-        }
+        log(DEBUG, TRACE, format, arguments);
     }
 
     default void infoIfDebugEnabled(String format, Object... arguments) {
-        if (isDebugEnabled()) {
-            info(format, arguments);
-        }
+        log(INFO, DEBUG, format, arguments);
     }
 
     default void infoIfTraceEnabled(String format, Object... arguments) {
-        if (isTraceEnabled()) {
-            info(format, arguments);
-        }
+        log(INFO, TRACE, format, arguments);
     }
 
     default void warnIfInfoEnabled(String format, Object... arguments) {
-        if (isInfoEnabled()) {
-            warn(format, arguments);
-        }
+        log(WARN, INFO, format, arguments);
     }
 
     default void warnIfDebugEnabled(String format, Object... arguments) {
-        if (isDebugEnabled()) {
-            warn(format, arguments);
-        }
+        log(WARN, DEBUG, format, arguments);
     }
 
     default void warnIfTraceEnabled(String format, Object... arguments) {
-        if (isTraceEnabled()) {
-            warn(format, arguments);
-        }
+        log(WARN, TRACE, format, arguments);
     }
 
     default void errorIfWarnEnabled(String format, Object... arguments) {
-        if (isWarnEnabled()) {
-            error(format, arguments);
-        }
+        log(ERROR, WARN, format, arguments);
     }
 
     default void errorIfInfoEnabled(String format, Object... arguments) {
-        if (isInfoEnabled()) {
-            error(format, arguments);
-        }
+        log(ERROR, INFO, format, arguments);
     }
 
     default void errorIfDebugEnabled(String format, Object... arguments) {
-        if (isDebugEnabled()) {
-            error(format, arguments);
-        }
+        log(ERROR, DEBUG, format, arguments);
     }
 
     default void errorIfTraceEnabled(String format, Object... arguments) {
-        if (isTraceEnabled()) {
-            error(format, arguments);
-        }
+        log(ERROR, TRACE, format, arguments);
     }
 }

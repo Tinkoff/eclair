@@ -58,8 +58,13 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
 
     @Override
     public void log(LogLevel level, String format, Object... arguments) {
+        log(level, level, format, arguments);
+    }
+
+    @Override
+    public void log(LogLevel level, LogLevel ifEnabledLevel, String format, Object... arguments) {
         String loggerName = loggerNameBuilder.buildByInvoker();
-        if (isLevelEnabled(loggerName, level)) {
+        if (isLevelEnabled(loggerName, ifEnabledLevel)) {
             String message = MANUAL + " " + format;
             Object[] unwrappedArguments = unwrapArguments(arguments);
             loggerFacadeFactory.getLoggerFacade(loggerName).log(level, message, unwrappedArguments);

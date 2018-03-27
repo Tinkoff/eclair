@@ -73,6 +73,10 @@ public class LoggerNameBuilderTest {
             String name = LoggerNameBuilder.getInstance().buildByInvoker();
             assertThat(name, is("ru.tinkoff.eclair.core.LoggerNameBuilderTest.buildByInvoker"));
         }
+
+        @Override
+        public void log(LogLevel level, LogLevel ifEnabledLevel, String format, Object... arguments) {
+        }
     }
 
     @Test(expected = IllegalArgumentException.class)

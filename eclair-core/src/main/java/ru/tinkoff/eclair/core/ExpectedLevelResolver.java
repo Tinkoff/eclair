@@ -18,9 +18,10 @@ public final class ExpectedLevelResolver implements Function<LogDefinition, LogL
 
     @Override
     public LogLevel apply(LogDefinition definition) {
-        if (definition.getLevel().ordinal() <= definition.getIfEnabledLevel().ordinal()) {
-            return definition.getLevel();
-        }
-        return definition.getIfEnabledLevel();
+        return min(definition.getLevel(), definition.getIfEnabledLevel());
+    }
+
+    private LogLevel min(LogLevel level1, LogLevel level2) {
+        return level1.ordinal() <= level2.ordinal() ? level1 : level2;
     }
 }
