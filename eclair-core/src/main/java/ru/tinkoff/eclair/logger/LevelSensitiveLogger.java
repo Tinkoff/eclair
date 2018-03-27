@@ -20,7 +20,7 @@ public abstract class LevelSensitiveLogger extends EclairLogger {
 
     static final Function<LogDefinition, LogLevel> expectedLevelResolver = ExpectedLevelResolver.getInstance();
 
-    protected abstract boolean isLevelEnabled(String loggerName, LogLevel expectedLevel);
+    protected abstract boolean isLogEnabled(String loggerName, LogLevel level);
 
     /**
      * Could be overridden for lazy optimal check
@@ -29,12 +29,12 @@ public abstract class LevelSensitiveLogger extends EclairLogger {
     protected boolean isLogInNecessary(MethodInvocation invocation, LogPack logPack) {
         String loggerName = getLoggerName(invocation);
         if (nonNull(logPack.getInLog())) {
-            if (isLevelEnabled(loggerName, expectedLevelResolver.apply(logPack.getInLog()))) {
+            if (isLogEnabled(loggerName, expectedLevelResolver.apply(logPack.getInLog()))) {
                 return true;
             }
         }
         return logPack.getArgLogs().stream()
-                .anyMatch(argLog -> nonNull(argLog) && isLevelEnabled(loggerName, expectedLevelResolver.apply(argLog)));
+                .anyMatch(argLog -> nonNull(argLog) && isLogEnabled(loggerName, expectedLevelResolver.apply(argLog)));
     }
 
     /**
@@ -43,7 +43,7 @@ public abstract class LevelSensitiveLogger extends EclairLogger {
     @Override
     protected boolean isLogOutNecessary(MethodInvocation invocation, LogPack logPack) {
         return super.isLogOutNecessary(invocation, logPack) &&
-                isLevelEnabled(getLoggerName(invocation), expectedLevelResolver.apply(logPack.getOutLog()));
+                isLogEnabled(getLoggerName(invocation), expectedLevelResolver.apply(logPack.getOutLog()));
     }
 
     /**
@@ -52,6 +52,6 @@ public abstract class LevelSensitiveLogger extends EclairLogger {
     @Override
     protected boolean isLogErrorNecessary(MethodInvocation invocation, LogPack logPack, Throwable throwable) {
         ErrorLog errorLog = logPack.findErrorLog(throwable.getClass());
-        return nonNull(errorLog) && isLevelEnabled(getLoggerName(invocation), expectedLevelResolver.apply(errorLog));
+        return nonNull(errorLog) && isLogEnabled(getLoggerName(invocation), expectedLevelResolver.apply(errorLog));
     }
 }

@@ -466,12 +466,12 @@ public class Example {
         // INFO  r.t.eclair.example.Example.manualLevelLogging - true
         // INFO  r.t.eclair.example.Example.manualLevelLogging - true
         // INFO  r.t.eclair.example.Example.manualLevelLogging - false
-        logger.info(Boolean.toString(logger.isTraceEnabled()));
-        logger.info(Boolean.toString(logger.isDebugEnabled()));
-        logger.info(Boolean.toString(logger.isInfoEnabled()));
-        logger.info(Boolean.toString(logger.isWarnEnabled()));
-        logger.info(Boolean.toString(logger.isErrorEnabled()));
-        logger.info(Boolean.toString(logger.isLevelEnabled(TRACE)));
+        logger.info(Boolean.toString(logger.isTraceLogEnabled()));
+        logger.info(Boolean.toString(logger.isDebugLogEnabled()));
+        logger.info(Boolean.toString(logger.isInfoLogEnabled()));
+        logger.info(Boolean.toString(logger.isWarnLogEnabled()));
+        logger.info(Boolean.toString(logger.isErrorLogEnabled()));
+        logger.info(Boolean.toString(logger.isLogEnabled(TRACE)));
 
         // nothing to log
         logger.trace("trace");
@@ -622,5 +622,31 @@ public class Example {
     // TODO: for several loggers with Orders
     // TODO: for several loggers without Orders
 
-    // TODO: for Level.OFF
+    /**
+     * (nothing to log)
+     */
+    @Log.in(OFF)
+    public void offLevel() {
+    }
+
+    /**
+     * DEBUG ru.tinkoff.eclair.example.Example.offLevelWithArg > a=1
+     */
+    @Log.in(OFF)
+    public void offLevelWithArg(@Log int a) {
+    }
+
+    /**
+     * DEBUG ru.tinkoff.eclair.example.Example.offLevelWithArg >
+     */
+    @Log.in
+    public void argOffLevel(@Log(OFF) int a) {
+    }
+
+    /**
+     * (nothing to log)
+     */
+    @Log.in(OFF)
+    public void offLevel(@Log(OFF) int a) {
+    }
 }

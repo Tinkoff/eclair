@@ -335,6 +335,90 @@ public class LogInSimpleLoggerTest {
         verify(logger.getLoggerFacadeFactory().getLoggerFacade(any())).log(DEBUG, "> s=\"s\", i=!, dto=<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><dto><i>0</i></dto>");
     }
 
+    @Test
+    public void levelIsOff() {
+        // given, when
+        SimpleLogger logger = new SimpleLoggerBuilder()
+                .method(methodWithParameters)
+                .parameterNames("s", "i", "dto")
+                .arguments("s", 1, new Dto())
+                .levels(OFF, OFF, DEBUG)
+                .argLogs(null, null, null)
+                .effectiveLevel(TRACE)
+                .buildAndInvokeAndGet();
+        // then
+        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any()), never()).log(any(), any());
+    }
+
+    @Test
+    public void offLevelWithArgs() {
+        // given, when
+        Printer printer = new ToStringPrinter();
+        SimpleLogger logger = new SimpleLoggerBuilder()
+                .method(methodWithParameters)
+                .parameterNames("s", "i", "dto")
+                .arguments("s", 1, new Dto())
+                .levels(OFF, OFF, DEBUG)
+                .argLog(DEBUG, OFF, DEBUG, printer)
+                .argLog(OFF, OFF, DEBUG, printer)
+                .argLog(INFO, OFF, TRACE, printer)
+                .effectiveLevel(DEBUG)
+                .buildAndInvokeAndGet();
+        // then
+        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any())).log(INFO, "> s=\"s\", Dto{i=0, s='null'}");
+    }
+
+    @Test
+    public void argLogLevelIsOff() {
+        // given, when
+        Printer printer = new ToStringPrinter();
+        SimpleLogger logger = new SimpleLoggerBuilder()
+                .method(methodWithParameters)
+                .parameterNames("s", "i", "dto")
+                .arguments("s", 1, new Dto())
+                .levels(DEBUG, OFF, DEBUG)
+                .argLog(OFF, OFF, DEBUG, printer)
+                .argLog(OFF, OFF, DEBUG, printer)
+                .argLog(OFF, OFF, DEBUG, printer)
+                .effectiveLevel(TRACE)
+                .buildAndInvokeAndGet();
+        // then
+        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any())).log(DEBUG, ">");
+    }
+
+    @Test
+    public void verboseLevelIsOff() {
+        // given, when
+        SimpleLogger logger = new SimpleLoggerBuilder()
+                .method(methodWithParameters)
+                .parameterNames("s", "i", "dto")
+                .arguments("s", 1, new Dto())
+                .levels(DEBUG, OFF, OFF)
+                .argLogs(null, null, null)
+                .effectiveLevel(TRACE)
+                .buildAndInvokeAndGet();
+        // then
+        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any())).log(DEBUG, ">");
+    }
+
+    @Test
+    public void inLogAndArgLogLevelsOff() {
+        // given, when
+        Printer printer = new ToStringPrinter();
+        SimpleLogger logger = new SimpleLoggerBuilder()
+                .method(methodWithParameters)
+                .parameterNames("s", "i", "dto")
+                .arguments("s", 1, new Dto())
+                .levels(OFF, OFF, DEBUG)
+                .argLog(OFF, OFF, DEBUG, printer)
+                .argLog(OFF, OFF, DEBUG, printer)
+                .argLog(OFF, OFF, DEBUG, printer)
+                .effectiveLevel(TRACE)
+                .buildAndInvokeAndGet();
+        // then
+        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any()), never()).log(any(), any());
+    }
+
     private class SimpleLoggerBuilder {
 
         private Method method;

@@ -63,7 +63,7 @@ public class LoggerNameBuilderTest {
     private static class TestLogger implements ManualLogger {
 
         @Override
-        public boolean isLevelEnabled(LogLevel expectedLevel) {
+        public boolean isLogEnabled(LogLevel level) {
             return false;
         }
 

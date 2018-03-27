@@ -9,30 +9,32 @@ import static org.springframework.boot.logging.LogLevel.*;
  */
 public interface ManualLogger {
 
-    boolean isLevelEnabled(LogLevel expectedLevel);
-
-    void log(LogLevel level, String format, Object... arguments);
+    boolean isLogEnabled(LogLevel level);
 
     void log(LogLevel level, LogLevel ifEnabledLevel, String format, Object... arguments);
 
-    default boolean isTraceEnabled() {
-        return isLevelEnabled(TRACE);
+    default void log(LogLevel level, String format, Object... arguments) {
+        log(level, level, format, arguments);
     }
 
-    default boolean isDebugEnabled() {
-        return isLevelEnabled(DEBUG);
+    default boolean isTraceLogEnabled() {
+        return isLogEnabled(TRACE);
     }
 
-    default boolean isInfoEnabled() {
-        return isLevelEnabled(INFO);
+    default boolean isDebugLogEnabled() {
+        return isLogEnabled(DEBUG);
     }
 
-    default boolean isWarnEnabled() {
-        return isLevelEnabled(WARN);
+    default boolean isInfoLogEnabled() {
+        return isLogEnabled(INFO);
     }
 
-    default boolean isErrorEnabled() {
-        return isLevelEnabled(ERROR);
+    default boolean isWarnLogEnabled() {
+        return isLogEnabled(WARN);
+    }
+
+    default boolean isErrorLogEnabled() {
+        return isLogEnabled(ERROR);
     }
 
     default void trace(String format, Object... arguments) {

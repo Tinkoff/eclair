@@ -12,7 +12,6 @@ import ru.tinkoff.eclair.logger.facade.Slf4JLoggerFacadeFactory;
 import ru.tinkoff.eclair.printer.Printer;
 import ru.tinkoff.eclair.printer.ToStringPrinter;
 
-import java.util.List;
 import java.util.function.Supplier;
 
 import static java.util.Objects.isNull;
@@ -51,20 +50,14 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
     }
 
     @Override
-    public boolean isLevelEnabled(LogLevel expectedLevel) {
-        String loggerName = loggerNameBuilder.buildByInvoker();
-        return isLevelEnabled(loggerName, expectedLevel);
-    }
-
-    @Override
-    public void log(LogLevel level, String format, Object... arguments) {
-        log(level, level, format, arguments);
+    public boolean isLogEnabled(LogLevel level) {
+        return level != OFF && isLogEnabled(loggerNameBuilder.buildByInvoker(), level);
     }
 
     @Override
     public void log(LogLevel level, LogLevel ifEnabledLevel, String format, Object... arguments) {
         String loggerName = loggerNameBuilder.buildByInvoker();
-        if (isLevelEnabled(loggerName, ifEnabledLevel)) {
+        if (isLogEnabled(loggerName, ifEnabledLevel)) {
             String message = MANUAL + " " + format;
             Object[] unwrappedArguments = unwrapArguments(arguments);
             loggerFacadeFactory.getLoggerFacade(loggerName).log(level, message, unwrappedArguments);
@@ -91,9 +84,9 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
     }
 
     @Override
-    protected boolean isLevelEnabled(String loggerName, LogLevel expectedLevel) {
-        LogLevel actualLevel = loggingSystem.getLoggerConfiguration(loggerName).getEffectiveLevel();
-        return expectedLevel.ordinal() >= actualLevel.ordinal() && actualLevel != OFF;
+    protected boolean isLogEnabled(String loggerName, LogLevel level) {
+        return level != OFF &&
+                level.ordinal() >= loggingSystem.getLoggerConfiguration(loggerName).getEffectiveLevel().ordinal();
     }
 
     /**
@@ -108,69 +101,72 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
 
     @Override
     protected void logIn(MethodInvocation invocation, LogPack logPack) {
-        LogLevel level;
-        boolean verboseLevelEnabled = false;
         String loggerName = getLoggerName(invocation);
-        InLog inLog = logPack.getInLog();
-        boolean inLogIsNull = isNull(inLog);
+        LogLevel level = null;
 
-        if (inLogIsNull) {
-            level = LogLevel.TRACE;
-        } else {
-            if (!isLevelEnabled(loggerName, expectedLevelResolver.apply(inLog))) {
-                return;
+        // initialize 'inLog' attributes
+        InLog inLog = logPack.getInLog();
+        boolean isInLogLogEnabled = false;
+        boolean isInLogVerboseLogEnabled = false;
+        if (nonNull(inLog)) {
+            LogLevel inLogLevel = inLog.getLevel();
+            isInLogLogEnabled = (inLogLevel != OFF) && isLogEnabled(loggerName, expectedLevelResolver.apply(inLog));
+            if (isInLogLogEnabled) {
+                level = inLogLevel;
+                isInLogVerboseLogEnabled = isLogEnabled(loggerName, inLog.getVerboseLevel());
             }
-            level = inLog.getLevel();
-            verboseLevelEnabled = isLevelEnabled(loggerName, inLog.getVerboseLevel());
         }
 
         StringBuilder builder = new StringBuilder();
-        boolean verboseFound = false;
+        boolean isArgLogVerboseFound = false;
         Object[] arguments = invocation.getArguments();
-        List<String> parameterNames = logPack.getParameterNames();
         for (int a = 0; a < arguments.length; a++) {
             ArgLog argLog = logPack.getArgLogs().get(a);
+            boolean isArgLogDefined = nonNull(argLog);
 
-            if (inLogIsNull) {
-                if (isNull(argLog) || !isLevelEnabled(loggerName, expectedLevelResolver.apply(argLog))) {
+            // filter argument
+            if (isArgLogDefined) {
+                LogLevel argLogLevel = argLog.getLevel();
+                if (argLogLevel == OFF || !isLogEnabled(loggerName, expectedLevelResolver.apply(argLog))) {
                     continue;
                 }
-                if (argLog.getLevel().ordinal() > level.ordinal()) {
-                    level = argLog.getLevel();
+                if (!isInLogLogEnabled) {
+                    if (isNull(level) || argLogLevel.ordinal() > level.ordinal()) {
+                        level = argLogLevel;
+                    }
                 }
-            } else if (isNull(argLog)) {
-                if (!verboseLevelEnabled) {
-                    continue;
-                }
-            } else if (!isLevelEnabled(loggerName, expectedLevelResolver.apply(argLog))) {
+            } else if (!isInLogVerboseLogEnabled) {
                 continue;
             }
 
-            if (verboseFound) {
+            // print delimiter
+            if (isArgLogVerboseFound) {
                 builder.append(", ");
             } else {
                 builder.append(" ");
-                verboseFound = true;
+                isArgLogVerboseFound = true;
             }
 
-            if (isNull(argLog) || isLevelEnabled(loggerName, argLog.getVerboseLevel())) {
-                String parameterName = parameterNames.get(a);
+            // print parameter name
+            if (!isArgLogDefined || isLogEnabled(loggerName, argLog.getVerboseLevel())) {
+                String parameterName = logPack.getParameterNames().get(a);
                 if (nonNull(parameterName)) {
                     builder.append(parameterName).append("=");
                 }
             }
 
+            // print parameter value
             Object argument = arguments[a];
             if (isNull(argument)) {
                 builder.append((String) null);
-            } else if (nonNull(argLog)) {
+            } else if (isArgLogDefined) {
                 builder.append(printArgument(argLog.getPrinter(), argument));
             } else {
                 builder.append(printArgument(inLog.getPrinter(), argument));
             }
         }
 
-        if (!inLogIsNull || verboseFound) {
+        if (isInLogLogEnabled || isArgLogVerboseFound) {
             String message = IN + builder.toString();
             loggerFacadeFactory.getLoggerFacade(loggerName).log(level, message);
         }
@@ -194,7 +190,7 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
             return;
         }
         String loggerName = getLoggerName(invocation);
-        if (!isLevelEnabled(loggerName, expectedLevelResolver.apply(logPack.getOutLog()))) {
+        if (!isLogEnabled(loggerName, expectedLevelResolver.apply(logPack.getOutLog()))) {
             return;
         }
         String message = OUT + buildResultClause(invocation, outLog, result, loggerName);
@@ -202,7 +198,7 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
     }
 
     private String buildResultClause(MethodInvocation invocation, OutLog outLog, Object result, String loggerName) {
-        if (isLevelEnabled(loggerName, outLog.getVerboseLevel())) {
+        if (isLogEnabled(loggerName, outLog.getVerboseLevel())) {
             if (nonNull(result)) {
                 return " " + printArgument(outLog.getPrinter(), result);
             }
@@ -229,7 +225,7 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
         ErrorLog errorLog = logPack.findErrorLog(throwable.getClass());
         if (nonNull(errorLog)) {
             String loggerName = getLoggerName(invocation);
-            if (isLevelEnabled(loggerName, expectedLevelResolver.apply(errorLog))) {
+            if (isLogEnabled(loggerName, expectedLevelResolver.apply(errorLog))) {
                 String message = ERROR + buildCauseClause(errorLog, throwable, loggerName);
                 loggerFacadeFactory.getLoggerFacade(loggerName).log(errorLog.getLevel(), message, throwable);
             }
@@ -237,7 +233,7 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
             OutLog outLog = logPack.getOutLog();
             if (nonNull(outLog)) {
                 String loggerName = getLoggerName(invocation);
-                if (isLevelEnabled(loggerName, expectedLevelResolver.apply(outLog))) {
+                if (isLogEnabled(loggerName, expectedLevelResolver.apply(outLog))) {
                     loggerFacadeFactory.getLoggerFacade(loggerName).log(outLog.getLevel(), ERROR);
                 }
             }
@@ -245,7 +241,7 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
     }
 
     private String buildCauseClause(ErrorLog errorLog, Throwable throwable, String loggerName) {
-        if (isLevelEnabled(loggerName, errorLog.getVerboseLevel())) {
+        if (isLogEnabled(loggerName, errorLog.getVerboseLevel())) {
             return " " + throwable.toString();
         }
         return "";
