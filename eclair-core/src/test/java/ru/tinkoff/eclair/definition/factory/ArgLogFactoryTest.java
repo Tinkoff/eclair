@@ -26,10 +26,10 @@ public class ArgLogFactoryTest {
     @Test
     public void newInstance() {
         // given
-        Log logArg = givenLogArg();
+        Log log = givenLog();
         Printer printer = givenPrinter();
         // when
-        ArgLog argLog = ArgLogFactory.newInstance(logArg, printer);
+        ArgLog argLog = ArgLogFactory.newInstance(log, printer);
         // then
         assertThat(argLog.getLevel(), is(INFO));
         assertThat(argLog.getIfEnabledLevel(), is(WARN));
@@ -37,7 +37,7 @@ public class ArgLogFactoryTest {
         assertThat(argLog.getPrinter(), is(printer));
     }
 
-    private Log givenLogArg() {
+    private Log givenLog() {
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("level", INFO);
         attributes.put("ifEnabled", WARN);
@@ -56,25 +56,25 @@ public class ArgLogFactoryTest {
     @Test
     public void newInstanceByValue() {
         // given
-        Log logArg = givenLogArgByValue();
+        Log log = givenLogByValue();
         Printer printer = givenPrinter();
         // when
-        ArgLog argLog = ArgLogFactory.newInstance(logArg, printer);
+        ArgLog argLog = ArgLogFactory.newInstance(log, printer);
         // then
         assertThat(argLog.getLevel(), is(WARN));
     }
 
-    private Log givenLogArgByValue() {
+    private Log givenLogByValue() {
         return synthesizeAnnotation(singletonMap("value", WARN), Log.class, null);
     }
 
     @Test(expected = NullPointerException.class)
     public void newInstanceNull() {
         // given
-        Log logArg = null;
+        Log log = null;
         Printer printer = givenPrinter();
         // when
-        ArgLog argLog = ArgLogFactory.newInstance(logArg, printer);
+        ArgLog argLog = ArgLogFactory.newInstance(log, printer);
         // then
         assertThat(argLog, nullValue());
     }

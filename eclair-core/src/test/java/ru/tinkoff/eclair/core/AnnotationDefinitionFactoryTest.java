@@ -92,7 +92,7 @@ public class AnnotationDefinitionFactoryTest {
     public void buildArgLogs() throws NoSuchMethodException {
         // given
         Set<String> loggerNames = singleton("");
-        Method method = LogInLoggableClass.class.getMethod("logArg", String.class, String.class);
+        Method method = LogInLoggableClass.class.getMethod("parameterLog", String.class, String.class);
         // when
         List<ArgLog> argLogs = annotationDefinitionFactory.buildArgLogs(loggerNames, method);
         // then
@@ -142,7 +142,7 @@ public class AnnotationDefinitionFactoryTest {
         public void empty(String a, String b) {
         }
 
-        public void logArg(@Log(ifEnabled = WARN) String a, String b) {
+        public void parameterLog(@Log(ifEnabled = WARN) String a, String b) {
         }
 
         @Log.ins(@Log.in(ERROR))

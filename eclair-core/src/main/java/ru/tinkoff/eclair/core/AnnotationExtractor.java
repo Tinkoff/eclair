@@ -108,10 +108,7 @@ public final class AnnotationExtractor {
         return findMergedRepeatableAnnotations(method, annotationClass);
     }
 
-    /**
-     * TODO: rename 'logArg => argLog' everywhere
-     */
-    public List<Set<Log>> getLogArgs(Method method) {
+    public List<Set<Log>> getParameterLogs(Method method) {
         return Stream.of(method.getParameters())
                 .map(parameter -> findAnnotationOnParameter(parameter, Log.class))
                 .collect(toList());
@@ -143,9 +140,9 @@ public final class AnnotationExtractor {
         return filterAnnotations(getLogErrors(method), loggers);
     }
 
-    List<Log> findLogArgs(Method method, Set<String> loggers) {
-        return getLogArgs(method).stream()
-                .map(logArgs -> filterAndFindFirstAnnotation(logArgs, loggers))
+    List<Log> findParameterLogs(Method method, Set<String> loggers) {
+        return getParameterLogs(method).stream()
+                .map(logs -> filterAndFindFirstAnnotation(logs, loggers))
                 .collect(toList());
     }
 

@@ -607,7 +607,7 @@ public class Example {
     /**
      * TODO: add javadoc
      */
-    public void logArgMultiLogger(@Log(logger = "simpleLogger")
+    public void parameterLogMultiLogger(@Log(logger = "simpleLogger")
                                   @Log(logger = "auditLogger") Dto dto) {
     }
 

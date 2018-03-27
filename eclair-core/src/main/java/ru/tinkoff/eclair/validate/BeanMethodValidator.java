@@ -31,7 +31,7 @@ class BeanMethodValidator implements Validator {
     private final LogInsValidator logInsValidator;
     private final LogOutsValidator logOutsValidator;
     private final LogErrorsValidator logErrorsValidator;
-    private final LogArgsValidator logArgsValidator;
+    private final ParameterLogsValidator parameterLogsValidator;
     private final MdcsValidator mdcsValidator;
 
     private final AnnotationExtractor annotationExtractor = AnnotationExtractor.getInstance();
@@ -66,8 +66,8 @@ class BeanMethodValidator implements Validator {
         Set<Mdc> mdcs = annotationExtractor.getMdcs(method);
         methodAnnotationFound |= !mdcs.isEmpty();
 
-        List<Set<Log>> parameterLogArgs = annotationExtractor.getLogArgs(method);
-        boolean argAnnotationFound = !parameterLogArgs.stream().allMatch(Set::isEmpty);
+        List<Set<Log>> parameterLogs = annotationExtractor.getParameterLogs(method);
+        boolean argAnnotationFound = !parameterLogs.stream().allMatch(Set::isEmpty);
 
         List<Set<Mdc>> parameterMdcs = annotationExtractor.getParametersMdcs(method);
         argAnnotationFound |= !parameterMdcs.stream().allMatch(Set::isEmpty);
@@ -97,7 +97,7 @@ class BeanMethodValidator implements Validator {
         logInsValidator.validate(logIns, errors);
         logOutsValidator.validate(logOuts, errors);
         logErrorsValidator.validate(logErrors, errors);
-        parameterLogArgs.forEach(logArgs -> logArgsValidator.validate(logArgs, errors));
+        parameterLogs.forEach(log -> parameterLogsValidator.validate(log, errors));
 
         Set<Mdc> mergedMdcs = new HashSet<>(mdcs);
         mergedMdcs.addAll(parameterMdcs.stream().flatMap(Collection::stream).collect(toSet()));

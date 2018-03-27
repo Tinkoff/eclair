@@ -177,9 +177,9 @@ public class AnnotationExtractorTest {
     }
 
     @Test
-    public void hasAnyAnnotationDetectsLogArgs() throws NoSuchMethodException {
+    public void hasAnyAnnotationDetectsParameterLogs() throws NoSuchMethodException {
         // given
-        Method method = ClassWithAnnotatedMethods.class.getMethod("logArgs", String.class);
+        Method method = ClassWithAnnotatedMethods.class.getMethod("parameterLogs", String.class);
         Parameter parameter = method.getParameters()[0];
         // when
         boolean has = annotationExtractor.hasAnyAnnotation(parameter);
@@ -188,9 +188,9 @@ public class AnnotationExtractorTest {
     }
 
     @Test
-    public void hasAnyAnnotationDetectsLogArg() throws NoSuchMethodException {
+    public void hasAnyAnnotationDetectsParameterLog() throws NoSuchMethodException {
         // given
-        Method method = ClassWithAnnotatedMethods.class.getMethod("logArg", String.class);
+        Method method = ClassWithAnnotatedMethods.class.getMethod("parameterLog", String.class);
         Parameter parameter = method.getParameters()[0];
         // when
         boolean has = annotationExtractor.hasAnyAnnotation(parameter);
@@ -232,9 +232,9 @@ public class AnnotationExtractorTest {
     }
 
     @Test
-    public void hasAnyAnnotationNotDetectsLogArgOverMethod() throws NoSuchMethodException {
+    public void hasAnyAnnotationNotDetectsParameterLogOverMethod() throws NoSuchMethodException {
         // given
-        Method method = ClassWithAnnotatedMethods.class.getMethod("logArg", String.class);
+        Method method = ClassWithAnnotatedMethods.class.getMethod("parameterLog", String.class);
         // when
         boolean has = annotationExtractor.hasAnyAnnotation(method);
         // then
@@ -297,10 +297,10 @@ public class AnnotationExtractorTest {
         public void mdc() {
         }
 
-        public void logArgs(@Logs(@Log) String input) {
+        public void parameterLogs(@Logs(@Log) String input) {
         }
 
-        public void logArg(@Log String input) {
+        public void parameterLog(@Log String input) {
         }
 
         public void parameterMdcs(@Mdcs(@Mdc(key = "", value = "")) String input) {
@@ -435,28 +435,28 @@ public class AnnotationExtractorTest {
     }
 
     @Test
-    public void getLogArgs() throws NoSuchMethodException {
+    public void getParameterLogs() throws NoSuchMethodException {
         // given
         Method loggedOverriddenMethod = AnnotatedChild.class.getMethod("loggedOverriddenMethod", String.class);
         Method overriddenMethod = AnnotatedChild.class.getMethod("overriddenMethod", String.class);
         Method overriddenNotGenericMethod = AnnotatedChild.class.getMethod("overriddenNotGenericMethod", String.class);
         // when
-        List<Set<Log>> logArgs = annotationExtractor.getLogArgs(loggedOverriddenMethod);
-        List<Set<Log>> emptyLogArgs = annotationExtractor.getLogArgs(overriddenMethod);
-        List<Set<Log>> overriddenLogArgs = annotationExtractor.getLogArgs(overriddenNotGenericMethod);
+        List<Set<Log>> logs = annotationExtractor.getParameterLogs(loggedOverriddenMethod);
+        List<Set<Log>> emptyLogs = annotationExtractor.getParameterLogs(overriddenMethod);
+        List<Set<Log>> overriddenLogs = annotationExtractor.getParameterLogs(overriddenNotGenericMethod);
         // then
-        assertThat(logArgs, hasSize(1));
-        Set<Log> parameterLogArgs = logArgs.iterator().next();
-        assertThat(parameterLogArgs, hasSize(1));
-        assertThat(parameterLogArgs.iterator().next().level(), is(DEBUG));
+        assertThat(logs, hasSize(1));
+        Set<Log> parameterLogs = logs.iterator().next();
+        assertThat(parameterLogs, hasSize(1));
+        assertThat(parameterLogs.iterator().next().level(), is(DEBUG));
 
-        assertThat(emptyLogArgs, hasSize(1));
-        Set<Log> parameterEmptyLogArgs = emptyLogArgs.iterator().next();
-        assertThat(parameterEmptyLogArgs, is(empty()));
+        assertThat(emptyLogs, hasSize(1));
+        Set<Log> emptyParameterLogs = emptyLogs.iterator().next();
+        assertThat(emptyParameterLogs, is(empty()));
 
-        assertThat(overriddenLogArgs, hasSize(1));
-        Set<Log> parameterOverriddenLogArgs = overriddenLogArgs.iterator().next();
-        assertThat(parameterOverriddenLogArgs, is(empty()));
+        assertThat(overriddenLogs, hasSize(1));
+        Set<Log> overriddenParameterLogs = overriddenLogs.iterator().next();
+        assertThat(overriddenParameterLogs, is(empty()));
     }
 
     @Test
@@ -616,23 +616,23 @@ public class AnnotationExtractorTest {
     }
 
     @Test
-    public void findLogArgs() throws NoSuchMethodException {
+    public void findParameterLogs() throws NoSuchMethodException {
         // given
-        Method method = MultiLogger.class.getMethod("logArgs", String.class);
-        Method loggerMethod = MultiLogger.class.getMethod("loggerLogArgs", String.class);
+        Method method = MultiLogger.class.getMethod("parameterLogs", String.class);
+        Method loggerMethod = MultiLogger.class.getMethod("loggerParameterLogs", String.class);
         Set<String> loggerNames = new HashSet<>(asList("", "logger"));
         Set<String> unknownLoggerNames = singleton("b");
         // when
-        List<Log> logArgs = annotationExtractor.findLogArgs(method, loggerNames);
-        List<Log> loggerLogArgs = annotationExtractor.findLogArgs(loggerMethod, loggerNames);
-        List<Log> notFoundLogArgs = annotationExtractor.findLogArgs(method, unknownLoggerNames);
+        List<Log> parameterLogs = annotationExtractor.findParameterLogs(method, loggerNames);
+        List<Log> loggerParameterLogs = annotationExtractor.findParameterLogs(loggerMethod, loggerNames);
+        List<Log> notFoundParameterLogs = annotationExtractor.findParameterLogs(method, unknownLoggerNames);
         // then
-        assertThat(logArgs, hasSize(1));
-        assertThat(logArgs.get(0), notNullValue());
-        assertThat(loggerLogArgs, hasSize(1));
-        assertThat(loggerLogArgs.get(0), notNullValue());
-        assertThat(notFoundLogArgs, hasSize(1));
-        assertThat(notFoundLogArgs.get(0), nullValue());
+        assertThat(parameterLogs, hasSize(1));
+        assertThat(parameterLogs.get(0), notNullValue());
+        assertThat(loggerParameterLogs, hasSize(1));
+        assertThat(loggerParameterLogs.get(0), notNullValue());
+        assertThat(notFoundParameterLogs, hasSize(1));
+        assertThat(notFoundParameterLogs.get(0), nullValue());
     }
 
     @SuppressWarnings("unused")
@@ -654,7 +654,7 @@ public class AnnotationExtractorTest {
         public void logErrors() {
         }
 
-        public void logArgs(@Log String input) {
+        public void parameterLogs(@Log String input) {
         }
 
         @Log(logger = "logger")
@@ -673,7 +673,7 @@ public class AnnotationExtractorTest {
         public void loggerLogErrors() {
         }
 
-        public void loggerLogArgs(@Log(logger = "logger") String input) {
+        public void loggerParameterLogs(@Log(logger = "logger") String input) {
         }
     }
 

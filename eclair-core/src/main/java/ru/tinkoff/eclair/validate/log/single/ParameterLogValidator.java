@@ -9,7 +9,7 @@ import ru.tinkoff.eclair.annotation.Log;
  * @author Viacheslav Klapatniuk
  */
 @Component
-public class LogArgValidator implements Validator {
+public class ParameterLogValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
