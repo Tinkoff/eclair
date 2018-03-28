@@ -12,7 +12,7 @@ import java.io.StringWriter;
  */
 public class Jaxb2Printer extends Printer {
 
-    final Jaxb2Marshaller jaxb2Marshaller;
+    private final Jaxb2Marshaller jaxb2Marshaller;
 
     public Jaxb2Printer(Jaxb2Marshaller jaxb2Marshaller) {
         this.jaxb2Marshaller = jaxb2Marshaller;

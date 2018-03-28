@@ -47,15 +47,15 @@ public class EclairProxyCreator extends AbstractAutoProxyCreator {
     private final AnnotationDefinitionFactory annotationDefinitionFactory;
     private final LoggerBeanNamesResolver loggerBeanNamesResolver = LoggerBeanNamesResolver.getInstance();
     private final AnnotationExtractor annotationExtractor = AnnotationExtractor.getInstance();
-    private final ParameterNameResolver parameterNameResolver = ParameterNameResolver.getInstance();
+    private final ParameterNameResolver parameterNameResolver = new ParameterNameResolver();
 
     private boolean validate = false;
 
-    public EclairProxyCreator(List<Printer> printerList,
+    public EclairProxyCreator(List<Printer> printers,
                               Map<String, EclairLogger> loggers,
                               GenericApplicationContext applicationContext,
                               BeanClassValidator beanClassValidator) {
-        this.annotationDefinitionFactory = new AnnotationDefinitionFactory(new PrinterResolver(applicationContext, printerList));
+        this.annotationDefinitionFactory = new AnnotationDefinitionFactory(new PrinterResolver(applicationContext, printers));
         this.loggers = initLoggers(loggers);
         this.applicationContext = applicationContext;
         this.beanClassValidator = beanClassValidator;

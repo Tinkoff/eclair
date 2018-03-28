@@ -11,19 +11,11 @@ import static java.util.Collections.nCopies;
 import static java.util.Objects.isNull;
 
 /**
- * TODO: add tests
- *
  * @author Viacheslav Klapatniuk
  */
 public final class ParameterNameResolver {
 
-    private final ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
-
-    private static final ParameterNameResolver instance = new ParameterNameResolver();
-
-    public static ParameterNameResolver getInstance() {
-        return instance;
-    }
+    private ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
 
     public List<String> tryToResolve(Method method) {
         String[] parameterNames = parameterNameDiscoverer.getParameterNames(method);
@@ -31,5 +23,9 @@ public final class ParameterNameResolver {
             return nCopies(method.getParameterCount(), null);
         }
         return asList(parameterNames);
+    }
+
+    void setParameterNameDiscoverer(ParameterNameDiscoverer parameterNameDiscoverer) {
+        this.parameterNameDiscoverer = parameterNameDiscoverer;
     }
 }

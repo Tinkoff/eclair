@@ -11,14 +11,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static java.lang.String.*;
 import static java.util.Objects.isNull;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 import static org.springframework.util.StringUtils.hasText;
 
 /**
- * TODO: add tests
- *
  * @author Viacheslav Klapatniuk
  */
 public class PrinterResolver {
@@ -41,9 +40,11 @@ public class PrinterResolver {
                                 .filter(entry -> entry.getValue().equals(printer))
                                 .findFirst()
                                 .map(Map.Entry::getKey)
-                                .orElseThrow(() -> new IllegalArgumentException("EclairLogger bean not found on map")),
+                                .orElseThrow(() -> new IllegalArgumentException("Printer bean not found on map")),
                         identity(),
-                        (printer, printer2) -> printer,
+                        (printer, printer2) -> {
+                            throw new IllegalArgumentException(format("Printer names not equals: %s, %s", printer, printer2));
+                        },
                         LinkedHashMap::new
                 ));
     }
@@ -64,5 +65,13 @@ public class PrinterResolver {
                 .filter(item -> item.supports(parameterType))
                 .findFirst()
                 .orElse(defaultPrinter);
+    }
+
+    Map<String, Printer> getPrinters() {
+        return printers;
+    }
+
+    Map<String, String> getAliases() {
+        return aliases;
     }
 }
