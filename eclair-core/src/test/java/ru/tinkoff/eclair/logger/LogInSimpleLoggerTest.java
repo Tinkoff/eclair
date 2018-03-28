@@ -8,9 +8,9 @@ import org.springframework.boot.logging.LogLevel;
 import org.springframework.boot.logging.LoggerConfiguration;
 import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
-import ru.tinkoff.eclair.definition.ParameterLog;
 import ru.tinkoff.eclair.definition.InLog;
 import ru.tinkoff.eclair.definition.MethodLog;
+import ru.tinkoff.eclair.definition.ParameterLog;
 import ru.tinkoff.eclair.logger.facade.LoggerFacadeFactory;
 import ru.tinkoff.eclair.printer.JacksonPrinter;
 import ru.tinkoff.eclair.printer.Jaxb2Printer;
@@ -421,13 +421,14 @@ public class LogInSimpleLoggerTest {
 
     private class SimpleLoggerBuilder {
 
+        private final List<ParameterLog> parameterLogs = new ArrayList<>();
+
         private Method method;
         private List<Object> arguments = emptyList();
         private LogLevel level = DEBUG;
         private LogLevel ifEnabledLevel = OFF;
         private LogLevel verboseLevel = DEBUG;
         private Printer printer = new ToStringPrinter();
-        private List<ParameterLog> parameterLogs = new ArrayList<>();
         private LogLevel effectiveLevel;
         private List<String> parameterNames;
 
@@ -453,6 +454,9 @@ public class LogInSimpleLoggerTest {
             return this;
         }
 
+        /**
+         * TODO: add tests with 'ifEnabledLevel != LogLevel.OFF'
+         */
         private SimpleLoggerBuilder parameterLog(LogLevel level, LogLevel ifEnabledLevel, LogLevel verboseLevel, Printer printer) {
             this.parameterLogs.add(ParameterLog.builder()
                     .level(level)

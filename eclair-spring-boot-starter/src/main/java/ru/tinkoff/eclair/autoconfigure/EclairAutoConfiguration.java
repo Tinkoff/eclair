@@ -28,8 +28,6 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * TODO: add test to Printer ordering
- *
  * @author Viacheslav Klapatniuk
  */
 @Configuration

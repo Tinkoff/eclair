@@ -6,7 +6,7 @@ import ru.tinkoff.eclair.definition.ParameterMdc;
 /**
  * @author Viacheslav Klapatniuk
  */
-public class ParameterMdcFactory {
+class ParameterMdcFactory {
 
     public static ParameterMdc newInstance(Mdc mdc) {
         return ParameterMdc.builder()

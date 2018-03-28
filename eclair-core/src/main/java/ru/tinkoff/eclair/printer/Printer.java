@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * TODO: add tests
+ *
  * @author Viacheslav Klapatniuk
  */
 public abstract class Printer {

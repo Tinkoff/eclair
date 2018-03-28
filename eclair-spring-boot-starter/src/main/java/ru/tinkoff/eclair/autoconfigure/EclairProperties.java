@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @author Viacheslav Klapatniuk
  */
 @ConfigurationProperties(prefix = "eclair")
-public class EclairProperties {
+class EclairProperties {
 
     private boolean validate = true;
 
