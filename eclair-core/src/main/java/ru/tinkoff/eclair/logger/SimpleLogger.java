@@ -190,7 +190,7 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
             return;
         }
         String loggerName = getLoggerName(invocation);
-        if (!isLogEnabled(loggerName, expectedLevelResolver.apply(methodLog.getOutLog()))) {
+        if (!isLogEnabled(loggerName, expectedLevelResolver.apply(outLog))) {
             return;
         }
         String message = OUT + buildResultClause(invocation, outLog, result, loggerName);

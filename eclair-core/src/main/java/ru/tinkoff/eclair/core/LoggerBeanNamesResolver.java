@@ -10,8 +10,6 @@ import static java.lang.String.format;
 import static java.util.Arrays.asList;
 
 /**
- * TODO: add tests
- *
  * @author Viacheslav Klapatniuk
  */
 public final class LoggerBeanNamesResolver {

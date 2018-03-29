@@ -114,8 +114,9 @@ public class LogInSimpleLoggerTest {
 
     @Test
     public void parameterLogsWithoutParameterNames() {
-        // given, when
+        // given
         Printer printer = new ToStringPrinter();
+        // when
         SimpleLogger logger = new SimpleLoggerBuilder()
                 .method(methodWithParameters)
                 .arguments("s", 1, new Dto())
@@ -144,8 +145,9 @@ public class LogInSimpleLoggerTest {
 
     @Test
     public void firstParameterLogIsNull() {
-        // given, when
+        // given
         Printer printer = new ToStringPrinter();
+        // when
         SimpleLogger logger = new SimpleLoggerBuilder()
                 .method(methodWithParameters)
                 .parameterNames("s", "i", "dto")
@@ -162,8 +164,9 @@ public class LogInSimpleLoggerTest {
 
     @Test
     public void middleParameterLogIsNull() {
-        // given, when
+        // given
         Printer printer = new ToStringPrinter();
+        // when
         SimpleLogger logger = new SimpleLoggerBuilder()
                 .method(methodWithParameters)
                 .parameterNames("s", "i", "dto")
@@ -180,8 +183,9 @@ public class LogInSimpleLoggerTest {
 
     @Test
     public void lastParameterLogIsNull() {
-        // given, when
+        // given
         Printer printer = new ToStringPrinter();
+        // when
         SimpleLogger logger = new SimpleLoggerBuilder()
                 .method(methodWithParameters)
                 .parameterNames("s", "i", "dto")
@@ -197,9 +201,10 @@ public class LogInSimpleLoggerTest {
     }
 
     @Test
-    public void someParameterLogIfEnabledLevelSmallerThanEffectiveLevel() {
-        // given, when
+    public void someParameterLogLevelSmallerThanEffectiveLevel() {
+        // given
         Printer printer = new ToStringPrinter();
+        // when
         SimpleLogger logger = new SimpleLoggerBuilder()
                 .method(methodWithParameters)
                 .parameterNames("s", "i", "dto")
@@ -216,8 +221,9 @@ public class LogInSimpleLoggerTest {
 
     @Test
     public void inLogIsNullFirstParameterLogIsNullLastParameterLogNotEnabled() {
-        // given, when
+        // given
         Printer printer = new ToStringPrinter();
+        // when
         SimpleLogger logger = new SimpleLoggerBuilder()
                 .method(methodWithParameters)
                 .parameterNames("s", "i", "dto")
@@ -233,8 +239,9 @@ public class LogInSimpleLoggerTest {
 
     @Test
     public void inLogIsNullMaximumParameterLogEnabledLevelFound() {
-        // given, when
+        // given
         Printer printer = new ToStringPrinter();
+        // when
         SimpleLogger logger = new SimpleLoggerBuilder()
                 .method(methodWithParameters)
                 .parameterNames("s", "i", "dto")
@@ -263,9 +270,10 @@ public class LogInSimpleLoggerTest {
     }
 
     @Test
-    public void parameterLogsIfEnabledLevelsAreDenied() {
-        // given, when
+    public void parameterLogLevelsAreDenied() {
+        // given
         Printer printer = new ToStringPrinter();
+        // when
         SimpleLogger logger = new SimpleLoggerBuilder()
                 .method(methodWithParameters)
                 .levels(INFO, OFF, DEBUG)
@@ -311,7 +319,7 @@ public class LogInSimpleLoggerTest {
 
     @Test
     public void printers() {
-        // given, when
+        // given
         Printer inLogPrinter = new Printer() {
             @Override
             protected String serialize(Object input) {
@@ -320,6 +328,7 @@ public class LogInSimpleLoggerTest {
         };
         Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
         marshaller.setClassesToBeBound(Dto.class);
+        // when
         SimpleLogger logger = new SimpleLoggerBuilder()
                 .method(methodWithParameters)
                 .parameterNames("s", "i", "dto")
@@ -352,8 +361,9 @@ public class LogInSimpleLoggerTest {
 
     @Test
     public void offLevelWithArgs() {
-        // given, when
+        // given
         Printer printer = new ToStringPrinter();
+        // when
         SimpleLogger logger = new SimpleLoggerBuilder()
                 .method(methodWithParameters)
                 .parameterNames("s", "i", "dto")
@@ -370,8 +380,9 @@ public class LogInSimpleLoggerTest {
 
     @Test
     public void parameterLogLevelIsOff() {
-        // given, when
+        // given
         Printer printer = new ToStringPrinter();
+        // when
         SimpleLogger logger = new SimpleLoggerBuilder()
                 .method(methodWithParameters)
                 .parameterNames("s", "i", "dto")
@@ -403,8 +414,9 @@ public class LogInSimpleLoggerTest {
 
     @Test
     public void inLogAndParameterLogLevelsOff() {
-        // given, when
+        // given
         Printer printer = new ToStringPrinter();
+        // when
         SimpleLogger logger = new SimpleLoggerBuilder()
                 .method(methodWithParameters)
                 .parameterNames("s", "i", "dto")
@@ -419,7 +431,27 @@ public class LogInSimpleLoggerTest {
         verify(logger.getLoggerFacadeFactory().getLoggerFacade(any()), never()).log(any(), any());
     }
 
-    private class SimpleLoggerBuilder {
+    @Test
+    public void printerThrowsException() {
+        // given
+        Printer printer = mock(Printer.class);
+        when(printer.print(any())).thenThrow(new RuntimeException());
+        // when
+        SimpleLogger logger = new SimpleLoggerBuilder()
+                .method(methodWithParameters)
+                .parameterNames("s", "i", "dto")
+                .arguments("s", 1, new Dto())
+                .levels(DEBUG, OFF, DEBUG)
+                .parameterLog(DEBUG, OFF, DEBUG, printer)
+                .parameterLog(DEBUG, OFF, DEBUG, printer)
+                .parameterLog(DEBUG, OFF, DEBUG, printer)
+                .effectiveLevel(TRACE)
+                .buildAndInvokeAndGet();
+        // then
+        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any())).log(DEBUG, "> s=\"s\", i=1, dto=Dto{i=0, s='null'}");
+    }
+
+    private static class SimpleLoggerBuilder {
 
         private final List<ParameterLog> parameterLogs = new ArrayList<>();
 
@@ -499,10 +531,8 @@ public class LogInSimpleLoggerTest {
         }
 
         private SimpleLogger buildAndInvokeAndGet(InLog inLog) {
-            // given
             MethodInvocation invocation = methodInvocation(method, arguments.toArray());
             SimpleLogger simpleLogger = new SimpleLogger(loggerFacadeFactory(), loggingSystem(effectiveLevel));
-            // when
             simpleLogger.logInIfNecessary(invocation, methodLog(inLog, parameterLogs, parameterNames));
             return simpleLogger;
         }
