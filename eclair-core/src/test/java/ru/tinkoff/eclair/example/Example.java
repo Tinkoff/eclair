@@ -204,7 +204,7 @@ public class Example {
     }
 
     /**
-     * WARN  ru.tinkoff.eclair.example.Example.simpleErrorEvent ! java.lang.RuntimeException: message
+     * ERROR ru.tinkoff.eclair.example.Example.simpleErrorEvent ! java.lang.RuntimeException: message
      * java.lang.RuntimeException: message
      *     at ru.tinkoff.eclair.example.Example.simpleErrorEvent(Example.java:167)
      */
@@ -214,11 +214,11 @@ public class Example {
     }
 
     /**
-     * ERROR ru.tinkoff.eclair.example.Example.levelErrorEvent ! java.lang.RuntimeException: message
+     * WARN  ru.tinkoff.eclair.example.Example.levelErrorEvent ! java.lang.RuntimeException: message
      * java.lang.RuntimeException: message
      *     at ru.tinkoff.eclair.example.Example.levelErrorEvent(Example.java:167)
      */
-    @Log.error(ERROR)
+    @Log.error(WARN)
     public void levelErrorEvent() {
         throw new RuntimeException("message");
     }
@@ -238,12 +238,12 @@ public class Example {
     }
 
     /**
-     * WARN  r.tinkoff.eclair.example.Example.verboseErrorEvent ! java.lang.RuntimeException: runtimeException
+     * ERROR r.tinkoff.eclair.example.Example.verboseErrorEvent ! java.lang.RuntimeException: runtimeException
      * java.lang.RuntimeException: runtimeException
      *     at r.tinkoff.eclair.example.Example.verboseErrorEvent(Example.java:167)
      *
      * or else
-     * ERROR r.tinkoff.eclair.example.Example.verboseErrorEvent ! java.lang.NullPointerException: nullPointerException
+     * WARN  r.tinkoff.eclair.example.Example.verboseErrorEvent ! java.lang.NullPointerException: nullPointerException
      * java.lang.NullPointerException: nullPointerException
      *     at r.tinkoff.eclair.example.Example.verboseErrorEvent(Example.java:167)
      *
@@ -251,7 +251,7 @@ public class Example {
      * (nothing to log)
      */
     @Log.error(ofType = RuntimeException.class)
-    @Log.error(level = ERROR, ofType = NullPointerException.class)
+    @Log.error(level = WARN, ofType = NullPointerException.class)
     public void verboseErrorEvent() throws Exception {
         if (new Random().nextBoolean()) {
             throw new RuntimeException("runtimeException");
@@ -263,7 +263,7 @@ public class Example {
     }
 
     /**
-     * WARN  r.t.e.e.Example.verboseWithExcludesErrorEvent ! java.lang.RuntimeException: runtimeException
+     * ERROR r.t.e.e.Example.verboseWithExcludesErrorEvent ! java.lang.RuntimeException: runtimeException
      * java.lang.RuntimeException: runtimeException
      *     at r.t.e.e.Example.verboseWithExcludesErrorEvent(Example.java:167)
      *
@@ -391,6 +391,8 @@ public class Example {
     public void mdcByArg(@Mdc(key = "length", value = "s.length()")
                          @Mdc(key = "staticString", value = "some string", global = true) Dto dto) {
     }
+
+    // TODO: add example for MDC with bean referencing
 
     @Autowired
     private ManualLogger logger;

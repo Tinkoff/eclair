@@ -97,17 +97,17 @@ public @interface Log {
     @interface error {
 
         @AliasFor("level")
-        LogLevel value() default WARN;
+        LogLevel value() default ERROR;
 
         @AliasFor("value")
-        LogLevel level() default WARN;
+        LogLevel level() default ERROR;
 
         LogLevel ifEnabled() default OFF;
 
         /**
          * TODO: add example for 'verbose' attribute
          */
-        LogLevel verbose() default WARN;
+        LogLevel verbose() default ERROR;
 
         Class<? extends Throwable>[] ofType() default Throwable.class;
 
