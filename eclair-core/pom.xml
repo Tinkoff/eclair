@@ -6,7 +6,7 @@
     <parent>
         <groupId>ru.tinkoff</groupId>
         <artifactId>eclair</artifactId>
-        <version>0.3.0</version>
+        <version>0.4.0</version>
     </parent>
 
     <artifactId>eclair-core</artifactId>

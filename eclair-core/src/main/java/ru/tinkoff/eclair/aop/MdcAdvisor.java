@@ -24,15 +24,17 @@ import static java.util.stream.Collectors.toMap;
  */
 final class MdcAdvisor extends StaticMethodMatcherPointcutAdvisor implements MethodInterceptor {
 
-    private final ExpressionEvaluator expressionEvaluator = ExpressionEvaluator.getInstance();
+    private final ExpressionEvaluator expressionEvaluator;
     private final Map<Method, MethodMdc> methodMdcs;
 
-    private MdcAdvisor(List<MethodMdc> methodMdcs) {
+    private MdcAdvisor(ExpressionEvaluator expressionEvaluator,
+                       List<MethodMdc> methodMdcs) {
+        this.expressionEvaluator = expressionEvaluator;
         this.methodMdcs = methodMdcs.stream().collect(toMap(MethodMdc::getMethod, identity()));
     }
 
-    static MdcAdvisor newInstance(List<MethodMdc> methodMdcs) {
-        return methodMdcs.isEmpty() ? null : new MdcAdvisor(methodMdcs);
+    static MdcAdvisor newInstance(ExpressionEvaluator expressionEvaluator, List<MethodMdc> methodMdcs) {
+        return methodMdcs.isEmpty() ? null : new MdcAdvisor(expressionEvaluator, methodMdcs);
     }
 
     @Override

@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import org.springframework.boot.logging.LogLevel;
-import ru.tinkoff.eclair.core.ClassUtils;
+import ru.tinkoff.eclair.core.RelationResolver;
 
 import java.util.Comparator;
 import java.util.Set;
@@ -49,7 +49,7 @@ public class ErrorLog implements LogDefinition {
     public static class Filter {
 
         private static final Comparator<Class> classComparator =
-                comparing((Function<Class, Integer>) clazz -> ClassUtils.calculateInheritanceDistance(Throwable.class, clazz))
+                comparing((Function<Class, Integer>) clazz -> RelationResolver.calculateInheritanceDistance(Throwable.class, clazz))
                         .thenComparing(Class::getName);
 
         private final Set<Class<? extends Throwable>> includes;

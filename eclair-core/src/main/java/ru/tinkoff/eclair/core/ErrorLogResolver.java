@@ -45,7 +45,7 @@ public final class ErrorLogResolver {
     private int minInheritanceDistance(ErrorLog errorLog, Class<?> causeClass) {
         int result = -1;
         for (Class<? extends Throwable> include : errorLog.getIncludes()) {
-            int distance = ClassUtils.calculateInheritanceDistance(include, causeClass);
+            int distance = RelationResolver.calculateInheritanceDistance(include, causeClass);
             if (distance >= 0 && (result < 0 || distance < result)) {
                 result = distance;
             }

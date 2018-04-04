@@ -25,7 +25,7 @@ import static java.util.stream.Collectors.toSet;
  */
 @Component
 @RequiredArgsConstructor
-class BeanMethodValidator implements Validator {
+public class BeanMethodValidator implements Validator {
 
     private final LogsValidator logsValidator;
     private final LogInsValidator logInsValidator;

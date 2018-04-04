@@ -14,7 +14,7 @@ import static org.springframework.boot.logging.LogLevel.*;
 
 /**
  * Estimated configuration:
- * logging.pattern.console: '%-5level %logger{50} %X %msg%n'
+ * logging.pattern.console: '%-5level [%X] %logger{50} %msg%n'
  *
  * @author Viacheslav Klapatniuk
  */
@@ -360,16 +360,16 @@ public class Example {
     /**
      * if logger level <= DEBUG
      *
-     * DEBUG ru.tinkoff.eclair.example.OuterClass.method >
+     * DEBUG [] ru.tinkoff.eclair.example.OuterClass.method >
      * ..
-     * DEBUG ru.tinkoff.eclair.example.Example.mdcByMethod key=value, sum=2 > Dto{i=0, s='null'}
+     * DEBUG [key=value, sum=2] ru.tinkoff.eclair.example.Example.mdcByMethod > Dto{i=0, s='null'}
      * ..
-     * DEBUG ru.tinkoff.eclair.example.InnerClass.method key=value, sum=2 >
-     * DEBUG ru.tinkoff.eclair.example.InnerClass.method key=value, sum=2 <
+     * DEBUG [key=value, sum=2] ru.tinkoff.eclair.example.InnerClass.method >
+     * DEBUG [key=value, sum=2] ru.tinkoff.eclair.example.InnerClass.method <
      * ..
-     * DEBUG ru.tinkoff.eclair.example.Example.mdcByMethod key=value, sum=2 <
+     * DEBUG [key=value, sum=2] ru.tinkoff.eclair.example.Example.mdcByMethod <
      * ..
-     * DEBUG ru.tinkoff.eclair.example.OuterClass.method sum=2 <
+     * DEBUG [sum=2] ru.tinkoff.eclair.example.OuterClass.method <
      */
     @Mdc(key = "key", value = "value")
     @Mdc(key = "sum", value = "1 + 1", global = true)
@@ -380,42 +380,17 @@ public class Example {
     /**
      * if logger level <= DEBUG
      *
-     * DEBUG ru.tinkoff.eclair.example.OuterClass.method >
+     * DEBUG [] ru.tinkoff.eclair.example.OuterClass.method >
      * ..
-     * DEBUG ru.tinkoff.eclair.example.Example.mdcByArg length=3, staticString=some string > Dto{i=0, s='null'}
-     * DEBUG ru.tinkoff.eclair.example.Example.mdcByArg length=3, staticString=some string <
+     * DEBUG [length=3, staticString=some string] ru.tinkoff.eclair.example.Example.mdcByArg > Dto{i=0, s='null'}
+     * DEBUG [length=3, staticString=some string] ru.tinkoff.eclair.example.Example.mdcByArg <
      * ..
-     * DEBUG ru.tinkoff.eclair.example.OuterClass.method staticString=some string <
+     * DEBUG [staticString=some string] ru.tinkoff.eclair.example.OuterClass.method <
      */
     @Log
     public void mdcByArg(@Mdc(key = "length", value = "s.length()")
                          @Mdc(key = "staticString", value = "some string", global = true) Dto dto) {
     }
-
-    /**
-     * if method invoked like: mdcDefault("0", "1", "2", "3")
-     *
-     * DEBUG ru.tinkoff.eclair.example.Example.mdcDefault key0=value0 > s0=0, s1=1, s2=2, s3=3
-     */
-    /*@Mdc(key = "key0", value = "value0")
-    @Mdc(value = "value1")
-    @Mdc(key = "key2")
-    @Mdc
-    @Log.in
-    public void mdcDefault(String s0, String s1, String s2, String s3) {
-    }*/
-
-    /**
-     * if method invoked like: mdcByArgDefault("0", "1", "2", "3")
-     *
-     * DEBUG ru.tinkoff.eclair.example.Example.mdcByArgDefault key0=value0, s1=value1, key2=2, s3=3 > s0=0, s1=1, s2=2, s3=3
-     */
-    /*@Log.in
-    public void mdcByArgDefault(@Mdc(key = "key0", value = "value0") String s0,
-                                @Mdc(value = "value1") String s1,
-                                @Mdc(key = "key2") String s2,
-                                @Mdc String s3) {
-    }*/
 
     @Autowired
     private ManualLogger logger;
@@ -423,10 +398,10 @@ public class Example {
     /**
      * if logger level <= DEBUG
      *
-     * DEBUG ru.tinkoff.eclair.example.Example.manualLogging >
-     * DEBUG ru.tinkoff.eclair.example.Example.manualLogging key=value - Manual logging: 0.123
-     * INFO  ru.tinkoff.eclair.example.Example.manualLogging key=value - Lazy manual logging: 0.456
-     * DEBUG ru.tinkoff.eclair.example.Example.manualLogging key=value <
+     * DEBUG [] ru.tinkoff.eclair.example.Example.manualLogging >
+     * DEBUG [key=value] ru.tinkoff.eclair.example.Example.manualLogging - Manual logging: 0.123
+     * INFO  [key=value] ru.tinkoff.eclair.example.Example.manualLogging - Lazy manual logging: 0.456
+     * DEBUG [key=value] ru.tinkoff.eclair.example.Example.manualLogging <
      */
     @Log
     public void manualLogging() {

@@ -9,9 +9,9 @@ import static java.lang.String.format;
 /**
  * @author Viacheslav Klapatniuk
  */
-public final class ClassUtils {
+public final class RelationResolver {
 
-    private ClassUtils() {
+    private RelationResolver() {
     }
 
     static Class<?> findMostSpecificAncestor(Set<Class<?>> parents, Class<?> child) {

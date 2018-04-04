@@ -24,8 +24,8 @@ public final class ErrorFilterFactory {
     }
 
     public ErrorLog.Filter buildErrorFilter(Class<? extends Throwable>[] rawIncludes, Class<? extends Throwable>[] rawExcludes) {
-        Set<Class<? extends Throwable>> includeCandidates = ClassUtils.reduceDescendants(new HashSet<>(asList(rawIncludes)));
-        Set<Class<? extends Throwable>> excludeCandidates = ClassUtils.reduceDescendants(new HashSet<>(asList(rawExcludes)));
+        Set<Class<? extends Throwable>> includeCandidates = RelationResolver.reduceDescendants(new HashSet<>(asList(rawIncludes)));
+        Set<Class<? extends Throwable>> excludeCandidates = RelationResolver.reduceDescendants(new HashSet<>(asList(rawExcludes)));
         Set<Class<? extends Throwable>> includes = optimizeAndSortIncludes(includeCandidates, excludeCandidates);
         Set<Class<? extends Throwable>> excludes = optimizeAndSortExcludes(includes, excludeCandidates);
         return new ErrorLog.Filter(includes, excludes);

@@ -1,6 +1,12 @@
 package ru.tinkoff.eclair.core;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
@@ -9,9 +15,15 @@ import static org.junit.Assert.assertThat;
 /**
  * @author Viacheslav Klapatniuk
  */
+@RunWith(SpringRunner.class)
+@ContextConfiguration(classes = {
+        ExpressionEvaluator.class,
+        ExpressionEvaluatorTest.TestConfiguration.class
+})
 public class ExpressionEvaluatorTest {
 
-    private final ExpressionEvaluator expressionEvaluator = ExpressionEvaluator.getInstance();
+    @Autowired
+    private ExpressionEvaluator expressionEvaluator;
 
     @Test
     public void evaluate() {
@@ -56,8 +68,8 @@ public class ExpressionEvaluatorTest {
     @Test
     public void evaluateWithArgument() {
         // given
-        Argument argument = new Argument();
         String literal = "publicField.length()";
+        Argument argument = new Argument();
         // when
         String result = expressionEvaluator.evaluate(literal, argument);
         // then
@@ -67,8 +79,8 @@ public class ExpressionEvaluatorTest {
     @Test
     public void evaluateWithArgumentError() {
         // given
-        Argument argument = new Argument();
         String literal = "privateField.length()";
+        Argument argument = new Argument();
         // when
         String result = expressionEvaluator.evaluate(literal, argument);
         // then
@@ -78,8 +90,8 @@ public class ExpressionEvaluatorTest {
     @Test
     public void evaluateWithArgumentNull() {
         // given
-        Argument argument = new Argument();
         String literal = "null";
+        Argument argument = new Argument();
         // when
         String result = expressionEvaluator.evaluate(literal, argument);
         // then
@@ -89,12 +101,33 @@ public class ExpressionEvaluatorTest {
     @Test
     public void evaluateWithArgumentNullArgument() {
         // given
-        Argument argument = null;
         String literal = "field.length()";
+        Argument argument = null;
         // when
         String result = expressionEvaluator.evaluate(literal, argument);
         // then
         assertThat(result, nullValue());
+    }
+
+    @Test
+    public void evaluateWithBeanReferencing() {
+        // given
+        String literal = "@string.toString()";
+        // when
+        String result = expressionEvaluator.evaluate(literal);
+        // then
+        assertThat(result, is("bean string"));
+    }
+
+    @Test
+    public void evaluateWithArgumentAndBeanReferencing() {
+        // given
+        String literal = "@string.toString()";
+        Argument argument = new Argument();
+        // when
+        String result = expressionEvaluator.evaluate(literal, argument);
+        // then
+        assertThat(result, is("bean string"));
     }
 
     @SuppressWarnings("unused")
@@ -105,6 +138,15 @@ public class ExpressionEvaluatorTest {
 
         public String getPublicField() {
             return publicField;
+        }
+    }
+
+    @Configuration
+    static class TestConfiguration {
+
+        @Bean
+        public String string() {
+            return "bean string";
         }
     }
 }

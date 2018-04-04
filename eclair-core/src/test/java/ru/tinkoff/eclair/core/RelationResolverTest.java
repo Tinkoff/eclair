@@ -20,7 +20,7 @@ import static org.junit.Assert.assertThat;
 /**
  * @author Viacheslav Klapatniuk
  */
-public class ClassUtilsTest {
+public class RelationResolverTest {
 
     @Test
     public void calculateInheritanceDistanceUnassignable() {
@@ -28,7 +28,7 @@ public class ClassUtilsTest {
         Class<?> parent = Error.class;
         Class<?> child = RuntimeException.class;
         // when
-        int distance = ClassUtils.calculateInheritanceDistance(parent, child);
+        int distance = RelationResolver.calculateInheritanceDistance(parent, child);
         // then
         assertThat(distance, is(-1));
     }
@@ -39,7 +39,7 @@ public class ClassUtilsTest {
         Class<?> parent = Advice.class;
         Class<?> child = MethodInterceptor.class;
         // when
-        ClassUtils.calculateInheritanceDistance(parent, child);
+        RelationResolver.calculateInheritanceDistance(parent, child);
         // then expected exception
     }
 
@@ -49,7 +49,7 @@ public class ClassUtilsTest {
         Class<?> parent = Object.class;
         Class<?> child = Object.class;
         // when
-        int distance = ClassUtils.calculateInheritanceDistance(parent, child);
+        int distance = RelationResolver.calculateInheritanceDistance(parent, child);
         // then
         assertThat(distance, is(0));
     }
@@ -60,7 +60,7 @@ public class ClassUtilsTest {
         Class<?> parent = String.class;
         Class<?> child = String.class;
         // when
-        int distance = ClassUtils.calculateInheritanceDistance(parent, child);
+        int distance = RelationResolver.calculateInheritanceDistance(parent, child);
         // then
         assertThat(distance, is(0));
     }
@@ -71,7 +71,7 @@ public class ClassUtilsTest {
         Class<?> parent = Throwable.class;
         Class<?> child = ArrayIndexOutOfBoundsException.class;
         // when
-        int distance = ClassUtils.calculateInheritanceDistance(parent, child);
+        int distance = RelationResolver.calculateInheritanceDistance(parent, child);
         // then
         assertThat(distance, is(4));
     }
@@ -82,7 +82,7 @@ public class ClassUtilsTest {
         Class<?> parent = ArrayIndexOutOfBoundsException.class;
         Class<?> child = Throwable.class;
         // when
-        int distance = ClassUtils.calculateInheritanceDistance(parent, child);
+        int distance = RelationResolver.calculateInheritanceDistance(parent, child);
         // then
         assertThat(distance, is(-1));
     }
@@ -93,7 +93,7 @@ public class ClassUtilsTest {
         Set<Class<?>> parents = Collections.emptySet();
         Class<?> child = Object.class;
         // when
-        Class<?> ancestor = ClassUtils.findMostSpecificAncestor(parents, child);
+        Class<?> ancestor = RelationResolver.findMostSpecificAncestor(parents, child);
         // then
         assertThat(ancestor, nullValue());
     }
@@ -104,7 +104,7 @@ public class ClassUtilsTest {
         Set<Class<?>> parents = new HashSet<>(asList(String.class, Integer.class, Void.class));
         Class<?> child = Double.class;
         // when
-        Class<?> ancestor = ClassUtils.findMostSpecificAncestor(parents, child);
+        Class<?> ancestor = RelationResolver.findMostSpecificAncestor(parents, child);
         // then
         assertThat(ancestor, nullValue());
     }
@@ -115,7 +115,7 @@ public class ClassUtilsTest {
         Set<Class<?>> parents = Collections.singleton(Serializable.class);
         Class<?> child = Double.class;
         // when
-        ClassUtils.findMostSpecificAncestor(parents, child);
+        RelationResolver.findMostSpecificAncestor(parents, child);
         // then expected exception
     }
 
@@ -125,7 +125,7 @@ public class ClassUtilsTest {
         Set<Class<?>> parents = new HashSet<>(asList(String.class, BigDecimal.class, Object.class, Number.class));
         Class<?> child = Number.class;
         // when
-        Class<?> ancestor = ClassUtils.findMostSpecificAncestor(parents, child);
+        Class<?> ancestor = RelationResolver.findMostSpecificAncestor(parents, child);
         // then
         assertEquals(Number.class, ancestor);
     }
@@ -135,7 +135,7 @@ public class ClassUtilsTest {
         // given
         List<Class<?>> classes = Collections.emptyList();
         // when
-        Set<Class<?>> set = ClassUtils.reduceDescendants(classes);
+        Set<Class<?>> set = RelationResolver.reduceDescendants(classes);
         // then
         assertThat(set, is(empty()));
     }
@@ -145,7 +145,7 @@ public class ClassUtilsTest {
         // given
         List<Class<?>> classes = asList(Number.class, BigDecimal.class, ArrayList.class, AbstractList.class);
         // when
-        Set<Class<?>> reduced = ClassUtils.reduceDescendants(classes);
+        Set<Class<?>> reduced = RelationResolver.reduceDescendants(classes);
         // then
         assertThat(reduced, hasSize(2));
         assertThat(reduced, Matchers.<Class<?>>containsInAnyOrder(Number.class, AbstractList.class));
