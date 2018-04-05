@@ -13,8 +13,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * TODO: implement
- *
  * @author Viacheslav Klapatniuk
  */
 public class LoggerNameBuilderTest {

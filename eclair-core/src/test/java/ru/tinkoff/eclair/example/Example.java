@@ -171,6 +171,8 @@ public class Example {
     public void verboseDtoToXmlOrJsonOrString(Dto dto, Integer i) {
     }
 
+    // TODO: add example for @Log.error#verbose()
+
     /**
      * if logger level <= DEBUG
      * DEBUG ru.tinkoff.eclair.example.Example.simpleInEvent >

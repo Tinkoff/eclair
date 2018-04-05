@@ -1,17 +1,16 @@
 package ru.tinkoff.eclair.annotation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
+ * Container for annotate method/parameter by multiple repeatable {@link Log} annotations.
+ *
  * @author Viacheslav Klapatniuk
+ * @see Repeatable
  */
-@Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE, ElementType.PARAMETER})
+@Target({ElementType.METHOD, ElementType.PARAMETER, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Logs {
 
-    @SuppressWarnings("unused")
     Log[] value();
 }
