@@ -9,7 +9,6 @@ import static org.springframework.boot.logging.LogLevel.*;
 
 /**
  * TODO: implement {@link ElementType#TYPE}
- * TODO: add tests of meta-annotations
  *
  * @author Viacheslav Klapatniuk
  */

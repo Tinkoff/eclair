@@ -7,6 +7,10 @@ import ru.tinkoff.eclair.annotation.Logs;
 import ru.tinkoff.eclair.annotation.Mdc;
 import ru.tinkoff.eclair.annotation.Mdcs;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
@@ -715,5 +719,40 @@ public class AnnotationExtractorTest {
         assertThat(logOut.verbose(), is(INFO));
         assertThat(logOut.printer(), is("printer"));
         assertThat(logOut.logger(), is("logger"));
+    }
+
+    @Test
+    public void getMethodMetaLogs() throws NoSuchMethodException {
+        // given
+        Method method = MetaAnnotated.class.getMethod("method", int.class);
+        // when
+        Set<Log> logs = annotationExtractor.getLogs(method);
+        // then
+        assertThat(logs, hasSize(1));
+    }
+
+    @Test
+    public void getParameterMetaLogs() throws NoSuchMethodException {
+        // given
+        Method method = MetaAnnotated.class.getMethod("method", int.class);
+        // when
+        List<Set<Log>> parameterLogs = annotationExtractor.getParameterLogs(method);
+        // then
+        assertThat(parameterLogs, hasSize(1));
+        assertThat(parameterLogs.get(0), hasSize(1));
+    }
+
+    @SuppressWarnings("unused")
+    private static class MetaAnnotated {
+
+        @Base
+        public void method(@Base int a) {
+        }
+    }
+
+    @Target({ElementType.METHOD, ElementType.PARAMETER})
+    @Retention(RetentionPolicy.RUNTIME)
+    @Log
+    private @interface Base {
     }
 }
