@@ -2,6 +2,7 @@ package ru.tinkoff.eclair.definition.factory;
 
 import org.junit.Test;
 import ru.tinkoff.eclair.annotation.Log;
+import ru.tinkoff.eclair.core.AnnotationAttribute;
 import ru.tinkoff.eclair.definition.ParameterLog;
 import ru.tinkoff.eclair.printer.Printer;
 import ru.tinkoff.eclair.printer.ToStringPrinter;
@@ -52,6 +53,7 @@ public class ParameterLogFactoryTest {
 
     /**
      * TODO: Incorrect test, because annotation always synthesized correct (according to {@link org.springframework.core.annotation.AliasFor})
+     * TODO: replace all 'byValue' tests by getAnnotation/findAnnotation tests, remove {@link AnnotationAttribute} if not necessary
      */
     @Test
     public void newInstanceByValue() {

@@ -34,11 +34,17 @@ import static org.springframework.util.StringUtils.hasText;
  */
 public class JaxbElementWrapper implements PrinterPreProcessor {
 
-    private static final Object EMPTY_METHOD = new Object();
+    /**
+     * Incorrect method for empty cache stub.
+     */
+    private static final Method EMPTY_METHOD = BeanUtils.findMethod(JaxbElementWrapper.class, "process", Object.class);
+
     private static final ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
     private static final MetadataReaderFactory metadataReaderFactory = new CachingMetadataReaderFactory(resourcePatternResolver);
 
-    private final Map<Class<?>, Object> wrapperMethodCache = new ConcurrentHashMap<>();
+    private final Map<Class<?>, Method> wrapperMethodCache = new ConcurrentHashMap<>();
+    private final Map<Class<?>, Object> wrapperCache = new ConcurrentHashMap<>();
+
     private final Jaxb2Marshaller jaxb2Marshaller;
 
     public JaxbElementWrapper(Jaxb2Marshaller jaxb2Marshaller) {
@@ -47,10 +53,14 @@ public class JaxbElementWrapper implements PrinterPreProcessor {
 
     @Override
     public Object process(Object input) {
-        if (isNull(findAnnotation(input.getClass(), XmlRootElement.class))) {
-            return wrap(jaxb2Marshaller, input);
+        if (nonNull(input.getClass().getAnnotation(XmlRootElement.class))) {
+            return input;
         }
-        return input;
+        return wrap(jaxb2Marshaller, input);
+    }
+
+    Map<Class<?>, Object> getWrapperCache() {
+        return wrapperCache;
     }
 
     private Object wrap(Jaxb2Marshaller jaxb2Marshaller, Object input) {
@@ -145,7 +155,8 @@ public class JaxbElementWrapper implements PrinterPreProcessor {
     }
 
     private Object wrap(Object input, Method method) {
-        Object wrapper = BeanUtils.instantiate(method.getDeclaringClass());
+        Class<?> wrapperClass = method.getDeclaringClass();
+        Object wrapper = wrapperCache.computeIfAbsent(wrapperClass, BeanUtils::instantiate);
         return ReflectionUtils.invokeMethod(method, wrapper, input);
     }
 }

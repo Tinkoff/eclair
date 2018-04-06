@@ -12,12 +12,11 @@ import static java.util.Collections.singletonMap;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.springframework.boot.logging.LogLevel.TRACE;
 import static org.springframework.boot.logging.LogLevel.WARN;
 import static org.springframework.core.annotation.AnnotationUtils.synthesizeAnnotation;
 
 /**
- * TODO: add verbose level check
- *
  * @author Viacheslav Klapatniuk
  */
 public class ErrorLogFactoryTest {
@@ -31,6 +30,7 @@ public class ErrorLogFactoryTest {
         // then
         assertThat(errorLog.getLevel(), is(WARN));
         assertThat(errorLog.getIfEnabledLevel(), is(WARN));
+        assertThat(errorLog.getVerboseLevel(), is(TRACE));
         assertThat(errorLog.getIncludes(), hasSize(1));
         assertThat(errorLog.getIncludes(), Matchers.<Class<?>>contains(RuntimeException.class));
         assertThat(errorLog.getExcludes(), hasSize(1));
@@ -41,6 +41,7 @@ public class ErrorLogFactoryTest {
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("level", WARN);
         attributes.put("ifEnabled", WARN);
+        attributes.put("verbose", TRACE);
         attributes.put("ofType", RuntimeException.class);
         attributes.put("exclude", NullPointerException.class);
         return synthesizeAnnotation(attributes, Log.error.class, null);
