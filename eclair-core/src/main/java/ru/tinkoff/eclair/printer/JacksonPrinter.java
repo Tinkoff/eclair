@@ -4,8 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * json -> throws
- *
  * @author Viacheslav Klapatniuk
  */
 public class JacksonPrinter extends Printer {

@@ -1,8 +1,6 @@
 package ru.tinkoff.eclair.printer;
 
 /**
- * any.toString -> throws
- *
  * @author Viacheslav Klapatniuk
  */
 public class ToStringPrinter extends Printer {

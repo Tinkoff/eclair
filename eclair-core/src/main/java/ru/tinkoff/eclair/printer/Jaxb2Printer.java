@@ -6,8 +6,6 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.StringWriter;
 
 /**
- * xml -> throws
- *
  * @author Viacheslav Klapatniuk
  */
 public class Jaxb2Printer extends Printer {

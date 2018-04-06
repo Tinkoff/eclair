@@ -19,14 +19,13 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
 import static org.springframework.util.StringUtils.hasText;
 
 /**
@@ -92,12 +91,15 @@ public class JaxbElementWrapper implements PrinterPreProcessor {
         if (!hasText(contextPath)) {
             return jaxb2Marshaller.getClassesToBeBound();
         }
-        return Stream.of(contextPath.split(":"))
-                .map(this::pathToResources)
-                .flatMap(Stream::of)
-                .filter(Resource::isReadable)
-                .map(this::forName)
-                .toArray(Class<?>[]::new);
+        List<Class<?>> classes = new ArrayList<>();
+        for (String path : contextPath.split(":")) {
+            for (Resource resource : pathToResources(path)) {
+                if (resource.isReadable()) {
+                    classes.add(forName(resource));
+                }
+            }
+        }
+        return classes.toArray(new Class[classes.size()]);
     }
 
     private Resource[] pathToResources(String path) {
@@ -112,46 +114,46 @@ public class JaxbElementWrapper implements PrinterPreProcessor {
 
     private Class<?> forName(Resource resource) {
         try {
-            return Class.forName(metadataReaderFactory.getMetadataReader(resource).getClassMetadata().getClassName());
+            String className = metadataReaderFactory.getMetadataReader(resource).getClassMetadata().getClassName();
+            return Class.forName(className);
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private Method findMethod(Class<?>[] classes, Class<?> argumentClass) {
-        return Stream.of(classes)
-                .filter(clazz -> nonNull(findAnnotation(clazz, XmlRegistry.class)))
-                .map(ReflectionUtils::getAllDeclaredMethods)
-                .flatMap(Stream::of)
-                .filter(byParameterType(argumentClass))
-                .filter(byReturnType(argumentClass))
-                .filter(byAnnotation())
-                .findFirst()
-                .orElse(null);
-    }
-
-    private Predicate<Method> byParameterType(Class<?> argumentClass) {
-        return method -> method.getParameterCount() == 1 && method.getParameterTypes()[0].equals(argumentClass);
-    }
-
-    private Predicate<Method> byReturnType(Class<?> argumentClass) {
-        return method -> {
-            Type genericReturnType = method.getGenericReturnType();
-            if (genericReturnType instanceof ParameterizedType) {
-                ParameterizedType parameterizedType = (ParameterizedType) genericReturnType;
-                if (parameterizedType.getRawType().equals(JAXBElement.class)) {
-                    Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
-                    if (actualTypeArguments.length == 1 && actualTypeArguments[0].equals(argumentClass)) {
-                        return true;
+    private Method findMethod(Class<?>[] classes, Class<?> parameterClass) {
+        for (Class<?> clazz : classes) {
+            if (nonNull(clazz.getAnnotation(XmlRegistry.class))) {
+                for (Method method : ReflectionUtils.getAllDeclaredMethods(clazz)) {
+                    if (byParameterType(method, parameterClass) && byReturnType(method, parameterClass) && byAnnotation(method)) {
+                        return method;
                     }
                 }
             }
-            return false;
-        };
+        }
+        return null;
     }
 
-    private Predicate<Method> byAnnotation() {
-        return method -> nonNull(findAnnotation(method, XmlElementDecl.class));
+    private boolean byParameterType(Method method, Class<?> parameterClass) {
+        return method.getParameterCount() == 1 && method.getParameterTypes()[0].equals(parameterClass);
+    }
+
+    private boolean byReturnType(Method method, Class<?> parameterClass) {
+        Type genericReturnType = method.getGenericReturnType();
+        if (genericReturnType instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) genericReturnType;
+            if (parameterizedType.getRawType().equals(JAXBElement.class)) {
+                Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+                if (actualTypeArguments.length == 1 && actualTypeArguments[0].equals(parameterClass)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean byAnnotation(Method method) {
+        return nonNull(method.getAnnotation(XmlElementDecl.class));
     }
 
     private Object wrap(Object input, Method method) {
