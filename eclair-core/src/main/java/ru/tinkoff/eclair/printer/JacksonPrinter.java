@@ -15,7 +15,7 @@ public class JacksonPrinter extends Printer {
     }
 
     @Override
-    public String serialize(Object input) {
+    protected String serialize(Object input) throws IllegalArgumentException {
         try {
             return objectMapper.writeValueAsString(input);
         } catch (JsonProcessingException e) {

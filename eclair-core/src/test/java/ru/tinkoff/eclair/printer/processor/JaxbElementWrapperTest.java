@@ -106,6 +106,20 @@ public class JaxbElementWrapperTest {
         assertThat(processed, is(input));
     }
 
+    @Test
+    public void processJaxbElement() {
+        // given
+        Jaxb2Marshaller marshaller = mock(Jaxb2Marshaller.class);
+        JaxbElementWrapper jaxbElementWrapper = new JaxbElementWrapper(marshaller);
+        Object input = new JAXBElement<>(new QName("localPart"), Empty.class, new Empty());
+        // when
+        Object processed = jaxbElementWrapper.process(input);
+        // then
+        verify(marshaller, never()).getContextPath();
+        verify(marshaller, never()).getClassesToBeBound();
+        assertThat(processed, is(input));
+    }
+
     @XmlRootElement
     private static class Root {
     }

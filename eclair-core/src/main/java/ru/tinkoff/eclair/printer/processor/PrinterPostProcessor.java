@@ -5,5 +5,9 @@ package ru.tinkoff.eclair.printer.processor;
  */
 public interface PrinterPostProcessor {
 
+    /**
+     * @param string never {@code null}
+     * @return never {@code null}
+     */
     String process(String string);
 }
