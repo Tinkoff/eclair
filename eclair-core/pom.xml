@@ -6,7 +6,7 @@
     <parent>
         <groupId>ru.tinkoff</groupId>
         <artifactId>eclair</artifactId>
-        <version>0.4.0</version>
+        <version>0.5.0</version>
     </parent>
 
     <artifactId>eclair-core</artifactId>
@@ -66,6 +66,11 @@
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-xml</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-logging</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

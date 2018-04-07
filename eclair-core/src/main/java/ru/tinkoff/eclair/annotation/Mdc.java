@@ -10,13 +10,13 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Mdc {
 
-    String key();
+    String key() default "";
 
     /**
      * TODO: add method arguments to context root
-     * SpEL literal
+     * SpEL expression string
      */
-    String value();
+    String value() default "";
 
     boolean global() default false;
 }

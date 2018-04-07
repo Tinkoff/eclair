@@ -359,6 +359,10 @@ public class Example {
         throw new IllegalArgumentException("message");
     }
 
+    // TODO: add example with bean referencing inside @Mdc
+    // TODO: add example with static method invocation inside @Mdc
+    // TODO: add example of print using 'Printer' bean name inside @Mdc
+
     /**
      * if logger level <= DEBUG
      *
@@ -392,6 +396,115 @@ public class Example {
     @Log
     public void mdcByArg(@Mdc(key = "length", value = "s.length()")
                          @Mdc(key = "staticString", value = "some string", global = true) Dto dto) {
+    }
+
+    /*if (annotatedElement.isParameter) {
+        // for annotated parameter
+        if (key.hasText) {
+            if (value.hasText) {
+                // key and value
+                MDC.put(key, spel(value)); // 1
+            } else {
+                // only key
+                MDC.put(key, parameter.value); // 2
+            }
+        } else if (value.hasText) {
+            // only value
+            MDC.put(parameter.name, spel(value)); // 3
+        } else {
+            // nothing
+            MDC.put(parameter.name, parameter.value); // 4
+        }
+    } else if (annotatedElement.isMethod) {
+        // for annotated method
+        if (key.hasText) {
+            if (value.hasText) {
+                // key and value
+                MDC.put(key, spel(value)); // 5
+            } else {
+                // only key
+                MDC.put(key[parameter0.name], parameter0.value); // 6
+                ..
+                MDC.put(key[parameterN.name], parameterN.value);
+            }
+        } else if (value.hasText) {
+            // only value
+            MDC.put(method.name, spel(value)); // 7
+        } else {
+            // nothing
+            MDC.put(method.name[parameter0.name], parameter0.value); // 8
+            ..
+            MDC.put(method.name[parameterN.name], parameterN.value);
+        }
+    }*/
+
+    /**
+     * DEBUG [parameterSKey=parameterSValue, parameterIKey=parameterIValue] ru.tinkoff.eclair.example.Example.mdc > s="s", i=0
+     */
+    @Log.in
+    public void mdc1(@Mdc(key = "parameterSKey", value = "parameterSValue") String s, @Mdc(key = "parameterIKey", value = "parameterIValue") Integer i) {
+    }
+
+    /**
+     * DEBUG [parameterSKey=s, parameterIKey=0] ru.tinkoff.eclair.example.Example.mdc > s="s", i=0
+     */
+    @Log.in
+    public void mdc2(@Mdc(key = "parameterSKey") String s, @Mdc(key = "parameterIKey") Integer i) {
+    }
+
+    /**
+     * DEBUG [s=parameterSValue, i=parameterIValue] ru.tinkoff.eclair.example.Example.mdc > s="s", i=0
+     * else if parameter names not enabled
+     * DEBUG [mdc[0]=parameterSValue, mdc[1]=parameterIValue] ru.tinkoff.eclair.example.Example.mdc > "s", 0
+     */
+    @Log.in
+    public void mdc3(@Mdc("parameterSValue") String s, @Mdc("parameterIValue") Integer i) {
+    }
+
+    /**
+     * DEBUG [s=s, i=0] ru.tinkoff.eclair.example.Example.mdc > s="s", i=0
+     * else if parameter names not enabled
+     * DEBUG [mdc[0]=s, mdc[1]=0] ru.tinkoff.eclair.example.Example.mdc > "s", 0
+     */
+    @Log.in
+    public void mdc4(@Mdc String s, @Mdc Integer i) {
+    }
+
+    /**
+     * DEBUG [methodKey=methodValue] ru.tinkoff.eclair.example.Example.mdc > s="s", i=0
+     */
+    @Mdc(key = "methodKey", value = "methodValue")
+    @Log.in
+    public void mdc5(String s, Integer i) {
+    }
+
+    /**
+     * DEBUG [methodKey[s]=s, methodKey[i]=0] ru.tinkoff.eclair.example.Example.mdc > s="s", i=0
+     * else if parameter names not enabled
+     * DEBUG [methodKey[0]=s, methodKey[1]=0] ru.tinkoff.eclair.example.Example.mdc > "s", 0
+     */
+    @Mdc(key = "methodKey")
+    @Log.in
+    public void mdc6(String s, Integer i) {
+    }
+
+    /**
+     * DEBUG [mdc=methodValue] ru.tinkoff.eclair.example.Example.mdc > s="s", i=0
+     */
+    @Mdc("methodValue")
+    @Log.in
+    public void mdc7(String s, Integer i) {
+    }
+
+    /**
+     * Equals to {@link #mdc4}
+     * DEBUG [s=s, i=0] ru.tinkoff.eclair.example.Example.mdc > s="s", i=0
+     * else if parameter names not enabled
+     * DEBUG [mdc[0]=s, mdc[1]=0] ru.tinkoff.eclair.example.Example.mdc > "s", 0
+     */
+    @Mdc
+    @Log.in
+    public void mdc8(String s, Integer i) {
     }
 
     // TODO: add example for MDC with bean referencing

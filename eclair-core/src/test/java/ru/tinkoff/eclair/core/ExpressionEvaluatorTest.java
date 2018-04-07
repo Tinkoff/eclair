@@ -1,5 +1,7 @@
 package ru.tinkoff.eclair.core;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
+import ru.tinkoff.eclair.example.Example;
 
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
@@ -28,9 +31,9 @@ public class ExpressionEvaluatorTest {
     @Test
     public void evaluate() {
         // given
-        String literal = "1 + 1";
+        String string = "1 + 1";
         // when
-        String result = expressionEvaluator.evaluate(literal);
+        String result = expressionEvaluator.evaluate(string);
         // then
         assertThat(result, is("2"));
     }
@@ -38,9 +41,9 @@ public class ExpressionEvaluatorTest {
     @Test
     public void evaluateNull() {
         // given
-        String literal = "null";
+        String string = "null";
         // when
-        String result = expressionEvaluator.evaluate(literal);
+        String result = expressionEvaluator.evaluate(string);
         // then
         assertThat(result, nullValue());
     }
@@ -48,9 +51,9 @@ public class ExpressionEvaluatorTest {
     @Test
     public void evaluateString() {
         // given
-        String literal = "'string'";
+        String string = "'string'";
         // when
-        String result = expressionEvaluator.evaluate(literal);
+        String result = expressionEvaluator.evaluate(string);
         // then
         assertThat(result, is("string"));
     }
@@ -58,9 +61,9 @@ public class ExpressionEvaluatorTest {
     @Test
     public void evaluateAsIs() {
         // given
-        String literal = "string as is";
+        String string = "string as is";
         // when
-        String result = expressionEvaluator.evaluate(literal);
+        String result = expressionEvaluator.evaluate(string);
         // then
         assertThat(result, is("string as is"));
     }
@@ -68,10 +71,10 @@ public class ExpressionEvaluatorTest {
     @Test
     public void evaluateWithArgument() {
         // given
-        String literal = "publicField.length()";
+        String string = "publicField.length()";
         Argument argument = new Argument();
         // when
-        String result = expressionEvaluator.evaluate(literal, argument);
+        String result = expressionEvaluator.evaluate(string, argument);
         // then
         assertThat(result, is("6"));
     }
@@ -79,10 +82,10 @@ public class ExpressionEvaluatorTest {
     @Test
     public void evaluateWithArgumentError() {
         // given
-        String literal = "privateField.length()";
+        String string = "privateField.length()";
         Argument argument = new Argument();
         // when
-        String result = expressionEvaluator.evaluate(literal, argument);
+        String result = expressionEvaluator.evaluate(string, argument);
         // then
         assertThat(result, is("privateField.length()"));
     }
@@ -90,10 +93,10 @@ public class ExpressionEvaluatorTest {
     @Test
     public void evaluateWithArgumentNull() {
         // given
-        String literal = "null";
+        String string = "null";
         Argument argument = new Argument();
         // when
-        String result = expressionEvaluator.evaluate(literal, argument);
+        String result = expressionEvaluator.evaluate(string, argument);
         // then
         assertThat(result, nullValue());
     }
@@ -101,10 +104,10 @@ public class ExpressionEvaluatorTest {
     @Test
     public void evaluateWithArgumentNullArgument() {
         // given
-        String literal = "field.length()";
+        String string = "field.length()";
         Argument argument = null;
         // when
-        String result = expressionEvaluator.evaluate(literal, argument);
+        String result = expressionEvaluator.evaluate(string, argument);
         // then
         assertThat(result, nullValue());
     }
@@ -112,9 +115,9 @@ public class ExpressionEvaluatorTest {
     @Test
     public void evaluateWithBeanReferencing() {
         // given
-        String literal = "@string.toString()";
+        String string = "@string.toString()";
         // when
-        String result = expressionEvaluator.evaluate(literal);
+        String result = expressionEvaluator.evaluate(string);
         // then
         assertThat(result, is("bean string"));
     }
@@ -122,22 +125,59 @@ public class ExpressionEvaluatorTest {
     @Test
     public void evaluateWithArgumentAndBeanReferencing() {
         // given
-        String literal = "@string.toString()";
+        String string = "@string.toString()";
         Argument argument = new Argument();
         // when
-        String result = expressionEvaluator.evaluate(literal, argument);
+        String result = expressionEvaluator.evaluate(string, argument);
         // then
         assertThat(result, is("bean string"));
+    }
+
+    /**
+     * TODO: add to {@link Example}
+     * TODO: replace expression by template
+     */
+    @Test
+    public void evaluateToString() {
+        // given
+        String string = "toString()";
+        String string2 = "#this";
+        String string3 = "#root";
+        Argument argument = new Argument();
+        // when
+        String result = expressionEvaluator.evaluate(string, argument);
+        String result2 = expressionEvaluator.evaluate(string2, argument);
+        String result3 = expressionEvaluator.evaluate(string3, argument);
+        // then
+        assertThat(result, is("!"));
+        assertThat(result2, is("!"));
+        assertThat(result3, is("!"));
+    }
+
+    @Test
+    public void evaluateChangeValue() {
+        // given
+        String string = "publicField = '123'";
+        Argument argument = new Argument();
+        // when
+        String result = expressionEvaluator.evaluate(string, argument);
+        // then
+        assertThat(result, is("123"));
+        assertThat(argument.getPublicField(), is("123"));
     }
 
     @SuppressWarnings("unused")
     private static class Argument {
 
-        private final String publicField = "public";
         private final String privateField = "private";
 
-        public String getPublicField() {
-            return publicField;
+        @Getter
+        @Setter
+        private String publicField = "public";
+
+        @Override
+        public String toString() {
+            return "!";
         }
     }
 
