@@ -6,15 +6,16 @@ import org.junit.Test;
 import org.springframework.boot.logging.LogLevel;
 import org.springframework.boot.logging.LoggerConfiguration;
 import org.springframework.boot.logging.LoggingSystem;
+import ru.tinkoff.eclair.definition.ErrorLog;
 import ru.tinkoff.eclair.definition.MethodLog;
 import ru.tinkoff.eclair.definition.OutLog;
 import ru.tinkoff.eclair.logger.facade.LoggerFacadeFactory;
-import ru.tinkoff.eclair.printer.Printer;
 import ru.tinkoff.eclair.printer.ToStringPrinter;
 
 import java.lang.reflect.Method;
-import java.math.BigDecimal;
 
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.boot.logging.LogLevel.*;
@@ -22,224 +23,184 @@ import static org.springframework.boot.logging.LogLevel.*;
 /**
  * @author Viacheslav Klapatniuk
  */
-public class LogOutSimpleLoggerTest {
+public class LogErrorSimpleLoggerTest {
 
-    private Method voidMethod;
-    private Method voidObjectMethod;
     private Method method;
 
     @Before
     public void init() throws NoSuchMethodException {
-        voidMethod = LogOutSimpleLoggerTest.class.getMethod("voidMethod");
-        voidObjectMethod = LogOutSimpleLoggerTest.class.getMethod("voidObjectMethod");
-        method = LogOutSimpleLoggerTest.class.getMethod("method");
+        method = LogErrorSimpleLoggerTest.class.getMethod("method");
     }
 
     @SuppressWarnings("unused")
-    public void voidMethod() {
-    }
-
-    @SuppressWarnings("unused")
-    public Void voidObjectMethod() {
-        return null;
-    }
-
-    @SuppressWarnings("unused")
-    public BigDecimal method() {
-        return null;
+    public void method() {
     }
 
     @Test
-    public void outLogIsNull() {
-        // given, when
+    public void errorLogAndOutLogAreNull() {
+        // given
+        Throwable throwable = new RuntimeException();
+        // when
         SimpleLogger logger = new SimpleLoggerBuilder()
                 .method(method)
+                .throwable(throwable)
                 .effectiveLevel(DEBUG)
-                .buildAndInvokeAndGet(null);
+                .buildAndInvokeAndGet(null, null);
         // then
+        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any()), never()).log(any(), any(), any());
         verify(logger.getLoggerFacadeFactory().getLoggerFacade(any()), never()).log(any(), any());
     }
 
     @Test
     public void effectiveLevelIsGreaterThanLevelAndIfEnabledLevel() {
-        // given, when
+        // given
+        Throwable throwable = new RuntimeException();
+        // when
         SimpleLogger logger = new SimpleLoggerBuilder()
                 .method(method)
-                .levels(DEBUG, OFF, DEBUG)
-                .effectiveLevel(INFO)
+                .throwable(throwable)
+                .levels(WARN, OFF, ERROR)
+                .effectiveLevel(ERROR)
                 .buildAndInvokeAndGet();
         // then
+        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any()), never()).log(any(), any(), any());
         verify(logger.getLoggerFacadeFactory().getLoggerFacade(any()), never()).log(any(), any());
     }
 
     @Test
     public void effectiveLevelIsOff() {
-        // given, when
+        // given
+        Throwable throwable = new RuntimeException();
+        // when
         SimpleLogger logger = new SimpleLoggerBuilder()
                 .method(method)
-                .levels(DEBUG, OFF, DEBUG)
+                .throwable(throwable)
+                .levels(ERROR, OFF, ERROR)
                 .effectiveLevel(OFF)
                 .buildAndInvokeAndGet();
         // then
+        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any()), never()).log(any(), any(), any());
         verify(logger.getLoggerFacadeFactory().getLoggerFacade(any()), never()).log(any(), any());
     }
 
     @Test
     public void ifEnabledSmallerThanEffectiveLevel() {
-        // given, when
-        SimpleLogger logger = new SimpleLoggerBuilder()
-                .method(method)
-                .levels(DEBUG, TRACE, DEBUG)
-                .effectiveLevel(DEBUG)
-                .buildAndInvokeAndGet();
-        // then
-        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any()), never()).log(any(), any());
-    }
-
-    @Test
-    public void outLogIfEnabledLevelDenied() {
-        // given, when
-        SimpleLogger logger = new SimpleLoggerBuilder()
-                .method(method)
-                .levels(INFO, DEBUG, DEBUG)
-                .effectiveLevel(INFO)
-                .buildAndInvokeAndGet();
-        // then
-        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any()), never()).log(any(), any());
-    }
-
-    @Test
-    public void outLogVerboseLevelDenied() {
-        // given, when
-        SimpleLogger logger = new SimpleLoggerBuilder()
-                .method(method)
-                .levels(INFO, OFF, DEBUG)
-                .effectiveLevel(INFO)
-                .buildAndInvokeAndGet();
-        // then
-        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any())).log(INFO, "<");
-    }
-
-    @Test
-    public void testVoidMethod() {
-        // given, when
-        SimpleLogger logger = new SimpleLoggerBuilder()
-                .method(voidMethod)
-                .levels(DEBUG, OFF, DEBUG)
-                .effectiveLevel(DEBUG)
-                .buildAndInvokeAndGet();
-        // then
-        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any())).log(DEBUG, "<");
-    }
-
-    @Test
-    public void testVoidObjectMethod() {
-        // given, when
-        SimpleLogger logger = new SimpleLoggerBuilder()
-                .method(voidObjectMethod)
-                .levels(DEBUG, OFF, DEBUG)
-                .effectiveLevel(DEBUG)
-                .buildAndInvokeAndGet();
-        // then
-        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any())).log(DEBUG, "<");
-    }
-
-    @Test
-    public void testMethod() {
-        // given, when
-        SimpleLogger logger = new SimpleLoggerBuilder()
-                .method(method)
-                .result(new BigDecimal("123.456"))
-                .levels(DEBUG, OFF, DEBUG)
-                .effectiveLevel(DEBUG)
-                .buildAndInvokeAndGet();
-        // then
-        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any())).log(DEBUG, "< 123.456");
-    }
-
-    @Test
-    public void printer() {
         // given
-        Printer printer = new Printer() {
-            @Override
-            protected String serialize(Object input) {
-                return "!";
-            }
-        };
+        Throwable throwable = new RuntimeException();
         // when
         SimpleLogger logger = new SimpleLoggerBuilder()
                 .method(method)
-                .result(new BigDecimal("123.456"))
-                .levels(DEBUG, OFF, DEBUG)
-                .printer(printer)
+                .throwable(throwable)
+                .levels(ERROR, TRACE, ERROR)
                 .effectiveLevel(DEBUG)
                 .buildAndInvokeAndGet();
         // then
-        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any())).log(DEBUG, "< !");
+        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any()), never()).log(any(), any(), any());
+        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any()), never()).log(any(), any());
+    }
+
+    @Test
+    public void errorLogVerboseLevelDenied() {
+        // given
+        Throwable throwable = new RuntimeException();
+        // when
+        SimpleLogger logger = new SimpleLoggerBuilder()
+                .method(method)
+                .throwable(throwable)
+                .levels(ERROR, OFF, DEBUG)
+                .effectiveLevel(INFO)
+                .buildAndInvokeAndGet();
+        // then
+        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any())).log(ERROR, "!", throwable);
+        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any()), never()).log(any(), any());
+    }
+
+    @Test
+    public void errorLog() {
+        // given
+        RuntimeException throwable = new RuntimeException("message");
+        // when
+        SimpleLogger logger = new SimpleLoggerBuilder()
+                .method(method)
+                .throwable(throwable)
+                .effectiveLevel(DEBUG)
+                .buildAndInvokeAndGet();
+        // then
+        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any())).log(ERROR, "! java.lang.RuntimeException: message", throwable);
+        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any()), never()).log(any(), any());
     }
 
     @Test
     public void levelIsOff() {
-        // given, when
+        // given
+        RuntimeException throwable = new RuntimeException();
+        // when
         SimpleLogger logger = new SimpleLoggerBuilder()
                 .method(method)
+                .throwable(throwable)
                 .levels(OFF, OFF, DEBUG)
                 .effectiveLevel(TRACE)
                 .buildAndInvokeAndGet();
         // then
+        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any()), never()).log(any(), any(), any());
         verify(logger.getLoggerFacadeFactory().getLoggerFacade(any()), never()).log(any(), any());
     }
 
     @Test
     public void verboseLevelIsOff() {
-        // given, when
-        SimpleLogger logger = new SimpleLoggerBuilder()
-                .method(method)
-                .levels(DEBUG, OFF, OFF)
-                .effectiveLevel(TRACE)
-                .buildAndInvokeAndGet();
-        // then
-        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any())).log(DEBUG, "<");
-    }
-
-    @Test
-    public void returnNull() {
-        // given, when
-        SimpleLogger logger = new SimpleLoggerBuilder()
-                .method(method)
-                .result(null)
-                .levels(DEBUG, OFF, DEBUG)
-                .effectiveLevel(TRACE)
-                .buildAndInvokeAndGet();
-        // then
-        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any())).log(DEBUG, "< null");
-    }
-
-    @Test
-    public void printerThrowsException() {
         // given
-        Printer printer = mock(Printer.class);
-        when(printer.print(any())).thenThrow(new RuntimeException());
+        RuntimeException throwable = new RuntimeException();
         // when
         SimpleLogger logger = new SimpleLoggerBuilder()
                 .method(method)
-                .printer(printer)
-                .result(new BigDecimal("123.456"))
-                .levels(DEBUG, OFF, DEBUG)
+                .throwable(throwable)
+                .levels(ERROR, OFF, OFF)
                 .effectiveLevel(TRACE)
                 .buildAndInvokeAndGet();
         // then
-        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any())).log(DEBUG, "< 123.456");
+        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any())).log(ERROR, "!", throwable);
+        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any()), never()).log(any(), any());
+    }
+
+    @Test
+    public void outLogInsteadOfErrorLog() {
+        // given
+        Throwable throwable = new RuntimeException();
+        OutLog outLog = OutLog.builder()
+                .level(DEBUG)
+                .ifEnabledLevel(OFF)
+                .verboseLevel(DEBUG)
+                .printer(new ToStringPrinter())
+                .build();
+        // when
+        SimpleLogger logger = new SimpleLoggerBuilder()
+                .method(method)
+                .throwable(throwable)
+                .effectiveLevel(DEBUG)
+                .buildAndInvokeAndGet(null, outLog);
+        // then
+        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any()), never()).log(any(), any(), any());
+        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any())).log(DEBUG, "!");
     }
 
     private static class SimpleLoggerBuilder {
 
+        private static final ErrorLog.Filter defaultFilter = new ErrorLog.Filter(singleton(Throwable.class), emptySet());
+
         private Method method;
-        private Object result;
-        private LogLevel level = DEBUG;
+
+        private Throwable throwable;
+
+        private LogLevel level = ERROR;
         private LogLevel ifEnabledLevel = OFF;
-        private LogLevel verboseLevel = DEBUG;
-        private Printer printer = new ToStringPrinter();
+        private LogLevel verboseLevel = ERROR;
+
+        private LogLevel outLevel = DEBUG;
+        private LogLevel outIfEnabledLevel = OFF;
+        private LogLevel outVerboseLevel = DEBUG;
+
+        private ErrorLog.Filter filter = defaultFilter;
+
         private LogLevel effectiveLevel;
 
         private SimpleLoggerBuilder method(Method method) {
@@ -247,8 +208,8 @@ public class LogOutSimpleLoggerTest {
             return this;
         }
 
-        private SimpleLoggerBuilder result(Object result) {
-            this.result = result;
+        private SimpleLoggerBuilder throwable(Throwable throwable) {
+            this.throwable = throwable;
             return this;
         }
 
@@ -259,30 +220,31 @@ public class LogOutSimpleLoggerTest {
             return this;
         }
 
-        private SimpleLoggerBuilder printer(Printer printer) {
-            this.printer = printer;
-            return this;
-        }
-
         private SimpleLoggerBuilder effectiveLevel(LogLevel effectiveLevel) {
             this.effectiveLevel = effectiveLevel;
             return this;
         }
 
         private SimpleLogger buildAndInvokeAndGet() {
-            OutLog outLog = OutLog.builder()
+            ErrorLog errorLog = ErrorLog.builder()
                     .level(level)
                     .ifEnabledLevel(ifEnabledLevel)
                     .verboseLevel(verboseLevel)
-                    .printer(printer)
+                    .filter(filter)
                     .build();
-            return buildAndInvokeAndGet(outLog);
+            OutLog outLog = OutLog.builder()
+                    .level(outLevel)
+                    .ifEnabledLevel(outIfEnabledLevel)
+                    .verboseLevel(outVerboseLevel)
+                    .printer(new ToStringPrinter())
+                    .build();
+            return buildAndInvokeAndGet(errorLog, outLog);
         }
 
-        private SimpleLogger buildAndInvokeAndGet(OutLog outLog) {
+        private SimpleLogger buildAndInvokeAndGet(ErrorLog errorLog, OutLog outLog) {
             MethodInvocation invocation = methodInvocation(method);
             SimpleLogger simpleLogger = new SimpleLogger(loggerFacadeFactory(), loggingSystem(effectiveLevel));
-            simpleLogger.logOutIfNecessary(invocation, methodLog(outLog), result);
+            simpleLogger.logErrorIfNecessary(invocation, methodLog(outLog, errorLog), throwable);
             return simpleLogger;
         }
 
@@ -302,9 +264,10 @@ public class LogOutSimpleLoggerTest {
             return loggingSystem;
         }
 
-        private MethodLog methodLog(OutLog outLog) {
+        private MethodLog methodLog(OutLog outLog, ErrorLog errorLog) {
             MethodLog methodLog = mock(MethodLog.class);
             when(methodLog.getOutLog()).thenReturn(outLog);
+            when(methodLog.findErrorLog(any())).thenReturn(errorLog);
             return methodLog;
         }
     }

@@ -125,18 +125,6 @@ public @interface Log {
     }
 
     /**
-     * Container to annotate method by multiple repeatable {@link in} annotations.
-     *
-     * @see Repeatable
-     */
-    @Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
-    @Retention(RetentionPolicy.RUNTIME)
-    @interface ins {
-
-        in[] value();
-    }
-
-    /**
      * Annotated {@link Method} is able to log only ending of execution.
      * Should be specified with unique {@link #logger} value per method.
      */
@@ -184,18 +172,6 @@ public @interface Log {
          * Note: if not specified single candidate or {@link Primary} bean will be used for processing.
          */
         String logger() default "";
-    }
-
-    /**
-     * Container to annotate method by multiple repeatable {@link out} annotations.
-     *
-     * @see Repeatable
-     */
-    @Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
-    @Retention(RetentionPolicy.RUNTIME)
-    @interface outs {
-
-        out[] value();
     }
 
     /**
@@ -251,6 +227,30 @@ public @interface Log {
          * Note: if not specified single candidate or {@link Primary} bean will be used for processing.
          */
         String logger() default "";
+    }
+
+    /**
+     * Container to annotate method by multiple repeatable {@link in} annotations.
+     *
+     * @see Repeatable
+     */
+    @Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface ins {
+
+        in[] value();
+    }
+
+    /**
+     * Container to annotate method by multiple repeatable {@link out} annotations.
+     *
+     * @see Repeatable
+     */
+    @Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface outs {
+
+        out[] value();
     }
 
     /**
