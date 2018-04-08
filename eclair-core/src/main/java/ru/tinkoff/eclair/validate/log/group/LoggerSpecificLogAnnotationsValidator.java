@@ -25,10 +25,10 @@ abstract class LoggerSpecificLogAnnotationsValidator implements Validator {
     private final LoggerBeanNamesResolver loggerBeanNamesResolver = LoggerBeanNamesResolver.getInstance();
     private final Map<String, Set<String>> loggerNames;
 
-    LoggerSpecificLogAnnotationsValidator(GenericApplicationContext genericApplicationContext,
+    LoggerSpecificLogAnnotationsValidator(GenericApplicationContext applicationContext,
                                           Map<String, EclairLogger> loggers) {
         this.loggerNames = loggers.keySet().stream()
-                .collect(toMap(identity(), loggerName -> loggerBeanNamesResolver.resolve(genericApplicationContext, loggerName)));
+                .collect(toMap(identity(), loggerName -> loggerBeanNamesResolver.resolve(applicationContext, loggerName)));
     }
 
     @Override

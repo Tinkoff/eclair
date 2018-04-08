@@ -9,7 +9,6 @@ import org.springframework.beans.BeanInstantiationException;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.util.ClassUtils;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindException;
@@ -19,7 +18,6 @@ import ru.tinkoff.eclair.definition.*;
 import ru.tinkoff.eclair.definition.factory.MethodLogFactory;
 import ru.tinkoff.eclair.definition.factory.MethodMdcFactory;
 import ru.tinkoff.eclair.logger.EclairLogger;
-import ru.tinkoff.eclair.printer.Printer;
 import ru.tinkoff.eclair.validate.BeanClassValidator;
 
 import java.lang.reflect.Method;
@@ -27,11 +25,9 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Collections.singletonList;
-import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
 
 /**
  * @author Viacheslav Klapatniuk
@@ -44,10 +40,10 @@ public class EclairProxyCreator extends AbstractAutoProxyCreator {
     private final Map<String, Class<?>> beanClassCache = new ConcurrentHashMap<>();
     private final Map<Class<?>, Object[]> advisorsCache = new ConcurrentHashMap<>();
 
-    private final Map<String, EclairLogger> loggers;
     private final GenericApplicationContext applicationContext;
-    private final BeanClassValidator beanClassValidator;
     private final AnnotationDefinitionFactory annotationDefinitionFactory;
+    private final Map<String, EclairLogger> loggers;
+    private final BeanClassValidator beanClassValidator;
     private final ExpressionEvaluator expressionEvaluator;
 
     private final LoggerBeanNamesResolver loggerBeanNamesResolver = LoggerBeanNamesResolver.getInstance();
@@ -56,27 +52,19 @@ public class EclairProxyCreator extends AbstractAutoProxyCreator {
 
     private boolean validate = false;
 
-    public EclairProxyCreator(List<Printer> printers,
+    /**
+     * @param loggers in order of execution, if necessary
+     */
+    public EclairProxyCreator(GenericApplicationContext applicationContext,
+                              AnnotationDefinitionFactory annotationDefinitionFactory,
                               Map<String, EclairLogger> loggers,
-                              GenericApplicationContext applicationContext,
                               BeanClassValidator beanClassValidator,
                               ExpressionEvaluator expressionEvaluator) {
-        this.annotationDefinitionFactory = new AnnotationDefinitionFactory(new PrinterResolver(applicationContext, printers));
-        this.loggers = initLoggers(loggers);
         this.applicationContext = applicationContext;
+        this.annotationDefinitionFactory = annotationDefinitionFactory;
+        this.loggers = loggers;
         this.beanClassValidator = beanClassValidator;
         this.expressionEvaluator = expressionEvaluator;
-    }
-
-    private Map<String, EclairLogger> initLoggers(Map<String, EclairLogger> loggers) {
-        return loggers.entrySet().stream()
-                .sorted(comparing(Map.Entry::getValue, AnnotationAwareOrderComparator.INSTANCE))
-                .collect(toMap(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue,
-                        (logger, logger2) -> logger,
-                        LinkedHashMap::new
-                ));
     }
 
     @Override
@@ -93,6 +81,7 @@ public class EclairProxyCreator extends AbstractAutoProxyCreator {
         if (nonNull(cachedAdvisors)) {
             return cachedAdvisors.length == 0 ? AbstractAutoProxyCreator.DO_NOT_PROXY : cachedAdvisors;
         }
+        // TODO: initialize validator by property condition
         if (!beanClassValidator.supports(targetClass)) {
             advisorsCache.put(targetClass, EMPTY_ARRAY);
             return AbstractAutoProxyCreator.DO_NOT_PROXY;
@@ -150,6 +139,7 @@ public class EclairProxyCreator extends AbstractAutoProxyCreator {
     }
 
     private List<MethodLog> getMethodLogs(Class<?> beanClass, String loggerName) {
+        // TODO: refactor and/or extract
         Set<String> loggerNames = loggerBeanNamesResolver.resolve(applicationContext, loggerName);
         return annotationExtractor.getCandidateMethods(beanClass).stream()
                 .map(method -> getMethodLog(loggerNames, method))

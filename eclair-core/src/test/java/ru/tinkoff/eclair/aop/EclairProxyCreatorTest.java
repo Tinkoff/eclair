@@ -11,7 +11,9 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.tinkoff.eclair.annotation.Log;
+import ru.tinkoff.eclair.core.AnnotationDefinitionFactory;
 import ru.tinkoff.eclair.core.ExpressionEvaluator;
+import ru.tinkoff.eclair.core.PrinterResolver;
 import ru.tinkoff.eclair.logger.SimpleLogger;
 import ru.tinkoff.eclair.printer.Printer;
 import ru.tinkoff.eclair.printer.ToStringPrinter;
@@ -36,6 +38,8 @@ import static org.junit.Assert.assertTrue;
         ExpressionEvaluator.class,
         SpelExpressionParser.class,
         StandardEvaluationContext.class,
+        AnnotationDefinitionFactory.class,
+        PrinterResolver.class,
 
         BeanClassValidator.class,
         BeanMethodValidator.class,

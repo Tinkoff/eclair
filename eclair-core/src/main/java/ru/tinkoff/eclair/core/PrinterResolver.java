@@ -22,7 +22,7 @@ import static org.springframework.util.StringUtils.hasText;
  */
 public class PrinterResolver {
 
-    private static final Printer defaultPrinter = new ToStringPrinter();
+    public static final Printer defaultPrinter = new ToStringPrinter();
 
     private final Map<String, Printer> printers;
     private final Map<String, String> aliases;
