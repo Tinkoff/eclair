@@ -3,13 +3,10 @@ package ru.tinkoff.eclair.aop;
 import org.aopalliance.aop.Advice;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.aop.support.StaticMethodMatcherPointcutAdvisor;
 import org.springframework.core.BridgeMethodResolver;
-import org.springframework.expression.*;
-import org.springframework.expression.common.LiteralExpression;
+import ru.tinkoff.eclair.core.ExpressionEvaluator;
 import ru.tinkoff.eclair.definition.MethodMdc;
 import ru.tinkoff.eclair.definition.ParameterMdc;
 
@@ -18,7 +15,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Objects.isNull;
 import static java.util.function.Function.identity;
@@ -29,30 +25,18 @@ import static java.util.stream.Collectors.toMap;
  */
 final class MdcAdvisor extends StaticMethodMatcherPointcutAdvisor implements MethodInterceptor {
 
-    private static final Logger logger = LoggerFactory.getLogger(MdcAdvisor.class);
-
-    // TODO: implement if necessary
-    // private static final ParserContext parserContext = ParserContext.TEMPLATE_EXPRESSION;
-    private static final ParserContext parserContext = null;
-
-    private final ExpressionParser expressionParser;
-    private final EvaluationContext defaultEvaluationContext;
+    private final ExpressionEvaluator expressionEvaluator;
     private final Map<Method, MethodMdc> methodMdcs;
 
-    private final Map<String, Expression> expressionCache = new ConcurrentHashMap<>();
-
-    private MdcAdvisor(ExpressionParser expressionParser,
-                       EvaluationContext defaultEvaluationContext,
+    private MdcAdvisor(ExpressionEvaluator expressionEvaluator,
                        List<MethodMdc> methodMdcs) {
-        this.expressionParser = expressionParser;
-        this.defaultEvaluationContext = defaultEvaluationContext;
+        this.expressionEvaluator = expressionEvaluator;
         this.methodMdcs = methodMdcs.stream().collect(toMap(MethodMdc::getMethod, identity()));
     }
 
-    static MdcAdvisor newInstance(ExpressionParser expressionParser,
-                                  EvaluationContext defaultEvaluationContext,
+    static MdcAdvisor newInstance(ExpressionEvaluator expressionEvaluator,
                                   List<MethodMdc> methodMdcs) {
-        return methodMdcs.isEmpty() ? null : new MdcAdvisor(expressionParser, defaultEvaluationContext, methodMdcs);
+        return methodMdcs.isEmpty() ? null : new MdcAdvisor(expressionEvaluator, methodMdcs);
     }
 
     @Override
@@ -100,7 +84,7 @@ final class MdcAdvisor extends StaticMethodMatcherPointcutAdvisor implements Met
                     putMdc(subKey, arguments[a], definition, localKeys);
                 }
             } else {
-                Object value = evaluateExpression(expressionString);
+                Object value = expressionEvaluator.evaluate(expressionString);
                 putMdc(key, value, definition, localKeys);
             }
         }
@@ -118,7 +102,7 @@ final class MdcAdvisor extends StaticMethodMatcherPointcutAdvisor implements Met
                     }
                 }
                 String expressionString = definition.getExpressionString();
-                Object value = expressionString.isEmpty() ? arguments[a] : evaluateExpression(expressionString, arguments[a]);
+                Object value = expressionString.isEmpty() ? arguments[a] : expressionEvaluator.evaluate(expressionString, arguments[a]);
                 putMdc(key, value, definition, localKeys);
             }
         }
@@ -126,27 +110,6 @@ final class MdcAdvisor extends StaticMethodMatcherPointcutAdvisor implements Met
 
     private String synthesizeKey(String prefix, int index) {
         return prefix + "[" + index + "]";
-    }
-
-    private Object evaluateExpression(String expressionString) {
-        return expressionCache.computeIfAbsent(expressionString, this::parseExpression)
-                .getValue(defaultEvaluationContext);
-    }
-
-    private Object evaluateExpression(String expressionString, Object rootObject) {
-        return expressionCache.computeIfAbsent(expressionString, this::parseExpression)
-                .getValue(defaultEvaluationContext, rootObject);
-    }
-
-    private Expression parseExpression(String expressionString) {
-        try {
-            return expressionParser.parseExpression(expressionString, parserContext);
-        } catch (ParseException e) {
-            if (logger.isDebugEnabled()) {
-                logger.warn("Expression string could not be parsed: {}", expressionString, e);
-            }
-            return new LiteralExpression(expressionString);
-        }
     }
 
     private void putMdc(String key, Object value, ParameterMdc definition, Set<String> localKeys) {

@@ -2,70 +2,70 @@ package ru.tinkoff.eclair.core;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.expression.BeanFactoryResolver;
 import org.springframework.expression.*;
-import org.springframework.expression.spel.SpelCompilerMode;
-import org.springframework.expression.spel.SpelParserConfiguration;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
-import org.springframework.stereotype.Component;
+import org.springframework.expression.common.LiteralExpression;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Objects.isNull;
 
 /**
  * @author Viacheslav Klapatniuk
  */
-@Component
 public final class ExpressionEvaluator {
 
     private static final Logger logger = LoggerFactory.getLogger(ExpressionEvaluator.class);
 
+    // TODO: implement if necessary
+    // private static final ParserContext parserContext = ParserContext.TEMPLATE_EXPRESSION;
+    private static final ParserContext parserContext = null;
+
     private final ExpressionParser expressionParser;
-    private final BeanFactoryResolver beanFactoryResolver;
-    // TODO: config 'context' outside
-    private final StandardEvaluationContext defaultEvaluationContext;
+    private final EvaluationContext evaluationContext;
 
-    public ExpressionEvaluator(ApplicationContext applicationContext) {
-        SpelParserConfiguration configuration = new SpelParserConfiguration(SpelCompilerMode.IMMEDIATE, null);
-        this.expressionParser = new SpelExpressionParser(configuration);
-        this.beanFactoryResolver = new BeanFactoryResolver(applicationContext);
-        this.defaultEvaluationContext = new StandardEvaluationContext();
-        this.defaultEvaluationContext.setBeanResolver(beanFactoryResolver);
+    private final Map<String, Expression> expressionCache = new ConcurrentHashMap<>();
+
+    public ExpressionEvaluator(ExpressionParser expressionParser,
+                               EvaluationContext evaluationContext) {
+        this.expressionParser = expressionParser;
+        this.evaluationContext = evaluationContext;
     }
 
-    public String evaluate(String expressionString) {
-        return getValue(expressionString, defaultEvaluationContext);
+    public Object evaluate(String expressionString) {
+        try {
+            return expressionCache.computeIfAbsent(expressionString, this::parse).getValue(evaluationContext);
+        } catch (EvaluationException e) {
+            return handleEvaluationException(expressionString, e);
+        }
     }
 
-    public String evaluate(String expressionString, Object argument) {
-        if (isNull(argument)) {
+    public Object evaluate(String expressionString, Object rootObject) {
+        if (isNull(rootObject)) {
             return null;
         }
-        StandardEvaluationContext evaluationContext = new StandardEvaluationContext(argument);
-        evaluationContext.setBeanResolver(beanFactoryResolver);
-        return getValue(expressionString, evaluationContext);
+        try {
+            return expressionCache.computeIfAbsent(expressionString, this::parse).getValue(evaluationContext, rootObject);
+        } catch (EvaluationException e) {
+            return handleEvaluationException(expressionString, e);
+        }
     }
 
-    private String getValue(String expressionString, EvaluationContext evaluationContext) {
-        // TODO: compile and cache compiled SpEL expression inside 'log definition'
-        Expression expression;
+    private Object handleEvaluationException(String expressionString, EvaluationException e) {
+        if (logger.isDebugEnabled()) {
+            logger.warn("Expression string could not be evaluated: '{}'", expressionString, e);
+        }
+        return expressionString;
+    }
+
+    private Expression parse(String expressionString) {
         try {
-            expression = expressionParser.parseExpression(expressionString);
+            return expressionParser.parseExpression(expressionString, parserContext);
         } catch (ParseException e) {
             if (logger.isDebugEnabled()) {
-                logger.error("Expression string could not be parsed: {}", expressionString, e);
+                logger.warn("Expression string could not be parsed: '{}'", expressionString, e);
             }
-            return expressionString;
-        }
-        try {
-            Object value = expression.getValue(evaluationContext);
-            return isNull(value) ? null : value.toString();
-        } catch (EvaluationException e) {
-            if (logger.isDebugEnabled()) {
-                logger.error("Expression string could not be evaluated: {}", expressionString, e);
-            }
-            return expressionString;
+            return new LiteralExpression(expressionString);
         }
     }
 }

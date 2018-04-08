@@ -11,11 +11,18 @@ import org.springframework.boot.logging.java.JavaLoggingSystem;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.expression.BeanFactoryResolver;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.SpelCompilerMode;
+import org.springframework.expression.spel.SpelParserConfiguration;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import ru.tinkoff.eclair.aop.EclairProxyCreator;
+import ru.tinkoff.eclair.core.ExpressionEvaluator;
 import ru.tinkoff.eclair.logger.EclairLogger;
 import ru.tinkoff.eclair.logger.SimpleLogger;
 import ru.tinkoff.eclair.logger.facade.JavaLoggerFacadeFactory;
@@ -89,12 +96,23 @@ public class EclairAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean
+    public ExpressionEvaluator expressionEvaluator(GenericApplicationContext genericApplicationContext) {
+        ExpressionParser expressionParser = new SpelExpressionParser(new SpelParserConfiguration(SpelCompilerMode.MIXED, null));
+        StandardEvaluationContext evaluationContext = new StandardEvaluationContext();
+        evaluationContext.setBeanResolver(new BeanFactoryResolver(genericApplicationContext));
+        return new ExpressionEvaluator(expressionParser, evaluationContext);
+    }
+
+    @Bean
     public EclairProxyCreator eclairProxyCreator(List<Printer> printerList,
                                                  Map<String, EclairLogger> loggers,
                                                  GenericApplicationContext genericApplicationContext,
                                                  BeanClassValidator beanClassValidator,
-                                                 EclairProperties eclairProperties) {
-        EclairProxyCreator eclairProxyCreator = new EclairProxyCreator(printerList, loggers, genericApplicationContext, beanClassValidator);
+                                                 EclairProperties eclairProperties,
+                                                 ExpressionEvaluator expressionEvaluator) {
+        EclairProxyCreator eclairProxyCreator =
+                new EclairProxyCreator(printerList, loggers, genericApplicationContext, beanClassValidator, expressionEvaluator);
         eclairProxyCreator.setOrder(Ordered.HIGHEST_PRECEDENCE);
         eclairProxyCreator.setFrozen(false);
         eclairProxyCreator.setValidate(eclairProperties.isValidate());

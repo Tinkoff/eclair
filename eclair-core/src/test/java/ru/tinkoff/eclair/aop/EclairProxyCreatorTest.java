@@ -6,6 +6,8 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.tinkoff.eclair.annotation.Log;
@@ -32,6 +34,8 @@ import static org.junit.Assert.assertTrue;
 @ContextConfiguration(classes = {
         EclairProxyCreator.class,
         ExpressionEvaluator.class,
+        SpelExpressionParser.class,
+        StandardEvaluationContext.class,
 
         BeanClassValidator.class,
         BeanMethodValidator.class,

@@ -7,6 +7,10 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.expression.BeanFactoryResolver;
+import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.tinkoff.eclair.example.Example;
@@ -21,21 +25,27 @@ import static org.junit.Assert.assertThat;
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = {
         ExpressionEvaluator.class,
+        SpelExpressionParser.class,
+        StandardEvaluationContext.class,
         ExpressionEvaluatorTest.TestConfiguration.class
 })
 public class ExpressionEvaluatorTest {
 
     @Autowired
     private ExpressionEvaluator expressionEvaluator;
+    @Autowired
+    private GenericApplicationContext applicationContext;
+    @Autowired
+    private SpelExpressionParser expressionParser;
 
     @Test
     public void evaluate() {
         // given
         String string = "1 + 1";
         // when
-        String result = expressionEvaluator.evaluate(string);
+        Object result = expressionEvaluator.evaluate(string);
         // then
-        assertThat(result, is("2"));
+        assertThat(result, is(2));
     }
 
     @Test
@@ -43,7 +53,7 @@ public class ExpressionEvaluatorTest {
         // given
         String string = "null";
         // when
-        String result = expressionEvaluator.evaluate(string);
+        Object result = expressionEvaluator.evaluate(string);
         // then
         assertThat(result, nullValue());
     }
@@ -53,7 +63,7 @@ public class ExpressionEvaluatorTest {
         // given
         String string = "'string'";
         // when
-        String result = expressionEvaluator.evaluate(string);
+        Object result = expressionEvaluator.evaluate(string);
         // then
         assertThat(result, is("string"));
     }
@@ -63,7 +73,7 @@ public class ExpressionEvaluatorTest {
         // given
         String string = "string as is";
         // when
-        String result = expressionEvaluator.evaluate(string);
+        Object result = expressionEvaluator.evaluate(string);
         // then
         assertThat(result, is("string as is"));
     }
@@ -74,9 +84,9 @@ public class ExpressionEvaluatorTest {
         String string = "publicField.length()";
         Argument argument = new Argument();
         // when
-        String result = expressionEvaluator.evaluate(string, argument);
+        Object result = expressionEvaluator.evaluate(string, argument);
         // then
-        assertThat(result, is("6"));
+        assertThat(result, is(6));
     }
 
     @Test
@@ -85,7 +95,7 @@ public class ExpressionEvaluatorTest {
         String string = "privateField.length()";
         Argument argument = new Argument();
         // when
-        String result = expressionEvaluator.evaluate(string, argument);
+        Object result = expressionEvaluator.evaluate(string, argument);
         // then
         assertThat(result, is("privateField.length()"));
     }
@@ -96,7 +106,7 @@ public class ExpressionEvaluatorTest {
         String string = "null";
         Argument argument = new Argument();
         // when
-        String result = expressionEvaluator.evaluate(string, argument);
+        Object result = expressionEvaluator.evaluate(string, argument);
         // then
         assertThat(result, nullValue());
     }
@@ -107,7 +117,7 @@ public class ExpressionEvaluatorTest {
         String string = "field.length()";
         Argument argument = null;
         // when
-        String result = expressionEvaluator.evaluate(string, argument);
+        Object result = expressionEvaluator.evaluate(string, argument);
         // then
         assertThat(result, nullValue());
     }
@@ -115,9 +125,13 @@ public class ExpressionEvaluatorTest {
     @Test
     public void evaluateWithBeanReferencing() {
         // given
+        StandardEvaluationContext evaluationContext = new StandardEvaluationContext();
+        evaluationContext.setBeanResolver(new BeanFactoryResolver(applicationContext));
+        ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(expressionParser, evaluationContext);
+
         String string = "@string.toString()";
         // when
-        String result = expressionEvaluator.evaluate(string);
+        Object result = expressionEvaluator.evaluate(string);
         // then
         assertThat(result, is("bean string"));
     }
@@ -125,33 +139,40 @@ public class ExpressionEvaluatorTest {
     @Test
     public void evaluateWithArgumentAndBeanReferencing() {
         // given
+        StandardEvaluationContext evaluationContext = new StandardEvaluationContext();
+        evaluationContext.setBeanResolver(new BeanFactoryResolver(applicationContext));
+        ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(expressionParser, evaluationContext);
+
         String string = "@string.toString()";
         Argument argument = new Argument();
         // when
-        String result = expressionEvaluator.evaluate(string, argument);
+        Object result = expressionEvaluator.evaluate(string, argument);
         // then
         assertThat(result, is("bean string"));
     }
 
     /**
      * TODO: add to {@link Example}
-     * TODO: replace expression by template
      */
     @Test
     public void evaluateToString() {
         // given
+        StandardEvaluationContext evaluationContext = new StandardEvaluationContext();
+        evaluationContext.setBeanResolver(new BeanFactoryResolver(applicationContext));
+        ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator(expressionParser, evaluationContext);
+
         String string = "toString()";
         String string2 = "#this";
         String string3 = "#root";
         Argument argument = new Argument();
         // when
-        String result = expressionEvaluator.evaluate(string, argument);
-        String result2 = expressionEvaluator.evaluate(string2, argument);
-        String result3 = expressionEvaluator.evaluate(string3, argument);
+        Object result = expressionEvaluator.evaluate(string, argument);
+        Object result2 = expressionEvaluator.evaluate(string2, argument);
+        Object result3 = expressionEvaluator.evaluate(string3, argument);
         // then
         assertThat(result, is("!"));
-        assertThat(result2, is("!"));
-        assertThat(result3, is("!"));
+        assertThat(result2, is(argument));
+        assertThat(result3, is(argument));
     }
 
     @Test
@@ -160,7 +181,7 @@ public class ExpressionEvaluatorTest {
         String string = "publicField = '123'";
         Argument argument = new Argument();
         // when
-        String result = expressionEvaluator.evaluate(string, argument);
+        Object result = expressionEvaluator.evaluate(string, argument);
         // then
         assertThat(result, is("123"));
         assertThat(argument.getPublicField(), is("123"));

@@ -8,14 +8,8 @@ import org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator;
 import org.springframework.beans.BeanInstantiationException;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
-import org.springframework.context.expression.BeanFactoryResolver;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.spel.SpelCompilerMode;
-import org.springframework.expression.spel.SpelParserConfiguration;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.util.ClassUtils;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindException;
@@ -54,8 +48,7 @@ public class EclairProxyCreator extends AbstractAutoProxyCreator {
     private final GenericApplicationContext applicationContext;
     private final BeanClassValidator beanClassValidator;
     private final AnnotationDefinitionFactory annotationDefinitionFactory;
-    private final StandardEvaluationContext standardEvaluationContext;
-    private final ExpressionParser expressionParser;
+    private final ExpressionEvaluator expressionEvaluator;
 
     private final LoggerBeanNamesResolver loggerBeanNamesResolver = LoggerBeanNamesResolver.getInstance();
     private final AnnotationExtractor annotationExtractor = AnnotationExtractor.getInstance();
@@ -66,14 +59,13 @@ public class EclairProxyCreator extends AbstractAutoProxyCreator {
     public EclairProxyCreator(List<Printer> printers,
                               Map<String, EclairLogger> loggers,
                               GenericApplicationContext applicationContext,
-                              BeanClassValidator beanClassValidator) {
+                              BeanClassValidator beanClassValidator,
+                              ExpressionEvaluator expressionEvaluator) {
         this.annotationDefinitionFactory = new AnnotationDefinitionFactory(new PrinterResolver(applicationContext, printers));
         this.loggers = initLoggers(loggers);
         this.applicationContext = applicationContext;
         this.beanClassValidator = beanClassValidator;
-        this.standardEvaluationContext = new StandardEvaluationContext();
-        this.standardEvaluationContext.setBeanResolver(new BeanFactoryResolver(applicationContext.getBeanFactory()));
-        this.expressionParser = new SpelExpressionParser(new SpelParserConfiguration(SpelCompilerMode.MIXED, null));
+        this.expressionEvaluator = expressionEvaluator;
     }
 
     private Map<String, EclairLogger> initLoggers(Map<String, EclairLogger> loggers) {
@@ -135,7 +127,7 @@ public class EclairProxyCreator extends AbstractAutoProxyCreator {
                 .map(this::getMethodMdc)
                 .filter(Objects::nonNull)
                 .collect(toList());
-        return MdcAdvisor.newInstance(expressionParser, standardEvaluationContext, methodMdcs);
+        return MdcAdvisor.newInstance(expressionEvaluator, methodMdcs);
     }
 
     private MethodMdc getMethodMdc(Method method) {
