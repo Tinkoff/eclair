@@ -1,7 +1,6 @@
 package ru.tinkoff.eclair.core;
 
 import ru.tinkoff.eclair.annotation.Log;
-import ru.tinkoff.eclair.annotation.Mdc;
 import ru.tinkoff.eclair.definition.*;
 import ru.tinkoff.eclair.definition.factory.*;
 import ru.tinkoff.eclair.printer.Printer;
@@ -13,10 +12,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static java.util.stream.Collectors.toCollection;
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.*;
 
 /**
  * @author Viacheslav Klapatniuk
@@ -82,9 +81,15 @@ public final class AnnotationDefinitionFactory {
                 .collect(toCollection(LinkedHashSet::new));
     }
 
-    public MethodMdc buildMethodMdc(Method method) {
-        Set<Mdc> methodMdcs = annotationExtractor.getMdcs(method);
-        List<Set<Mdc>> parametersMdcs = annotationExtractor.getParametersMdcs(method);
-        return MethodMdcFactory.newInstance(method, methodMdcs, parametersMdcs);
+    public Set<ParameterMdc> buildMethodParameterMdcs(Method method) {
+        return annotationExtractor.getMdcs(method).stream()
+                .map(ParameterMdcFactory::newInstance)
+                .collect(toSet());
+    }
+
+    public List<Set<ParameterMdc>> buildParameterMdcs(Method method) {
+        return annotationExtractor.getParametersMdcs(method).stream()
+                .map(mdcs -> unmodifiableSet(mdcs.stream().map(ParameterMdcFactory::newInstance).collect(toSet())))
+                .collect(toList());
     }
 }

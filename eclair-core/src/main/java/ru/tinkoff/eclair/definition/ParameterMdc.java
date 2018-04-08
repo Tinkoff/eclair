@@ -15,7 +15,7 @@ public class ParameterMdc {
     private String key;
 
     @NonNull
-    private String value;
+    private String expressionString;
 
     private boolean global;
 }

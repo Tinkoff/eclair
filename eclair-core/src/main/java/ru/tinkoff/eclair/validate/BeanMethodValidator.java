@@ -9,6 +9,7 @@ import ru.tinkoff.eclair.annotation.Mdc;
 import ru.tinkoff.eclair.core.AnnotationExtractor;
 import ru.tinkoff.eclair.validate.log.group.*;
 import ru.tinkoff.eclair.validate.mdc.MdcsValidator;
+import ru.tinkoff.eclair.validate.mdc.MergedMdcsValidator;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -33,6 +34,7 @@ public class BeanMethodValidator implements Validator {
     private final LogErrorsValidator logErrorsValidator;
     private final ParameterLogsValidator parameterLogsValidator;
     private final MdcsValidator mdcsValidator;
+    private final MergedMdcsValidator mergedMdcsValidator;
 
     private final AnnotationExtractor annotationExtractor = AnnotationExtractor.getInstance();
 
@@ -99,8 +101,10 @@ public class BeanMethodValidator implements Validator {
         logErrorsValidator.validate(logErrors, errors);
         parameterLogs.forEach(log -> parameterLogsValidator.validate(log, errors));
 
+        mdcsValidator.validate(mdcs, errors);
+        parameterMdcs.forEach(item -> mdcsValidator.validate(item, errors));
         Set<Mdc> mergedMdcs = new HashSet<>(mdcs);
         mergedMdcs.addAll(parameterMdcs.stream().flatMap(Collection::stream).collect(toSet()));
-        mdcsValidator.validate(mergedMdcs, errors);
+        mergedMdcsValidator.validate(mergedMdcs, errors);
     }
 }

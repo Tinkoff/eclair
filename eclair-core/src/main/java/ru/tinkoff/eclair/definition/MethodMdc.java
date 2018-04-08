@@ -19,6 +19,11 @@ public class MethodMdc {
     @NonNull
     private Method method;
 
+    @Getter
+    @NonNull
+    @Singular
+    private List<String> parameterNames;
+
     @NonNull
     @Singular
     private Set<ParameterMdc> methodDefinitions;

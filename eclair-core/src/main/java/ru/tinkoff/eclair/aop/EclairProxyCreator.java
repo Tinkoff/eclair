@@ -8,8 +8,14 @@ import org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator;
 import org.springframework.beans.BeanInstantiationException;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.context.expression.BeanFactoryResolver;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.SpelCompilerMode;
+import org.springframework.expression.spel.SpelParserConfiguration;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.util.ClassUtils;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindException;
@@ -17,6 +23,7 @@ import org.springframework.validation.BindingResult;
 import ru.tinkoff.eclair.core.*;
 import ru.tinkoff.eclair.definition.*;
 import ru.tinkoff.eclair.definition.factory.MethodLogFactory;
+import ru.tinkoff.eclair.definition.factory.MethodMdcFactory;
 import ru.tinkoff.eclair.logger.EclairLogger;
 import ru.tinkoff.eclair.printer.Printer;
 import ru.tinkoff.eclair.validate.BeanClassValidator;
@@ -46,9 +53,10 @@ public class EclairProxyCreator extends AbstractAutoProxyCreator {
     private final Map<String, EclairLogger> loggers;
     private final GenericApplicationContext applicationContext;
     private final BeanClassValidator beanClassValidator;
-    private final ExpressionEvaluator expressionEvaluator;
-
     private final AnnotationDefinitionFactory annotationDefinitionFactory;
+    private final StandardEvaluationContext standardEvaluationContext;
+    private final ExpressionParser expressionParser;
+
     private final LoggerBeanNamesResolver loggerBeanNamesResolver = LoggerBeanNamesResolver.getInstance();
     private final AnnotationExtractor annotationExtractor = AnnotationExtractor.getInstance();
     private final ParameterNameResolver parameterNameResolver = new ParameterNameResolver();
@@ -58,13 +66,14 @@ public class EclairProxyCreator extends AbstractAutoProxyCreator {
     public EclairProxyCreator(List<Printer> printers,
                               Map<String, EclairLogger> loggers,
                               GenericApplicationContext applicationContext,
-                              BeanClassValidator beanClassValidator,
-                              ExpressionEvaluator expressionEvaluator) {
+                              BeanClassValidator beanClassValidator) {
         this.annotationDefinitionFactory = new AnnotationDefinitionFactory(new PrinterResolver(applicationContext, printers));
         this.loggers = initLoggers(loggers);
         this.applicationContext = applicationContext;
         this.beanClassValidator = beanClassValidator;
-        this.expressionEvaluator = expressionEvaluator;
+        this.standardEvaluationContext = new StandardEvaluationContext();
+        this.standardEvaluationContext.setBeanResolver(new BeanFactoryResolver(applicationContext.getBeanFactory()));
+        this.expressionParser = new SpelExpressionParser(new SpelParserConfiguration(SpelCompilerMode.MIXED, null));
     }
 
     private Map<String, EclairLogger> initLoggers(Map<String, EclairLogger> loggers) {
@@ -83,16 +92,6 @@ public class EclairProxyCreator extends AbstractAutoProxyCreator {
         Class<?> targetClass = (bean instanceof FactoryBean) ? ((FactoryBean) bean).getObjectType() : ClassUtils.getUserClass(bean);
         beanClassCache.putIfAbsent(beanName, targetClass);
         return bean;
-    }
-
-    private void validateBeanClass(Class<?> beanClass, String beanName) {
-        BindingResult bindingResult = new BeanPropertyBindingResult(beanClass, beanName);
-        beanClassValidator.validate(beanClass, bindingResult);
-        if (bindingResult.hasErrors()) {
-            bindingResult.getAllErrors()
-                    .forEach(objectError -> logger.error(objectError.getDefaultMessage()));
-            throw new BeanInstantiationException(beanClass, "Incorrect logging annotations usage", new BindException(bindingResult));
-        }
     }
 
     @Override
@@ -116,6 +115,16 @@ public class EclairProxyCreator extends AbstractAutoProxyCreator {
         return composedAdvisors.length == 0 ? AbstractAutoProxyCreator.DO_NOT_PROXY : composedAdvisors;
     }
 
+    private void validateBeanClass(Class<?> beanClass, String beanName) {
+        BindingResult bindingResult = new BeanPropertyBindingResult(beanClass, beanName);
+        beanClassValidator.validate(beanClass, bindingResult);
+        if (bindingResult.hasErrors()) {
+            bindingResult.getAllErrors()
+                    .forEach(objectError -> logger.error(objectError.getDefaultMessage()));
+            throw new BeanInstantiationException(beanClass, "Incorrect logging annotations usage", new BindException(bindingResult));
+        }
+    }
+
     @Override
     protected boolean advisorsPreFiltered() {
         return true;
@@ -123,10 +132,17 @@ public class EclairProxyCreator extends AbstractAutoProxyCreator {
 
     private MdcAdvisor getMdcAdvisor(Class<?> beanClass) {
         List<MethodMdc> methodMdcs = annotationExtractor.getCandidateMethods(beanClass).stream()
-                .map(annotationDefinitionFactory::buildMethodMdc)
+                .map(this::getMethodMdc)
                 .filter(Objects::nonNull)
                 .collect(toList());
-        return MdcAdvisor.newInstance(expressionEvaluator, methodMdcs);
+        return MdcAdvisor.newInstance(expressionParser, standardEvaluationContext, methodMdcs);
+    }
+
+    private MethodMdc getMethodMdc(Method method) {
+        List<String> parameterNames = parameterNameResolver.tryToResolve(method);
+        Set<ParameterMdc> methodParameterMdcs = annotationDefinitionFactory.buildMethodParameterMdcs(method);
+        List<Set<ParameterMdc>> parameterMdcs = annotationDefinitionFactory.buildParameterMdcs(method);
+        return MethodMdcFactory.newInstance(method, parameterNames, methodParameterMdcs, parameterMdcs);
     }
 
     private List<LogAdvisor> getLoggingAdvisors(Class<?> beanClass) {

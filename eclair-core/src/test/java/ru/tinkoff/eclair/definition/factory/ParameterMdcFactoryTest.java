@@ -25,7 +25,7 @@ public class ParameterMdcFactoryTest {
         ParameterMdc definition = ParameterMdcFactory.newInstance(mdc);
         // then
         assertThat(definition.getKey(), is("key"));
-        assertThat(definition.getValue(), is("value"));
+        assertThat(definition.getExpressionString(), is("value"));
         assertTrue(definition.isGlobal());
     }
 

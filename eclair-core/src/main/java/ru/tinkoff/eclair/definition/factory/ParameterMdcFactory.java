@@ -6,12 +6,12 @@ import ru.tinkoff.eclair.definition.ParameterMdc;
 /**
  * @author Viacheslav Klapatniuk
  */
-class ParameterMdcFactory {
+public class ParameterMdcFactory {
 
     public static ParameterMdc newInstance(Mdc mdc) {
         return ParameterMdc.builder()
                 .key(mdc.key())
-                .value(mdc.value())
+                .expressionString(mdc.value())
                 .global(mdc.global())
                 .build();
     }

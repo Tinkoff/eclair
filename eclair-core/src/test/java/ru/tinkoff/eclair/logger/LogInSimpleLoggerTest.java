@@ -130,6 +130,24 @@ public class LogInSimpleLoggerTest {
     }
 
     @Test
+    public void parameterLogsWithoutParameterNamesAndSkippedArgument() {
+        // given
+        Printer printer = new ToStringPrinter();
+        // when
+        SimpleLogger logger = new SimpleLoggerBuilder()
+                .method(methodWithParameters)
+                .parameterNames(null, null, null)
+                .arguments("s", 1, new Dto())
+                .parameterLog(DEBUG, OFF, DEBUG, printer)
+                .parameterLog(null)
+                .parameterLog(DEBUG, OFF, DEBUG, printer)
+                .effectiveLevel(DEBUG)
+                .buildAndInvokeAndGet(null);
+        // then
+        verify(logger.getLoggerFacadeFactory().getLoggerFacade(any())).log(DEBUG, "> \"s\", 2=Dto{i=0, s='null'}");
+    }
+
+    @Test
     public void parameterLogsAreNullIfEnabledSmallerThanEffectiveLevel() {
         // given, when
         SimpleLogger logger = new SimpleLoggerBuilder()

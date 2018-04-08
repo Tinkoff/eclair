@@ -2,18 +2,14 @@ package ru.tinkoff.eclair.definition.factory;
 
 import org.junit.Test;
 import ru.tinkoff.eclair.annotation.Mdc;
-import ru.tinkoff.eclair.definition.ParameterMdc;
 import ru.tinkoff.eclair.definition.MethodMdc;
+import ru.tinkoff.eclair.definition.ParameterMdc;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptySet;
-import static java.util.Collections.singleton;
+import static java.util.Collections.*;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -28,10 +24,11 @@ public class MethodMdcFactoryTest {
     public void newInstance() throws NoSuchMethodException {
         // given
         Method method = givenMethod();
-        Set<Mdc> methodMdcs = givenMethodMdcs();
-        List<Set<Mdc>> argumentMdcs = givenArgumentMdcs();
+        List<String> parameterNames = emptyList();
+        Set<ParameterMdc> methodMdcs = givenMethodMdcs();
+        List<Set<ParameterMdc>> argumentMdcs = givenArgumentMdcs();
         // when
-        MethodMdc methodMdc = MethodMdcFactory.newInstance(method, methodMdcs, argumentMdcs);
+        MethodMdc methodMdc = MethodMdcFactory.newInstance(method, parameterNames, methodMdcs, argumentMdcs);
         // then
         assertThat(methodMdc.getMethod(), is(method));
         thenMethodDefinition(methodMdc.getMethodDefinitions());
@@ -46,12 +43,15 @@ public class MethodMdcFactoryTest {
     public void annotatedMethod(String a, String b) {
     }
 
-    private Set<Mdc> givenMethodMdcs() {
-        return singleton(givenMdc("method"));
+    private Set<ParameterMdc> givenMethodMdcs() {
+        return singleton(ParameterMdcFactory.newInstance(givenMdc("method")));
     }
 
-    private List<Set<Mdc>> givenArgumentMdcs() {
-        return asList(singleton(givenMdc("a")), singleton(givenMdc("b")));
+    private List<Set<ParameterMdc>> givenArgumentMdcs() {
+        return asList(
+                singleton(ParameterMdcFactory.newInstance(givenMdc("a"))),
+                singleton(ParameterMdcFactory.newInstance(givenMdc("b")))
+        );
     }
 
     private Mdc givenMdc(String key) {
@@ -86,10 +86,11 @@ public class MethodMdcFactoryTest {
     public void newInstanceNull() throws NoSuchMethodException {
         // given
         Method method = givenMethod();
-        Set<Mdc> methodMdcs = emptySet();
-        List<Set<Mdc>> argumentMdcs = asList(emptySet(), emptySet());
+        List<String> parameterNames = emptyList();
+        Set<ParameterMdc> methodMdcs = emptySet();
+        List<Set<ParameterMdc>> argumentMdcs = asList(emptySet(), emptySet());
         // when
-        MethodMdc methodMdc = MethodMdcFactory.newInstance(method, methodMdcs, argumentMdcs);
+        MethodMdc methodMdc = MethodMdcFactory.newInstance(method, parameterNames, methodMdcs, argumentMdcs);
         // then
         assertThat(methodMdc, nullValue());
     }
@@ -98,10 +99,11 @@ public class MethodMdcFactoryTest {
     public void newInstanceImmutableMethodDefinitions() throws NoSuchMethodException {
         // given
         Method method = givenMethod();
-        Set<Mdc> methodMdcs = givenMethodMdcs();
-        List<Set<Mdc>> argumentMdcs = givenArgumentMdcs();
+        List<String> parameterNames = emptyList();
+        Set<ParameterMdc> methodMdcs = givenMethodMdcs();
+        List<Set<ParameterMdc>> argumentMdcs = givenArgumentMdcs();
         // when
-        MethodMdc methodMdc = MethodMdcFactory.newInstance(method, methodMdcs, argumentMdcs);
+        MethodMdc methodMdc = MethodMdcFactory.newInstance(method, parameterNames, methodMdcs, argumentMdcs);
         // then
         methodMdc.getMethodDefinitions().add(ParameterMdcFactory.newInstance(givenMdc("")));
     }
@@ -110,11 +112,25 @@ public class MethodMdcFactoryTest {
     public void newInstanceImmutableParameterDefinitions() throws NoSuchMethodException {
         // given
         Method method = givenMethod();
-        Set<Mdc> methodMdcs = givenMethodMdcs();
-        List<Set<Mdc>> argumentMdcs = givenArgumentMdcs();
+        List<String> parameterNames = emptyList();
+        Set<ParameterMdc> methodMdcs = givenMethodMdcs();
+        List<Set<ParameterMdc>> argumentMdcs = givenArgumentMdcs();
         // when
-        MethodMdc methodMdc = MethodMdcFactory.newInstance(method, methodMdcs, argumentMdcs);
+        MethodMdc methodMdc = MethodMdcFactory.newInstance(method, parameterNames, methodMdcs, argumentMdcs);
         // then
         methodMdc.getParameterDefinitions().add(emptySet());
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void newInstanceImmutableParameterNames() throws NoSuchMethodException {
+        // given
+        Method method = givenMethod();
+        List<String> parameterNames = new ArrayList<>(singletonList("parameterName"));
+        Set<ParameterMdc> methodMdcs = givenMethodMdcs();
+        List<Set<ParameterMdc>> argumentMdcs = givenArgumentMdcs();
+        // when
+        MethodMdc methodMdc = MethodMdcFactory.newInstance(method, parameterNames, methodMdcs, argumentMdcs);
+        // then
+        methodMdc.getParameterNames().add("");
     }
 }

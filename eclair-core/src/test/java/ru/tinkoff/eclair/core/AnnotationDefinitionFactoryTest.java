@@ -289,29 +289,47 @@ public class AnnotationDefinitionFactoryTest {
     }
 
     @Test
-    public void buildMethodMdc() throws NoSuchMethodException {
+    public void buildMethodParameterMdcs() throws NoSuchMethodException {
         // given
         Method method = MdcLoggableClass.class.getMethod("mdc", String.class, String.class);
         // when
-        MethodMdc methodMdc = annotationDefinitionFactory.buildMethodMdc(method);
+        Set<ParameterMdc> parameterMdcs = annotationDefinitionFactory.buildMethodParameterMdcs(method);
         // then
-        assertThat(methodMdc.getMethod(), is(method));
-        assertThat(methodMdc.getMethodDefinitions(), hasSize(1));
-        assertThat(methodMdc.getMethodDefinitions().iterator().next().getKey(), is("method"));
-        assertThat(methodMdc.getParameterDefinitions(), hasSize(2));
-        assertThat(methodMdc.getParameterDefinitions().get(0), hasSize(1));
-        assertThat(methodMdc.getParameterDefinitions().get(0).iterator().next().getKey(), is("a"));
-        assertThat(methodMdc.getParameterDefinitions().get(1), is(empty()));
+        assertThat(parameterMdcs, hasSize(1));
+        assertThat(parameterMdcs.iterator().next().getKey(), is("method"));
     }
 
     @Test
-    public void buildMethodMdcEmpty() throws NoSuchMethodException {
+    public void buildMethodParameterMdcsEmpty() throws NoSuchMethodException {
         // given
         Method method = MdcLoggableClass.class.getMethod("empty");
         // when
-        MethodMdc methodMdc = annotationDefinitionFactory.buildMethodMdc(method);
+        Set<ParameterMdc> parameterMdcs = annotationDefinitionFactory.buildMethodParameterMdcs(method);
         // then
-        assertThat(methodMdc, nullValue());
+        assertThat(parameterMdcs, is(empty()));
+    }
+
+    @Test
+    public void buildParameterMdcs() throws NoSuchMethodException {
+        // given
+        Method method = MdcLoggableClass.class.getMethod("mdc", String.class, String.class);
+        // when
+        List<Set<ParameterMdc>> parameterMdcs = annotationDefinitionFactory.buildParameterMdcs(method);
+        // then
+        assertThat(parameterMdcs, hasSize(2));
+        assertThat(parameterMdcs.get(0), hasSize(1));
+        assertThat(parameterMdcs.get(0).iterator().next().getKey(), is("a"));
+        assertThat(parameterMdcs.get(1), is(empty()));
+    }
+
+    @Test
+    public void buildParameterMdcsEmpty() throws NoSuchMethodException {
+        // given
+        Method method = MdcLoggableClass.class.getMethod("empty");
+        // when
+        List<Set<ParameterMdc>> parameterMdcs = annotationDefinitionFactory.buildParameterMdcs(method);
+        // then
+        assertThat(parameterMdcs, is(empty()));
     }
 
     @SuppressWarnings("unused")

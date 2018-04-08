@@ -119,6 +119,7 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
 
         StringBuilder builder = new StringBuilder();
         boolean isParameterLogVerboseFound = false;
+        boolean isParameterLogSkippedFound = false;
         Object[] arguments = invocation.getArguments();
         for (int a = 0; a < arguments.length; a++) {
             ParameterLog parameterLog = methodLog.getParameterLogs().get(a);
@@ -128,6 +129,7 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
             if (isParameterLogDefined) {
                 LogLevel parameterLogLevel = parameterLog.getLevel();
                 if (parameterLogLevel == OFF || !isLogEnabled(loggerName, expectedLevelResolver.apply(parameterLog))) {
+                    isParameterLogSkippedFound = true;
                     continue;
                 }
                 if (!isInLogLogEnabled) {
@@ -136,6 +138,7 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
                     }
                 }
             } else if (!isInLogVerboseLogEnabled) {
+                isParameterLogSkippedFound = true;
                 continue;
             }
 
@@ -152,6 +155,8 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
                 String parameterName = methodLog.getParameterNames().get(a);
                 if (nonNull(parameterName)) {
                     builder.append(parameterName).append("=");
+                } else if (isParameterLogSkippedFound) {
+                    builder.append(Integer.toString(a)).append("=");
                 }
             }
 

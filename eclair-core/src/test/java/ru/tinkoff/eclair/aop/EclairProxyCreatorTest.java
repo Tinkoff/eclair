@@ -19,6 +19,7 @@ import ru.tinkoff.eclair.validate.log.group.*;
 import ru.tinkoff.eclair.validate.log.single.*;
 import ru.tinkoff.eclair.validate.mdc.MdcValidator;
 import ru.tinkoff.eclair.validate.mdc.MdcsValidator;
+import ru.tinkoff.eclair.validate.mdc.MergedMdcsValidator;
 
 import java.util.Map;
 
@@ -46,6 +47,7 @@ import static org.junit.Assert.assertTrue;
         ParameterLogValidator.class,
         MdcsValidator.class,
         MdcValidator.class,
+        MergedMdcsValidator.class,
 
         EclairProxyCreatorTest.InfrastructureTestConfiguration.class,
         EclairProxyCreatorTest.TestConfiguration.class
