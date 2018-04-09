@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 public class Slf4JLoggerFacadeFactory implements LoggerFacadeFactory {
 
     @Override
-    public LoggerFacade getLoggerFacade(String name) {
-        return new Slf4JLoggerFacade(LoggerFactory.getLogger(name));
+    public LoggerFacade getLoggerFacade(String loggerName) {
+        return new Slf4JLoggerFacade(LoggerFactory.getLogger(loggerName));
     }
 }

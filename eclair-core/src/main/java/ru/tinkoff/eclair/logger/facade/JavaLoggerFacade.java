@@ -28,7 +28,7 @@ public class JavaLoggerFacade implements LoggerFacade {
         LEVELS.put(LogLevel.OFF, Level.OFF);
     }
 
-    JavaLoggerFacade(Logger logger) {
+    public JavaLoggerFacade(Logger logger) {
         this.logger = logger;
     }
 

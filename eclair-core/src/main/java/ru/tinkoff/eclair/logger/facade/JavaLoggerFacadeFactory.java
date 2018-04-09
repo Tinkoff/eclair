@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 public class JavaLoggerFacadeFactory implements LoggerFacadeFactory {
 
     @Override
-    public LoggerFacade getLoggerFacade(String name) {
-        return new JavaLoggerFacade(Logger.getLogger(name));
+    public LoggerFacade getLoggerFacade(String loggerName) {
+        return new JavaLoggerFacade(Logger.getLogger(loggerName));
     }
 }

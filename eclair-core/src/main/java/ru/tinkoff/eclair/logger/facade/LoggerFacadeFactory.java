@@ -5,5 +5,5 @@ package ru.tinkoff.eclair.logger.facade;
  */
 public interface LoggerFacadeFactory {
 
-    LoggerFacade getLoggerFacade(String name);
+    LoggerFacade getLoggerFacade(String loggerName);
 }

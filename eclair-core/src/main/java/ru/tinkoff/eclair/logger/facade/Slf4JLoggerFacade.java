@@ -10,7 +10,7 @@ public class Slf4JLoggerFacade implements LoggerFacade {
 
     private final Logger logger;
 
-    Slf4JLoggerFacade(Logger logger) {
+    public Slf4JLoggerFacade(Logger logger) {
         this.logger = logger;
     }
 
