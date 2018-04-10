@@ -22,7 +22,7 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.StringWriter;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public class Jaxb2Printer extends Printer {
 

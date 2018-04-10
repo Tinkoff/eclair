@@ -21,7 +21,7 @@ import ru.tinkoff.eclair.core.ErrorFilterFactory;
 import ru.tinkoff.eclair.definition.ErrorLog;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public class ErrorLogFactory {
 

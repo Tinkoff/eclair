@@ -27,7 +27,7 @@ import static java.util.stream.Collectors.toMap;
 /**
  * TODO: add tests
  *
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public class LoggerMapSorter {
 

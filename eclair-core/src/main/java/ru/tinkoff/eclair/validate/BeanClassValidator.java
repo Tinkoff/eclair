@@ -24,7 +24,7 @@ import ru.tinkoff.eclair.core.AnnotationExtractor;
 import java.util.stream.Stream;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 @Component
 @RequiredArgsConstructor

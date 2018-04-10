@@ -24,7 +24,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public class ReversedBridgeMethodResolverTest {
 

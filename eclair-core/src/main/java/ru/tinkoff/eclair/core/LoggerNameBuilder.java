@@ -21,7 +21,7 @@ import ru.tinkoff.eclair.logger.ManualLogger;
 import java.lang.reflect.Method;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public final class LoggerNameBuilder {
 

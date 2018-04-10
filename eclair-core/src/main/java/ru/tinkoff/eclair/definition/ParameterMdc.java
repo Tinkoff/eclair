@@ -20,7 +20,7 @@ import lombok.Getter;
 import lombok.NonNull;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 @Getter
 @Builder

@@ -21,7 +21,7 @@ import org.springframework.validation.Validator;
 import ru.tinkoff.eclair.annotation.Mdc;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 @Component
 public class MdcValidator implements Validator {

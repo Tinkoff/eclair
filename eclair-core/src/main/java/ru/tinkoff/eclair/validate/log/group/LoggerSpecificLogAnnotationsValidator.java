@@ -33,7 +33,7 @@ import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 abstract class LoggerSpecificLogAnnotationsValidator implements Validator {
 

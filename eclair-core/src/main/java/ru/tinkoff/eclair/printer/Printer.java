@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * TODO: add tests
  *
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public abstract class Printer {
 

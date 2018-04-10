@@ -35,7 +35,7 @@ import static org.junit.Assert.assertThat;
 import static org.springframework.core.annotation.AnnotationUtils.synthesizeAnnotation;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public class MethodLogFactoryTest {
 

@@ -21,7 +21,7 @@ import ru.tinkoff.eclair.definition.LogDefinition;
 import java.util.function.Function;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public final class ExpectedLevelResolver implements Function<LogDefinition, LogLevel> {
 

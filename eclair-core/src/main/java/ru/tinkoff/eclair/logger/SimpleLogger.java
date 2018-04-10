@@ -34,7 +34,7 @@ import static java.util.Objects.nonNull;
 import static org.springframework.boot.logging.LogLevel.OFF;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
 

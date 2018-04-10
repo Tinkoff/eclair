@@ -20,7 +20,7 @@ import ru.tinkoff.eclair.definition.ErrorLog;
 import java.util.Set;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public final class ErrorLogResolver {
 

@@ -24,7 +24,7 @@ import static java.util.Arrays.asList;
 /**
  * TODO: implement
  *
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public class AuditLogger extends EclairLogger {
 

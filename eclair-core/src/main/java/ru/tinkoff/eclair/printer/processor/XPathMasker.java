@@ -41,7 +41,7 @@ import static java.util.Arrays.asList;
 /**
  * TODO: add tests
  *
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public class XPathMasker implements PrinterPostProcessor {
 

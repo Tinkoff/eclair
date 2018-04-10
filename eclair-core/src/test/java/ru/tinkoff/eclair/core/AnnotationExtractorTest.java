@@ -38,7 +38,7 @@ import static org.junit.Assert.*;
 import static org.springframework.boot.logging.LogLevel.*;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public class AnnotationExtractorTest {
 

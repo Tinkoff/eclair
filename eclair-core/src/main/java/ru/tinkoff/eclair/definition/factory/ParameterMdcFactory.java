@@ -19,7 +19,7 @@ import ru.tinkoff.eclair.annotation.Mdc;
 import ru.tinkoff.eclair.definition.ParameterMdc;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public class ParameterMdcFactory {
 

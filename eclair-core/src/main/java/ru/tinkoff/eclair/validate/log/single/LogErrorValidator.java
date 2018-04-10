@@ -26,7 +26,7 @@ import java.util.Set;
 import static java.lang.String.format;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 @Component
 public class LogErrorValidator extends MethodTargetLogAnnotationValidator {

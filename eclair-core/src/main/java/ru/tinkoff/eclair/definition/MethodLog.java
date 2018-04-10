@@ -34,7 +34,7 @@ import static java.util.Objects.nonNull;
 import static org.springframework.core.annotation.AnnotationUtils.synthesizeAnnotation;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 @Builder
 public class MethodLog {

@@ -21,7 +21,7 @@ import ru.tinkoff.eclair.definition.ParameterLog;
 import ru.tinkoff.eclair.printer.Printer;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public class ParameterLogFactory {
 

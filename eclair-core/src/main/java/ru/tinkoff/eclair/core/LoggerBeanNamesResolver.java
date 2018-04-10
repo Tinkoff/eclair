@@ -25,7 +25,7 @@ import static java.lang.String.format;
 import static java.util.Arrays.asList;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public final class LoggerBeanNamesResolver {
 

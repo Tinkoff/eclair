@@ -18,7 +18,7 @@ package ru.tinkoff.eclair.definition;
 import org.springframework.boot.logging.LogLevel;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public interface LogDefinition {
 

@@ -36,7 +36,7 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 final class MdcAdvisor extends StaticMethodMatcherPointcutAdvisor implements MethodInterceptor {
 

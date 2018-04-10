@@ -20,7 +20,7 @@ import java.lang.annotation.Annotation;
 import static org.springframework.core.annotation.AnnotationUtils.getValue;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public enum AnnotationAttribute {
     LEVEL("level"),

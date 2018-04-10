@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public class MethodMdcFactory {
 

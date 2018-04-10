@@ -10,13 +10,25 @@
 
     <name>Eclair</name>
     <description>Parent POM providing dependency and plugin management for submodules</description>
-
+    <inceptionYear>2018</inceptionYear>
+    <organization>
+        <name>Tinkoff Bank</name>
+        <url>http://tinkoff.ru</url>
+    </organization>
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
         </license>
     </licenses>
+
+    <developers>
+        <developer>
+            <id>klapatnyuk</id>
+            <name>Vyacheslav Klapatnyuk</name>
+        </developer>
+    </developers>
 
     <properties>
         <java.version>1.8</java.version>

@@ -26,7 +26,7 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.groupingBy;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 @Component
 public class MergedMdcsValidator implements Validator {

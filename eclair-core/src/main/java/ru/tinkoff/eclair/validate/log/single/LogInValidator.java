@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 import ru.tinkoff.eclair.annotation.Log;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 @Component
 public class LogInValidator extends MethodTargetLogAnnotationValidator {

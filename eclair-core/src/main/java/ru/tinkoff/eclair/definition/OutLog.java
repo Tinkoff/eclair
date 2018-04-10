@@ -22,7 +22,7 @@ import org.springframework.boot.logging.LogLevel;
 import ru.tinkoff.eclair.printer.Printer;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 @Getter
 @Builder

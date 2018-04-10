@@ -33,7 +33,7 @@ import static java.util.stream.Collectors.toMap;
 import static org.springframework.util.StringUtils.hasText;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public class PrinterResolver {
 

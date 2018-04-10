@@ -26,7 +26,7 @@ import static java.util.Collections.nCopies;
 import static java.util.Objects.isNull;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public final class ParameterNameResolver {
 

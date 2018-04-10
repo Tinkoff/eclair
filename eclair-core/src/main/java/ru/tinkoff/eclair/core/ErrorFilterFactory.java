@@ -25,7 +25,7 @@ import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toSet;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public final class ErrorFilterFactory {
 

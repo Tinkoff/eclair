@@ -18,7 +18,7 @@ package ru.tinkoff.eclair.logger.facade;
 import java.util.logging.Logger;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public class JavaLoggerFacadeFactory implements LoggerFacadeFactory {
 

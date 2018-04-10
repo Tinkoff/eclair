@@ -18,7 +18,7 @@ package ru.tinkoff.eclair.logger.facade;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public class Slf4JLoggerFacadeFactory implements LoggerFacadeFactory {
 

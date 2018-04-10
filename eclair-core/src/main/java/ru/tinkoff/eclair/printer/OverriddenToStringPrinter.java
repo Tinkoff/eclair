@@ -22,7 +22,7 @@ import java.lang.reflect.Method;
 import static java.util.Objects.isNull;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public class OverriddenToStringPrinter extends ToStringPrinter {
 

@@ -39,7 +39,7 @@ import static org.springframework.boot.logging.LogLevel.*;
  * Should have unique {@link #logger} value per annotated element.
  * {@link Parameter}-level annotation has higher priority settings than {@link Method}-level with same {@link #logger} value.
  *
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 @Repeatable(Logs.class)
 // TODO: implement {@link ElementType#TYPE}

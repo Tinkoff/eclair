@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static java.util.Objects.isNull;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public final class ExpressionEvaluator {
 

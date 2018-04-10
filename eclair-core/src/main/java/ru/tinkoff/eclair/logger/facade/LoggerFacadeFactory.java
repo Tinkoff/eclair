@@ -16,7 +16,7 @@
 package ru.tinkoff.eclair.logger.facade;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public interface LoggerFacadeFactory {
 

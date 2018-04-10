@@ -25,7 +25,7 @@ import ru.tinkoff.eclair.validate.log.single.LogValidator;
 import java.util.Map;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 @Component
 public class LogsValidator extends LoggerSpecificLogAnnotationsValidator {

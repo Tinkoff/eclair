@@ -20,7 +20,7 @@ import java.lang.annotation.*;
 /**
  * Container for annotate method/parameter by multiple repeatable {@link Log} annotations.
  *
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  * @see Repeatable
  */
 @Target({ElementType.METHOD, ElementType.PARAMETER, ElementType.ANNOTATION_TYPE})

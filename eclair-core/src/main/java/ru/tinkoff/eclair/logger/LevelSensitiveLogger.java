@@ -29,7 +29,7 @@ import static java.util.Objects.nonNull;
 /**
  * TODO: add tests
  *
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public abstract class LevelSensitiveLogger extends EclairLogger {
 

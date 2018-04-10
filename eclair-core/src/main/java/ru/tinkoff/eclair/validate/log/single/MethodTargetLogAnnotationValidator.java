@@ -28,7 +28,7 @@ import static org.springframework.boot.logging.LogLevel.OFF;
 /**
  * TODO: verbose, printer for empty parameter array (or (v|V)oid return type)
  *
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 abstract class MethodTargetLogAnnotationValidator implements Validator {
 

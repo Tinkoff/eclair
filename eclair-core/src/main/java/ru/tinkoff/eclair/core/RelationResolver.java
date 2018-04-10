@@ -22,7 +22,7 @@ import java.util.Set;
 import static java.lang.String.format;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public final class RelationResolver {
 

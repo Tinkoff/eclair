@@ -18,7 +18,7 @@ package ru.tinkoff.eclair.printer;
 import java.util.Arrays;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public class ToStringPrinter extends Printer {
 

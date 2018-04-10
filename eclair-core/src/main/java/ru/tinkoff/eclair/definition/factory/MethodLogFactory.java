@@ -25,7 +25,7 @@ import java.util.Set;
 import static java.util.Objects.isNull;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public class MethodLogFactory {
 

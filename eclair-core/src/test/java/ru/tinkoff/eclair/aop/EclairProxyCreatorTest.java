@@ -45,7 +45,7 @@ import java.util.Map;
 import static org.junit.Assert.assertTrue;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = {

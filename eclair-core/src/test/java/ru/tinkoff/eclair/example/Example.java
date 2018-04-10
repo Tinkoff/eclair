@@ -31,7 +31,7 @@ import static org.springframework.boot.logging.LogLevel.*;
  * Estimated configuration:
  * logging.pattern.console: '%-5level [%X] %logger{50} %msg%n'
  *
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 @SuppressWarnings("unused")
 public class Example {

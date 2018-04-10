@@ -33,7 +33,7 @@ import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.*;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public final class AnnotationDefinitionFactory {
 

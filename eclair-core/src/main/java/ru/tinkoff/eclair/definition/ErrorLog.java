@@ -31,7 +31,7 @@ import static java.util.Collections.unmodifiableSet;
 import static java.util.Comparator.comparing;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 @Builder
 public class ErrorLog implements LogDefinition {

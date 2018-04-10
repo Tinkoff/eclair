@@ -24,7 +24,7 @@ import java.util.Map;
 import static org.springframework.core.annotation.AnnotationUtils.synthesizeAnnotation;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public class TestErrorLogFactory {
 

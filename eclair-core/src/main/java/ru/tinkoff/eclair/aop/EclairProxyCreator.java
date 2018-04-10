@@ -45,7 +45,7 @@ import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public class EclairProxyCreator extends AbstractAutoProxyCreator {
 

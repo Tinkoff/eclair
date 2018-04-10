@@ -38,7 +38,7 @@ import static org.springframework.core.annotation.AnnotationUtils.synthesizeAnno
 import static ru.tinkoff.eclair.core.AnnotationAttribute.LOGGER;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public final class AnnotationExtractor {
 

@@ -25,7 +25,7 @@ import ru.tinkoff.eclair.validate.log.single.LogOutValidator;
 import java.util.Map;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 @Component
 public class LogOutsValidator extends LoggerSpecificLogAnnotationsValidator {

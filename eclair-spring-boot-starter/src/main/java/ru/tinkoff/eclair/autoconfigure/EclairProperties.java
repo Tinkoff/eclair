@@ -18,7 +18,7 @@ package ru.tinkoff.eclair.autoconfigure;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 @ConfigurationProperties(prefix = "eclair")
 class EclairProperties {

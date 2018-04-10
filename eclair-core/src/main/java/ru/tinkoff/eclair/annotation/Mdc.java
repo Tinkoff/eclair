@@ -18,7 +18,7 @@ package ru.tinkoff.eclair.annotation;
 import java.lang.annotation.*;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 @Repeatable(Mdcs.class)
 @Target({ElementType.PARAMETER, ElementType.METHOD, ElementType.ANNOTATION_TYPE})

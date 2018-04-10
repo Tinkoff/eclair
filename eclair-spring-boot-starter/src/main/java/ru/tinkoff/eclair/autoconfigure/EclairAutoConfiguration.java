@@ -48,7 +48,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 @Configuration
 @EnableConfigurationProperties(EclairProperties.class)

@@ -16,7 +16,7 @@
 package ru.tinkoff.eclair.printer.processor;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public interface PrinterPostProcessor {
 

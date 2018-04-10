@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 import static java.lang.String.format;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 @Component
 public class LogErrorsValidator extends LoggerSpecificLogAnnotationsValidator {

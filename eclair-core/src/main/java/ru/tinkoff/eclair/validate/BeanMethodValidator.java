@@ -37,7 +37,7 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toSet;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 @Component
 @RequiredArgsConstructor

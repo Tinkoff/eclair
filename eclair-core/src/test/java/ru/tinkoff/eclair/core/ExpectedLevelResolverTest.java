@@ -31,7 +31,7 @@ import static org.springframework.boot.logging.LogLevel.*;
 import static org.springframework.core.annotation.AnnotationUtils.synthesizeAnnotation;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public class ExpectedLevelResolverTest {
 

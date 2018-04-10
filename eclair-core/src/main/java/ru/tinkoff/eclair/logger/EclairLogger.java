@@ -24,7 +24,7 @@ import java.util.Objects;
 import static java.util.Objects.nonNull;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public abstract class EclairLogger implements Ordered {
 

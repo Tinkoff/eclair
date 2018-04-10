@@ -20,7 +20,7 @@ import org.springframework.boot.logging.LogLevel;
 import static org.springframework.boot.logging.LogLevel.*;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public interface ManualLogger {
 

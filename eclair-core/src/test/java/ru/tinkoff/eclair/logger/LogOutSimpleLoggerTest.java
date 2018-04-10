@@ -35,7 +35,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.boot.logging.LogLevel.*;
 
 /**
- * @author Viacheslav Klapatniuk
+ * @author Vyacheslav Klapatnyuk
  */
 public class LogOutSimpleLoggerTest {
 
