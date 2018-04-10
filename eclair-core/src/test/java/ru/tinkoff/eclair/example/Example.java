@@ -37,16 +37,16 @@ import static org.springframework.boot.logging.LogLevel.*;
 public class Example {
 
     /**
-     * DEBUG ru.tinkoff.eclair.example.Example.simple >
-     * DEBUG ru.tinkoff.eclair.example.Example.simple <
+     * DEBUG [] ru.tinkoff.eclair.example.Example.simple >
+     * DEBUG [] ru.tinkoff.eclair.example.Example.simple <
      */
     @Log
     public void simple() {
     }
 
     /**
-     * DEBUG ru.tinkoff.eclair.example.Example.simpleWithError >
-     * DEBUG ru.tinkoff.eclair.example.Example.simpleWithError !
+     * DEBUG [] ru.tinkoff.eclair.example.Example.simpleWithError >
+     * DEBUG [] ru.tinkoff.eclair.example.Example.simpleWithError !
      */
     @Log
     public void simpleWithError() {
@@ -55,8 +55,8 @@ public class Example {
 
     /**
      * if logger level = INFO
-     * INFO  ru.tinkoff.eclair.example.Example.level >
-     * INFO  ru.tinkoff.eclair.example.Example.level <
+     * INFO  [] ru.tinkoff.eclair.example.Example.level >
+     * INFO  [] ru.tinkoff.eclair.example.Example.level <
      */
     @Log(INFO)
     public void level() {
@@ -67,12 +67,12 @@ public class Example {
      * (nothing to log)
      *
      * if logger level = DEBUG
-     * INFO  ru.tinkoff.eclair.example.Example.levelIfEnabled >
-     * INFO  ru.tinkoff.eclair.example.Example.levelIfEnabled <
+     * INFO  [] ru.tinkoff.eclair.example.Example.levelIfEnabled >
+     * INFO  [] ru.tinkoff.eclair.example.Example.levelIfEnabled <
      *
      * if logger level = TRACE
-     * INFO  ru.tinkoff.eclair.example.Example.levelIfEnabled >
-     * INFO  ru.tinkoff.eclair.example.Example.levelIfEnabled <
+     * INFO  [] ru.tinkoff.eclair.example.Example.levelIfEnabled >
+     * INFO  [] ru.tinkoff.eclair.example.Example.levelIfEnabled <
      */
     @Log(level = INFO, ifEnabled = DEBUG)
     public void levelIfEnabled() {
@@ -80,8 +80,8 @@ public class Example {
 
     /**
      * if logger level = INFO
-     * INFO  ru.tinkoff.eclair.example.Example.levelWithError >
-     * INFO  ru.tinkoff.eclair.example.Example.levelWithError !
+     * INFO  [] ru.tinkoff.eclair.example.Example.levelWithError >
+     * INFO  [] ru.tinkoff.eclair.example.Example.levelWithError !
      */
     @Log(INFO)
     public void levelWithError() {
@@ -90,12 +90,12 @@ public class Example {
 
     /**
      * if logger level = DEBUG
-     * INFO  ru.tinkoff.eclair.example.Example.verboseLevel > s="a", i=0, d=0.0
-     * INFO  ru.tinkoff.eclair.example.Example.verboseLevel < false
+     * INFO  [] ru.tinkoff.eclair.example.Example.verboseLevel > s="a", i=0, d=0.0
+     * INFO  [] ru.tinkoff.eclair.example.Example.verboseLevel < false
      *
      * else if logger level = INFO
-     * INFO  ru.tinkoff.eclair.example.Example.verboseLevel >
-     * INFO  ru.tinkoff.eclair.example.Example.verboseLevel <
+     * INFO  [] ru.tinkoff.eclair.example.Example.verboseLevel >
+     * INFO  [] ru.tinkoff.eclair.example.Example.verboseLevel <
      */
     @Log(INFO)
     public Boolean verboseLevel(String s, Integer i, Double d) {
@@ -104,12 +104,12 @@ public class Example {
 
     /**
      * if logger level = TRACE
-     * TRACE ru.tinkoff.eclair.example.Example.verboseLowest > s="a", i=0, d=0.0
-     * TRACE ru.tinkoff.eclair.example.Example.verboseLowest < false
+     * TRACE [] ru.tinkoff.eclair.example.Example.verboseLowest > s="a", i=0, d=0.0
+     * TRACE [] ru.tinkoff.eclair.example.Example.verboseLowest < false
      *
      * for any other logger level
-     * TRACE ru.tinkoff.eclair.example.Example.verboseLowest >
-     * TRACE ru.tinkoff.eclair.example.Example.verboseLowest <
+     * TRACE [] ru.tinkoff.eclair.example.Example.verboseLowest >
+     * TRACE [] ru.tinkoff.eclair.example.Example.verboseLowest <
      */
     @Log(level = TRACE, verbose = TRACE)
     public Boolean verboseLowest(String s, Integer i, Double d) {
@@ -118,8 +118,8 @@ public class Example {
 
     /**
      * for any logger level
-     * DEBUG ru.tinkoff.eclair.example.Example.verboseHighest > s="a", i=0, d=0.0
-     * DEBUG ru.tinkoff.eclair.example.Example.verboseHighest < false
+     * DEBUG [] ru.tinkoff.eclair.example.Example.verboseHighest > s="a", i=0, d=0.0
+     * DEBUG [] ru.tinkoff.eclair.example.Example.verboseHighest < false
      */
     @Log(verbose = OFF)
     public Boolean verboseHighest(String s, Integer i, Double d) {
@@ -128,8 +128,8 @@ public class Example {
 
     /**
      * if logger level <= DEBUG
-     * DEBUG ru.tinkoff.eclair.example.Example.verboseWithError > s="a", i=0, d=0.0
-     * DEBUG ru.tinkoff.eclair.example.Example.verboseWithError !
+     * DEBUG [] ru.tinkoff.eclair.example.Example.verboseWithError > s="a", i=0, d=0.0
+     * DEBUG [] ru.tinkoff.eclair.example.Example.verboseWithError !
      */
     @Log
     public Boolean verboseWithError(String s, Integer i, Double d) {
@@ -138,8 +138,8 @@ public class Example {
 
     /**
      * if logger level <= DEBUG
-     * DEBUG r.t.eclair.example.Example.verboseDtoToString > dto=Dto{i=0, s='null'}, i=0
-     * DEBUG r.t.eclair.example.Example.verboseDtoToString <
+     * DEBUG [] r.t.eclair.example.Example.verboseDtoToString > dto=Dto{i=0, s='null'}, i=0
+     * DEBUG [] r.t.eclair.example.Example.verboseDtoToString <
      */
     @Log
     public void verboseDtoToString(Dto dto, Integer i) {
@@ -147,8 +147,8 @@ public class Example {
 
     /**
      * if logger level <= DEBUG
-     * DEBUG ru.tinkoff.eclair.example.Example.verboseDtoToJson > dto={"i":0,"s":null}, i=0
-     * DEBUG ru.tinkoff.eclair.example.Example.verboseDtoToJson <
+     * DEBUG [] ru.tinkoff.eclair.example.Example.verboseDtoToJson > dto={"i":0,"s":null}, i=0
+     * DEBUG [] ru.tinkoff.eclair.example.Example.verboseDtoToJson <
      */
     @Log(printer = "json")
     public void verboseDtoToJson(Dto dto, Integer i) {
@@ -156,8 +156,8 @@ public class Example {
 
     /**
      * if logger level <= DEBUG
-     * DEBUG ru.tinkoff.eclair.example.Example.verboseDtoToXml > dto=<dto><i>0</i></dto>
-     * DEBUG ru.tinkoff.eclair.example.Example.verboseDtoToXml <
+     * DEBUG [] ru.tinkoff.eclair.example.Example.verboseDtoToXml > dto=<dto><i>0</i></dto>, i=0
+     * DEBUG [] ru.tinkoff.eclair.example.Example.verboseDtoToXml <
      */
     @Log(printer = "xml")
     public void verboseDtoToXml(Dto dto, Integer i) {
@@ -167,20 +167,20 @@ public class Example {
      * if logger level <= DEBUG && applied auto-configuration
      *
      * has overridden toString()
-     * DEBUG r.t.e.e.Example.verboseDtoToXmlOrJsonOrString > dto=Dto{i=0, s='null'}, i=0
-     * DEBUG r.t.e.e.Example.verboseDtoToXmlOrJsonOrString <
+     * DEBUG [] r.t.e.e.Example.verboseDtoToXmlOrJsonOrString > dto=Dto{i=0, s='null'}, i=0
+     * DEBUG [] r.t.e.e.Example.verboseDtoToXmlOrJsonOrString <
      *
      * or else "xml"
-     * DEBUG r.t.e.e.Example.verboseDtoToXmlOrJsonOrString > dto=<dto><i>0</i></dto>, i=0
-     * DEBUG r.t.e.e.Example.verboseDtoToXmlOrJsonOrString <
+     * DEBUG [] r.t.e.e.Example.verboseDtoToXmlOrJsonOrString > dto=<dto><i>0</i></dto>, i=0
+     * DEBUG [] r.t.e.e.Example.verboseDtoToXmlOrJsonOrString <
      *
      * or else "json"
-     * DEBUG r.t.e.e.Example.verboseDtoToXmlOrJsonOrString > dto={"i":0,"s":null}, i=0
-     * DEBUG r.t.e.e.Example.verboseDtoToXmlOrJsonOrString <
+     * DEBUG [] r.t.e.e.Example.verboseDtoToXmlOrJsonOrString > dto={"i":0,"s":null}, i=0
+     * DEBUG [] r.t.e.e.Example.verboseDtoToXmlOrJsonOrString <
      *
      * or else Object.toString()
-     * DEBUG r.t.e.e.Example.verboseDtoToXmlOrJsonOrString > dto=ru.tinkoff.eclair.logger.Dto@6b884d57, i=0
-     * DEBUG r.t.e.e.Example.verboseDtoToXmlOrJsonOrString <
+     * DEBUG [] r.t.e.e.Example.verboseDtoToXmlOrJsonOrString > dto=ru.tinkoff.eclair.logger.Dto@6b884d57, i=0
+     * DEBUG [] r.t.e.e.Example.verboseDtoToXmlOrJsonOrString <
      */
     @Log
     public void verboseDtoToXmlOrJsonOrString(Dto dto, Integer i) {
@@ -190,7 +190,7 @@ public class Example {
 
     /**
      * if logger level <= DEBUG
-     * DEBUG ru.tinkoff.eclair.example.Example.simpleInEvent >
+     * DEBUG [] ru.tinkoff.eclair.example.Example.simpleInEvent >
      */
     @Log.in
     public void simpleInEvent() {
@@ -198,7 +198,7 @@ public class Example {
 
     /**
      * if logger level <= DEBUG
-     * INFO  ru.tinkoff.eclair.example.Example.inEvent > dto={"i":0,"s":null}, s=null, i=0
+     * INFO  [] ru.tinkoff.eclair.example.Example.inEvent > dto={"i":0,"s":null}, s=null, i=0
      */
     @Log.in(level = INFO, printer = "json")
     public void inEvent(Dto dto, String s, Integer i) {
@@ -206,7 +206,7 @@ public class Example {
 
     /**
      * if logger level <= DEBUG
-     * DEBUG ru.tinkoff.eclair.example.Example.simpleOutEvent <
+     * DEBUG [] ru.tinkoff.eclair.example.Example.simpleOutEvent <
      */
     @Log.out
     public void simpleOutEvent() {
@@ -214,14 +214,14 @@ public class Example {
 
     /**
      * if logger level <= DEBUG
-     * INFO  ru.tinkoff.eclair.example.Example.outEvent <
+     * INFO  [] ru.tinkoff.eclair.example.Example.outEvent <
      */
     @Log.out(INFO)
     public void outEvent(Dto dto, String s, Integer i) {
     }
 
     /**
-     * ERROR ru.tinkoff.eclair.example.Example.simpleErrorEvent ! java.lang.RuntimeException: message
+     * ERROR [] ru.tinkoff.eclair.example.Example.simpleErrorEvent ! java.lang.RuntimeException: message
      * java.lang.RuntimeException: message
      *     at ru.tinkoff.eclair.example.Example.simpleErrorEvent(Example.java:167)
      */
@@ -231,7 +231,7 @@ public class Example {
     }
 
     /**
-     * WARN  ru.tinkoff.eclair.example.Example.levelErrorEvent ! java.lang.RuntimeException: message
+     * WARN  [] ru.tinkoff.eclair.example.Example.levelErrorEvent ! java.lang.RuntimeException: message
      * java.lang.RuntimeException: message
      *     at ru.tinkoff.eclair.example.Example.levelErrorEvent(Example.java:167)
      */
@@ -242,7 +242,7 @@ public class Example {
 
     /**
      * if logger level = DEBUG
-     * WARN  r.t.e.example.Example.levelIfEnabledErrorEvent ! java.lang.RuntimeException: message
+     * WARN  [] r.t.e.example.Example.levelIfEnabledErrorEvent ! java.lang.RuntimeException: message
      * java.lang.RuntimeException: message
      *     at r.t.e.example.Example.levelIfEnabledErrorEvent(Example.java:167)
      *
@@ -255,12 +255,12 @@ public class Example {
     }
 
     /**
-     * ERROR r.tinkoff.eclair.example.Example.verboseErrorEvent ! java.lang.RuntimeException: runtimeException
+     * ERROR [] r.tinkoff.eclair.example.Example.verboseErrorEvent ! java.lang.RuntimeException: runtimeException
      * java.lang.RuntimeException: runtimeException
      *     at r.tinkoff.eclair.example.Example.verboseErrorEvent(Example.java:167)
      *
      * or else
-     * WARN  r.tinkoff.eclair.example.Example.verboseErrorEvent ! java.lang.NullPointerException: nullPointerException
+     * WARN  [] r.tinkoff.eclair.example.Example.verboseErrorEvent ! java.lang.NullPointerException: nullPointerException
      * java.lang.NullPointerException: nullPointerException
      *     at r.tinkoff.eclair.example.Example.verboseErrorEvent(Example.java:167)
      *
@@ -280,7 +280,7 @@ public class Example {
     }
 
     /**
-     * ERROR r.t.e.e.Example.verboseWithExcludesErrorEvent ! java.lang.RuntimeException: runtimeException
+     * ERROR [] r.t.e.e.Example.verboseWithExcludesErrorEvent ! java.lang.RuntimeException: runtimeException
      * java.lang.RuntimeException: runtimeException
      *     at r.t.e.e.Example.verboseWithExcludesErrorEvent(Example.java:167)
      *
@@ -296,19 +296,19 @@ public class Example {
     }
 
     /**
-     * DEBUG ru.tinkoff.eclair.example.Example.verbose > dto=Dto{i=0, s='null'}
+     * DEBUG [] ru.tinkoff.eclair.example.Example.verbose > dto=Dto{i=0, s='null'}
      */
     public void verbose(@Log Dto dto, String s, Integer i) {
     }
 
     /**
-     * INFO  ru.tinkoff.eclair.example.Example.levelVerbose > dto=Dto{i=0, s='null'}
+     * INFO  [] ru.tinkoff.eclair.example.Example.levelVerbose > dto=Dto{i=0, s='null'}
      */
     public void levelVerbose(@Log(INFO) Dto dto, String s, Integer i) {
     }
 
     /**
-     * DEBUG r.t.e.example.Example.verboseToVariousPrinters > xmlDto=<dto><i>0</i></dto>, jsonDto={"i":0,"s":null}
+     * DEBUG [] r.t.e.example.Example.verboseToVariousPrinters > xmlDto=<dto><i>0</i></dto>, jsonDto={"i":0,"s":null}
      */
     public void verboseToVariousPrinters(@Log(printer = "xml") Dto xmlDto,
                                          @Log(printer = "json") Dto jsonDto,
@@ -320,13 +320,13 @@ public class Example {
      * (nothing to log)
      *
      * else if logger level = INFO
-     * INFO  r.t.eclair.example.Example.inEventWithLevelVerbose > d=0.0
+     * INFO  [] r.t.eclair.example.Example.inEventWithLevelVerbose > d=0.0
      *
      * else if logger level = DEBUG
-     * INFO  r.t.eclair.example.Example.inEventWithLevelVerbose > d=0.0, s="s"
+     * INFO  [] r.t.eclair.example.Example.inEventWithLevelVerbose > d=0.0, s="s"
      *
      * else if logger level = TRACE
-     * INFO  r.t.eclair.example.Example.inEventWithLevelVerbose > d=0.0, s="s", i=0
+     * INFO  [] r.t.eclair.example.Example.inEventWithLevelVerbose > d=0.0, s="s", i=0
      */
     @Log.in(INFO)
     public void inEventWithLevelVerbose(@Log(INFO) Double d,
@@ -339,25 +339,25 @@ public class Example {
 
     /**
      * if logger level = TRACE
-     * INFO  ru.tinkoff.eclair.example.Example.mix > xmlDto=<dto><i>0</i></dto>, jsonDto={"i":0,"s":null}
-     * WARN  ru.tinkoff.eclair.example.Example.mix ! java.lang.IllegalArgumentException: message
+     * INFO  [] ru.tinkoff.eclair.example.Example.mix > xmlDto=<dto><i>0</i></dto>, jsonDto={"i":0,"s":null}
+     * WARN  [] ru.tinkoff.eclair.example.Example.mix ! java.lang.IllegalArgumentException: message
      * java.lang.IllegalArgumentException: message
      *     at ru.tinkoff.eclair.example.Example.mix(Example.java:245)
      *
      * else if logger level = DEBUG
-     * INFO  ru.tinkoff.eclair.example.Example.mix > xmlDto=<dto><i>0</i></dto>
-     * WARN  ru.tinkoff.eclair.example.Example.mix ! java.lang.IllegalArgumentException: message
+     * INFO  [] ru.tinkoff.eclair.example.Example.mix > xmlDto=<dto><i>0</i></dto>
+     * WARN  [] ru.tinkoff.eclair.example.Example.mix ! java.lang.IllegalArgumentException: message
      * java.lang.IllegalArgumentException: message
      *     at ru.tinkoff.eclair.example.Example.mix(Example.java:245)
      *
      * else if logger level = INFO
-     * INFO  ru.tinkoff.eclair.example.Example.mix >
-     * WARN  ru.tinkoff.eclair.example.Example.mix ! java.lang.IllegalArgumentException: message
+     * INFO  [] ru.tinkoff.eclair.example.Example.mix >
+     * WARN  [] ru.tinkoff.eclair.example.Example.mix ! java.lang.IllegalArgumentException: message
      * java.lang.IllegalArgumentException: message
      *     at ru.tinkoff.eclair.example.Example.mix(Example.java:245)
      *
      * else if logger level = WARN
-     * WARN  ru.tinkoff.eclair.example.Example.mix ! java.lang.IllegalArgumentException: message
+     * WARN  [] ru.tinkoff.eclair.example.Example.mix ! java.lang.IllegalArgumentException: message
      * java.lang.IllegalArgumentException: message
      *     at ru.tinkoff.eclair.example.Example.mix(Example.java:245)
      *
@@ -545,34 +545,34 @@ public class Example {
     /**
      * if logger level <= DEBUG
      *
-     * DEBUG r.t.eclair.example.Example.manualLevelLogging >
-     * INFO  r.t.eclair.example.Example.manualLevelLogging - false
-     * INFO  r.t.eclair.example.Example.manualLevelLogging - true
-     * INFO  r.t.eclair.example.Example.manualLevelLogging - true
-     * INFO  r.t.eclair.example.Example.manualLevelLogging - true
-     * INFO  r.t.eclair.example.Example.manualLevelLogging - true
-     * INFO  r.t.eclair.example.Example.manualLevelLogging - false
-     * DEBUG r.t.eclair.example.Example.manualLevelLogging - debug
-     * INFO  r.t.eclair.example.Example.manualLevelLogging - info
-     * INFO  r.t.eclair.example.Example.manualLevelLogging - infoIfDebugEnabled
-     * WARN  r.t.eclair.example.Example.manualLevelLogging - warn
-     * WARN  r.t.eclair.example.Example.manualLevelLogging - warnIfInfoEnabled
-     * WARN  r.t.eclair.example.Example.manualLevelLogging - warnIfDebugEnabled
-     * ERROR r.t.eclair.example.Example.manualLevelLogging - error
-     * ERROR r.t.eclair.example.Example.manualLevelLogging - errorIfWarnEnabled
-     * ERROR r.t.eclair.example.Example.manualLevelLogging - errorIfInfoEnabled
-     * ERROR r.t.eclair.example.Example.manualLevelLogging - errorIfDebugEnabled
-     * ERROR r.t.eclair.example.Example.manualLevelLogging - log
-     * ERROR r.t.eclair.example.Example.manualLevelLogging <
+     * DEBUG [] r.t.eclair.example.Example.manualLevelLogging >
+     * INFO  [] r.t.eclair.example.Example.manualLevelLogging - false
+     * INFO  [] r.t.eclair.example.Example.manualLevelLogging - true
+     * INFO  [] r.t.eclair.example.Example.manualLevelLogging - true
+     * INFO  [] r.t.eclair.example.Example.manualLevelLogging - true
+     * INFO  [] r.t.eclair.example.Example.manualLevelLogging - true
+     * INFO  [] r.t.eclair.example.Example.manualLevelLogging - false
+     * DEBUG [] r.t.eclair.example.Example.manualLevelLogging - debug
+     * INFO  [] r.t.eclair.example.Example.manualLevelLogging - info
+     * INFO  [] r.t.eclair.example.Example.manualLevelLogging - infoIfDebugEnabled
+     * WARN  [] r.t.eclair.example.Example.manualLevelLogging - warn
+     * WARN  [] r.t.eclair.example.Example.manualLevelLogging - warnIfInfoEnabled
+     * WARN  [] r.t.eclair.example.Example.manualLevelLogging - warnIfDebugEnabled
+     * ERROR [] r.t.eclair.example.Example.manualLevelLogging - error
+     * ERROR [] r.t.eclair.example.Example.manualLevelLogging - errorIfWarnEnabled
+     * ERROR [] r.t.eclair.example.Example.manualLevelLogging - errorIfInfoEnabled
+     * ERROR [] r.t.eclair.example.Example.manualLevelLogging - errorIfDebugEnabled
+     * ERROR [] r.t.eclair.example.Example.manualLevelLogging - log
+     * ERROR [] r.t.eclair.example.Example.manualLevelLogging <
      */
     @Log
     public void manualLevelLogging() {
-        // INFO  r.t.eclair.example.Example.manualLevelLogging - false
-        // INFO  r.t.eclair.example.Example.manualLevelLogging - true
-        // INFO  r.t.eclair.example.Example.manualLevelLogging - true
-        // INFO  r.t.eclair.example.Example.manualLevelLogging - true
-        // INFO  r.t.eclair.example.Example.manualLevelLogging - true
-        // INFO  r.t.eclair.example.Example.manualLevelLogging - false
+        // INFO  [] r.t.eclair.example.Example.manualLevelLogging - false
+        // INFO  [] r.t.eclair.example.Example.manualLevelLogging - true
+        // INFO  [] r.t.eclair.example.Example.manualLevelLogging - true
+        // INFO  [] r.t.eclair.example.Example.manualLevelLogging - true
+        // INFO  [] r.t.eclair.example.Example.manualLevelLogging - true
+        // INFO  [] r.t.eclair.example.Example.manualLevelLogging - false
         logger.info(Boolean.toString(logger.isTraceLogEnabled()));
         logger.info(Boolean.toString(logger.isDebugLogEnabled()));
         logger.info(Boolean.toString(logger.isInfoLogEnabled()));
@@ -583,31 +583,31 @@ public class Example {
         // nothing to log
         logger.trace("trace");
 
-        // DEBUG r.t.eclair.example.Example.manualLevelLogging - debug
+        // DEBUG [] r.t.eclair.example.Example.manualLevelLogging - debug
         // nothing to log
         logger.debug("debug");
         logger.debugIfTraceEnabled("debugIfTraceEnabled");
 
-        // INFO  r.t.eclair.example.Example.manualLevelLogging - info
-        // INFO  r.t.eclair.example.Example.manualLevelLogging - infoIfDebugEnabled
+        // INFO  [] r.t.eclair.example.Example.manualLevelLogging - info
+        // INFO  [] r.t.eclair.example.Example.manualLevelLogging - infoIfDebugEnabled
         // nothing to log
         logger.info("info");
         logger.infoIfDebugEnabled("infoIfDebugEnabled");
         logger.infoIfTraceEnabled("infoIfTraceEnabled");
 
-        // WARN  r.t.eclair.example.Example.manualLevelLogging - warn
-        // WARN  r.t.eclair.example.Example.manualLevelLogging - warnIfInfoEnabled
-        // WARN  r.t.eclair.example.Example.manualLevelLogging - warnIfDebugEnabled
+        // WARN  [] r.t.eclair.example.Example.manualLevelLogging - warn
+        // WARN  [] r.t.eclair.example.Example.manualLevelLogging - warnIfInfoEnabled
+        // WARN  [] r.t.eclair.example.Example.manualLevelLogging - warnIfDebugEnabled
         // nothing to log
         logger.warn("warn");
         logger.warnIfInfoEnabled("warnIfInfoEnabled");
         logger.warnIfDebugEnabled("warnIfDebugEnabled");
         logger.warnIfTraceEnabled("warnIfTraceEnabled");
 
-        // ERROR r.t.eclair.example.Example.manualLevelLogging - error
-        // ERROR r.t.eclair.example.Example.manualLevelLogging - errorIfWarnEnabled
-        // ERROR r.t.eclair.example.Example.manualLevelLogging - errorIfInfoEnabled
-        // ERROR r.t.eclair.example.Example.manualLevelLogging - errorIfDebugEnabled
+        // ERROR [] r.t.eclair.example.Example.manualLevelLogging - error
+        // ERROR [] r.t.eclair.example.Example.manualLevelLogging - errorIfWarnEnabled
+        // ERROR [] r.t.eclair.example.Example.manualLevelLogging - errorIfInfoEnabled
+        // ERROR [] r.t.eclair.example.Example.manualLevelLogging - errorIfDebugEnabled
         // nothing to log
         logger.error("error");
         logger.errorIfWarnEnabled("errorIfWarnEnabled");
@@ -615,7 +615,7 @@ public class Example {
         logger.errorIfDebugEnabled("errorIfDebugEnabled");
         logger.errorIfTraceEnabled("errorIfTraceEnabled");
 
-        // ERROR r.t.eclair.example.Example.manualLevelLogging - log
+        // ERROR [] r.t.eclair.example.Example.manualLevelLogging - log
         logger.log(ERROR, "log");
     }
 
@@ -662,11 +662,11 @@ public class Example {
      * (nothing to log)
      *
      * else if logger level = INFO or DEBUG
-     * INFO  ru.tinkoff.eclair.example.Example.priority >
+     * INFO  [] ru.tinkoff.eclair.example.Example.priority >
      *
      * else if logger level = TRACE
-     * INFO  ru.tinkoff.eclair.example.Example.priority >
-     * TRACE ru.tinkoff.eclair.example.Example.priority <
+     * INFO  [] ru.tinkoff.eclair.example.Example.priority >
+     * TRACE [] ru.tinkoff.eclair.example.Example.priority <
      */
     @Log.in(level = INFO, verbose = TRACE)
     @Log(level = TRACE, verbose = OFF)
@@ -737,14 +737,14 @@ public class Example {
     }
 
     /**
-     * DEBUG ru.tinkoff.eclair.example.Example.offLevelWithArg > a=1
+     * DEBUG [] ru.tinkoff.eclair.example.Example.offLevelWithArg > a=1
      */
     @Log.in(OFF)
     public void offLevelWithArg(@Log int a) {
     }
 
     /**
-     * DEBUG ru.tinkoff.eclair.example.Example.offLevelWithArg >
+     * DEBUG [] ru.tinkoff.eclair.example.Example.offLevelWithArg >
      */
     @Log.in
     public void argOffLevel(@Log(OFF) int a) {

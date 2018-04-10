@@ -224,6 +224,7 @@ public @interface Log {
         LogLevel verbose() default ERROR;
 
         /**
+         * TODO: complement about detection of the most specific ancestor
          * Determines array of {@link Throwable} types (with children) which should be processed by this annotation.
          * Every thrown {@link Throwable} could be processed by only one annotation per {@link #logger}.
          * Tries to process any {@link Throwable} by default.
