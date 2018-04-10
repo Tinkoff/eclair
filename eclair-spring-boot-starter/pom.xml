@@ -11,6 +11,9 @@
 
     <artifactId>eclair-spring-boot-starter</artifactId>
 
+    <name>Eclair Spring Boot Starter</name>
+    <description>Spring Boot starter, including auto-configuration</description>
+
     <dependencies>
         <dependency>
             <groupId>ru.tinkoff</groupId>

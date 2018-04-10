@@ -11,6 +11,9 @@
 
     <artifactId>eclair-core</artifactId>
 
+    <name>Eclair Core</name>
+    <description>Core Eclair module</description>
+
     <dependencies>
         <!-- Spring -->
         <dependency>
