@@ -6,17 +6,17 @@ Includes abstractions for annotations processing, simple implementation and Spri
 
 ## Features
 
-* logging of events, detected by Spring AOP: *beginning*, *ending* or *emergency ending* of method execution
+* events logging detected by Spring AOP: *beginning*, *ending* or *emergency ending* of method execution
 * flexible filtering `Throwable` types for logging
 * configurable verbosity based on the enabled log level
-* pre-defined printers for logging arguments or method return value in different formats:
+* pre-defined printers to log arguments or method return value in different formats:
     * `JSON` (by Jackson)
     * `XML` (by JAXB)
 * declarative defining (with *SpEL*) and erasing of *Mapped Diagnostic Context* (MDC) based on scopes
 * multiple logger definition
 * annotations validation during application context start
-* ability of use meta-annotations (applied to other annotations) and annotated method overriding
-* manual logging with detection of invoker class is also available
+* ability to use meta-annotations (applied to other annotations) and annotated method overriding
+* manual logging with invoker class detection is also available
 
 ## Getting started
 
@@ -32,7 +32,7 @@ Add this to your POM.
 
 ## Usage examples
 
-The examples assume that you are using a standard `SimpleLogger` and that you have the following YAML configuration: 
+The examples assume that you are using a standard `SimpleLogger` and that you have the following configuration property: 
 
 ```yaml
 logging.pattern.console: '%-5level [%X] %logger{80} %msg%n'
