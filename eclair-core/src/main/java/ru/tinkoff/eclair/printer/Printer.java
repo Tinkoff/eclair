@@ -59,5 +59,8 @@ public abstract class Printer {
         return string;
     }
 
+    /**
+     * TODO: parameterize?
+     */
     protected abstract String serialize(Object input);
 }

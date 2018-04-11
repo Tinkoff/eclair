@@ -17,14 +17,18 @@ package ru.tinkoff.eclair.definition.factory;
 
 import org.junit.Test;
 import ru.tinkoff.eclair.annotation.Log;
+import ru.tinkoff.eclair.core.PrinterResolver;
 import ru.tinkoff.eclair.definition.InLog;
 import ru.tinkoff.eclair.printer.Printer;
 import ru.tinkoff.eclair.printer.ToStringPrinter;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.springframework.boot.logging.LogLevel.TRACE;
@@ -40,14 +44,16 @@ public class InLogFactoryTest {
     public void newInstance() {
         // given
         Log.in logIn = givenLogIn();
-        Printer printer = new ToStringPrinter();
+        ToStringPrinter printer = new ToStringPrinter();
+        List<Printer> printers = singletonList(printer);
         // when
-        InLog inLog = InLogFactory.newInstance(logIn, printer);
+        InLog inLog = InLogFactory.newInstance(logIn, printers);
         // then
         assertThat(inLog.getLevel(), is(WARN));
         assertThat(inLog.getIfEnabledLevel(), is(WARN));
         assertThat(inLog.getVerboseLevel(), is(TRACE));
-        assertThat(inLog.getPrinter(), is(printer));
+        assertThat(inLog.getPrinters(), hasSize(1));
+        assertThat(inLog.getPrinters().get(0), is(printer));
     }
 
     private Log.in givenLogIn() {
@@ -63,14 +69,27 @@ public class InLogFactoryTest {
     public void newInstanceByValue() {
         // given
         Log.in logIn = givenLogInByValue();
-        Printer printer = new ToStringPrinter();
+        ToStringPrinter printer = new ToStringPrinter();
+        List<Printer> printers = singletonList(printer);
         // when
-        InLog inLog = InLogFactory.newInstance(logIn, printer);
+        InLog inLog = InLogFactory.newInstance(logIn, printers);
         // then
         assertThat(inLog.getLevel(), is(WARN));
     }
 
     private Log.in givenLogInByValue() {
         return synthesizeAnnotation(singletonMap("value", WARN), Log.in.class, null);
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void newInstancePrintersImmutable() {
+        // given
+        Log.in logIn = givenLogIn();
+        ToStringPrinter printer = new ToStringPrinter();
+        List<Printer> printers = singletonList(printer);
+        // when
+        InLog inLog = InLogFactory.newInstance(logIn, printers);
+        inLog.getPrinters().add(PrinterResolver.defaultPrinter);
+        // then expected exception
     }
 }

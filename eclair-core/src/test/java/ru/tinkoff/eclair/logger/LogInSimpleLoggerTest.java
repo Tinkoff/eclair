@@ -23,6 +23,7 @@ import org.springframework.boot.logging.LogLevel;
 import org.springframework.boot.logging.LoggerConfiguration;
 import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
+import ru.tinkoff.eclair.core.PrinterResolver;
 import ru.tinkoff.eclair.definition.InLog;
 import ru.tinkoff.eclair.definition.MethodLog;
 import ru.tinkoff.eclair.definition.ParameterLog;
@@ -39,6 +40,7 @@ import java.util.List;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.nCopies;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.boot.logging.LogLevel.*;
@@ -367,7 +369,7 @@ public class LogInSimpleLoggerTest {
                 .parameterNames("s", "i", "dto")
                 .arguments("s", 1, new Dto())
                 .levels(DEBUG, OFF, DEBUG)
-                .printer(inLogPrinter)
+                .printers(nCopies(3, inLogPrinter))
                 .parameterLog(DEBUG, OFF, DEBUG, new JacksonPrinter(new ObjectMapper()))
                 .parameterLog(null)
                 .parameterLog(DEBUG, OFF, DEBUG, new Jaxb2Printer(marshaller))
@@ -493,7 +495,7 @@ public class LogInSimpleLoggerTest {
         private LogLevel level = DEBUG;
         private LogLevel ifEnabledLevel = OFF;
         private LogLevel verboseLevel = DEBUG;
-        private Printer printer = new ToStringPrinter();
+        private List<Printer> printers = emptyList();
         private LogLevel effectiveLevel;
         private List<String> parameterNames;
 
@@ -514,8 +516,8 @@ public class LogInSimpleLoggerTest {
             return this;
         }
 
-        private SimpleLoggerBuilder printer(Printer printer) {
-            this.printer = printer;
+        private SimpleLoggerBuilder printers(List<Printer> printers) {
+            this.printers = printers;
             return this;
         }
 
@@ -558,7 +560,7 @@ public class LogInSimpleLoggerTest {
                     .level(level)
                     .ifEnabledLevel(ifEnabledLevel)
                     .verboseLevel(verboseLevel)
-                    .printer(printer)
+                    .printers(printers.isEmpty() ? nCopies(arguments.size(), PrinterResolver.defaultPrinter) : printers)
                     .build();
             return buildAndInvokeAndGet(inLog);
         }

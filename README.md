@@ -32,7 +32,7 @@ Add this to your POM.
 
 ## Usage examples
 
-The examples assume that you are using a standard `SimpleLogger` and that you have the following configuration property: 
+The examples assume that you are using a standard `SimpleLogger` and that you have the following configuration property:
 
 ```yaml
 logging.pattern.console: '%-5level [%X] %logger{80} %msg%n'
@@ -42,7 +42,7 @@ logging.pattern.console: '%-5level [%X] %logger{80} %msg%n'
 
 ```java
 class Example {
-    
+
     /**
      * DEBUG [] ru.tinkoff.eclair.example.Example.simple > s="a", i=0, d=0.0
      * DEBUG [] ru.tinkoff.eclair.example.Example.simple < false
@@ -51,7 +51,7 @@ class Example {
     public Boolean simple(String s, Integer i, Double d) {
         return false;
     }
-    
+
     /**
      * if logger level <= DEBUG
      *
@@ -71,10 +71,10 @@ class Example {
     @Log
     public void mdcByMethod(Dto dto) {
     }
-    
+
     @Autowired
     private ManualLogger logger;
-    
+
     /**
      * if logger level <= DEBUG
      *
@@ -117,7 +117,7 @@ class Advanced {
     public void levelIfEnabledErrorEvent() {
         throw new RuntimeException("message");
     }
-    
+
     /**
      * DEBUG [] r.t.e.example.Advanced.verboseToVariousPrinters > xmlDto=<dto><i>0</i></dto>, jsonDto={"i":0,"s":null}
      */
@@ -125,7 +125,7 @@ class Advanced {
                                          @Log(printer = "json") Dto jsonDto,
                                          Integer i) {
     }
-    
+
     /**
      * if logger level <= DEBUG
      *
@@ -140,10 +140,10 @@ class Advanced {
     public void mdcByArg(@Mdc(key = "length", value = "s.length()")
                          @Mdc(key = "staticString", value = "some string", global = true) Dto dto) {
     }
-    
+
     @Autowired
     private ManualLogger logger;
-    
+
     /**
      * if logger level = DEBUG
      */
@@ -171,8 +171,17 @@ class Advanced {
 
 ## License
 
+```
 Copyright 2018 Tinkoff Bank
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-Licensed under the Apache License, Version 2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
-[https://github.com/TinkoffCreditSystems/eclair](https://github.com/TinkoffCreditSystems/eclair)
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+```

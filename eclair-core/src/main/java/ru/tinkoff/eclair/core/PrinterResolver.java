@@ -26,9 +26,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static java.lang.String.*;
+import static java.lang.String.format;
+import static java.util.Collections.nCopies;
 import static java.util.Objects.isNull;
 import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.springframework.util.StringUtils.hasText;
 
@@ -71,15 +73,27 @@ public class PrinterResolver {
                 .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    Printer resolve(String printerName, Class<?> parameterType) {
+    List<Printer> resolve(String printerName, Class<?>[] parameterTypes) {
         if (hasText(printerName)) {
-            Printer printer = printers.get(printerName);
-            return isNull(printer) ? printers.getOrDefault(aliases.get(printerName), defaultPrinter) : printer;
+            return nCopies(parameterTypes.length, resolve(printerName));
         }
+        return Stream.of(parameterTypes).map(this::resolve).collect(toList());
+    }
+
+    Printer resolve(String printerName, Class<?> parameterType) {
+        return hasText(printerName) ? resolve(printerName) : resolve(parameterType);
+    }
+
+    private Printer resolve(Class<?> parameterType) {
         return printers.values().stream()
                 .filter(item -> item.supports(parameterType))
                 .findFirst()
                 .orElse(defaultPrinter);
+    }
+
+    private Printer resolve(String printerName) {
+        Printer printer = printers.get(printerName);
+        return isNull(printer) ? printers.getOrDefault(aliases.get(printerName), defaultPrinter) : printer;
     }
 
     Map<String, Printer> getPrinters() {

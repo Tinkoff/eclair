@@ -149,6 +149,46 @@ public class PrinterResolverTest {
         assertThat(printer.print("input"), is("2"));
     }
 
+    @Test
+    public void resolveByPrinterNameAndParameterTypes() {
+        // given
+        String printerName = "two";
+        Class<?>[] parameterTypes = new Class[]{String.class, Integer.class};
+        // when
+        List<Printer> printers = printerResolver.resolve(printerName, parameterTypes);
+        // then
+        assertThat(printers, hasSize(2));
+        assertThat(printers.get(0).print("input"), is("2"));
+        assertThat(printers.get(1).print("input"), is("2"));
+    }
+
+    @Test
+    public void resolveByParameterTypes() {
+        // given
+        String printerName = "";
+        Class<?>[] parameterTypes = new Class[]{String.class, Integer.class};
+        // when
+        List<Printer> printers = printerResolver.resolve(printerName, parameterTypes);
+        // then
+        assertThat(printers, hasSize(2));
+        assertThat(printers.get(0).print("input"), is("0"));
+        assertThat(printers.get(1).print("input"), is("1"));
+    }
+
+    @Test
+    public void resolveByParameterTypesDefault() {
+        // given
+        String printerName = "";
+        Class<?>[] parameterTypes = new Class[]{String.class, Integer.class, Throwable.class};
+        // when
+        List<Printer> printers = printerResolver.resolve(printerName, parameterTypes);
+        // then
+        assertThat(printers, hasSize(3));
+        assertThat(printers.get(0).print("input"), is("0"));
+        assertThat(printers.get(1).print("input"), is("1"));
+        assertThat(printers.get(2).print("input"), is("\"input\""));
+    }
+
     @Configuration
     public static class TestConfiguration {
 

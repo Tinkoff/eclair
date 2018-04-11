@@ -18,8 +18,11 @@ package ru.tinkoff.eclair.definition;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Singular;
 import org.springframework.boot.logging.LogLevel;
 import ru.tinkoff.eclair.printer.Printer;
+
+import java.util.List;
 
 /**
  * @author Vyacheslav Klapatnyuk
@@ -38,5 +41,6 @@ public class InLog implements LogDefinition {
     private LogLevel verboseLevel;
 
     @NonNull
-    private Printer printer;
+    @Singular
+    private List<Printer> printers;
 }

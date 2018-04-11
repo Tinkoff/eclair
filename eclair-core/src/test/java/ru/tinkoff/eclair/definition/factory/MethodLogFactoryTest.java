@@ -127,7 +127,7 @@ public class MethodLogFactoryTest {
 
     private InLog givenInLog() {
         Log.in logIn = synthesizeAnnotation(Log.in.class);
-        return InLogFactory.newInstance(logIn, new ToStringPrinter());
+        return InLogFactory.newInstance(logIn, singletonList(new ToStringPrinter()));
     }
 
     private ParameterLog givenParameterLog() {

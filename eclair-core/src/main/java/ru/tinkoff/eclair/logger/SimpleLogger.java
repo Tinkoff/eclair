@@ -176,7 +176,7 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
             } else if (isParameterLogDefined) {
                 builder.append(printArgument(parameterLog.getPrinter(), argument));
             } else {
-                builder.append(printArgument(inLog.getPrinter(), argument));
+                builder.append(printArgument(inLog.getPrinters().get(a), argument));
             }
         }
 

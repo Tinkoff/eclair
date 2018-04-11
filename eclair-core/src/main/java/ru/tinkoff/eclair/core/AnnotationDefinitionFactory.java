@@ -47,16 +47,18 @@ public final class AnnotationDefinitionFactory {
     public InLog buildInLog(Set<String> loggerNames, Method method) {
         Log.in logIn = annotationExtractor.findLogIn(method, loggerNames);
         if (nonNull(logIn)) {
-            Printer printer = printerResolver.resolve(logIn.printer(), method.getReturnType());
-            return InLogFactory.newInstance(logIn, printer);
+            return buildInLog(method, logIn);
         }
         Log log = annotationExtractor.findLog(method, loggerNames);
         if (nonNull(log)) {
-            logIn = annotationExtractor.synthesizeLogIn(log);
-            Printer printer = printerResolver.resolve(logIn.printer(), method.getReturnType());
-            return InLogFactory.newInstance(logIn, printer);
+            return buildInLog(method, annotationExtractor.synthesizeLogIn(log));
         }
         return null;
+    }
+
+    private InLog buildInLog(Method method, Log.in logIn) {
+        List<Printer> printers = printerResolver.resolve(logIn.printer(), method.getParameterTypes());
+        return InLogFactory.newInstance(logIn, printers);
     }
 
     public List<ParameterLog> buildParameterLogs(Set<String> loggerNames, Method method) {
@@ -78,16 +80,18 @@ public final class AnnotationDefinitionFactory {
     public OutLog buildOutLog(Set<String> loggerNames, Method method) {
         Log.out logOut = annotationExtractor.findLogOut(method, loggerNames);
         if (nonNull(logOut)) {
-            Printer printer = printerResolver.resolve(logOut.printer(), method.getReturnType());
-            return OutLogFactory.newInstance(logOut, printer);
+            return buildOutLog(method, logOut);
         }
         Log log = annotationExtractor.findLog(method, loggerNames);
         if (nonNull(log)) {
-            Log.out syntheticLogOut = annotationExtractor.synthesizeLogOut(log);
-            Printer printer = printerResolver.resolve(syntheticLogOut.printer(), method.getReturnType());
-            return OutLogFactory.newInstance(syntheticLogOut, printer);
+            return buildOutLog(method, annotationExtractor.synthesizeLogOut(log));
         }
         return null;
+    }
+
+    private OutLog buildOutLog(Method method, Log.out logOut) {
+        Printer printer = printerResolver.resolve(logOut.printer(), method.getReturnType());
+        return OutLogFactory.newInstance(logOut, printer);
     }
 
     public Set<ErrorLog> buildErrorLogs(Set<String> loggerNames, Method method) {

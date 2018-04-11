@@ -20,17 +20,19 @@ import ru.tinkoff.eclair.core.AnnotationAttribute;
 import ru.tinkoff.eclair.definition.InLog;
 import ru.tinkoff.eclair.printer.Printer;
 
+import java.util.List;
+
 /**
  * @author Vyacheslav Klapatnyuk
  */
 public class InLogFactory {
 
-    public static InLog newInstance(Log.in logIn, Printer printer) {
+    public static InLog newInstance(Log.in logIn, List<Printer> printers) {
         return InLog.builder()
                 .level(AnnotationAttribute.LEVEL.extract(logIn))
                 .ifEnabledLevel(logIn.ifEnabled())
                 .verboseLevel(logIn.verbose())
-                .printer(printer)
+                .printers(printers)
                 .build();
     }
 }
