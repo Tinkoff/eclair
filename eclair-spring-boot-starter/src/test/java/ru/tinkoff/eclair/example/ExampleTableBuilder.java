@@ -67,7 +67,7 @@ class ExampleTableBuilder {
                 .limit(MULTI_LINE_MAX_LENGTH)
                 .collect(joining(LINE_SEPARATOR));
         if (lines.length > MULTI_LINE_MAX_LENGTH) {
-            result += LINE_SEPARATOR + "`..`";
+            result += LINE_SEPARATOR + "..";
         }
         return result;
     }
