@@ -16,6 +16,8 @@
 package ru.tinkoff.eclair.logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Getter;
+import lombok.Setter;
 import org.aopalliance.intercept.MethodInvocation;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,13 +29,14 @@ import ru.tinkoff.eclair.core.PrinterResolver;
 import ru.tinkoff.eclair.definition.InLog;
 import ru.tinkoff.eclair.definition.MethodLog;
 import ru.tinkoff.eclair.definition.ParameterLog;
-import ru.tinkoff.eclair.example.Dto;
 import ru.tinkoff.eclair.logger.facade.LoggerFacadeFactory;
 import ru.tinkoff.eclair.printer.JacksonPrinter;
 import ru.tinkoff.eclair.printer.Jaxb2Printer;
 import ru.tinkoff.eclair.printer.Printer;
 import ru.tinkoff.eclair.printer.ToStringPrinter;
 
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -596,6 +599,21 @@ public class LogInSimpleLoggerTest {
             when(methodLog.getParameterLogs()).thenReturn(parameterLogs);
             when(methodLog.getParameterNames()).thenReturn(parameterNames);
             return methodLog;
+        }
+    }
+
+    @XmlRootElement
+    @XmlType(name = "dto")
+    @Getter
+    @Setter
+    public static class Dto {
+
+        private int i;
+        private String s;
+
+        @Override
+        public String toString() {
+            return "Dto{i=" + i + ", s='" + s + "'}";
         }
     }
 }

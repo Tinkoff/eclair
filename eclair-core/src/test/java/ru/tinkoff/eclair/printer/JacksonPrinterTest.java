@@ -25,7 +25,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.junit.Before;
 import org.junit.Test;
-import ru.tinkoff.eclair.example.Dto;
 
 import javax.xml.bind.annotation.*;
 
@@ -67,9 +66,9 @@ public class JacksonPrinterTest {
         ObjectMapper objectMapper = mock(ObjectMapper.class);
         when(objectMapper.writeValueAsString(any())).thenThrow(new JsonGenerationException("", (JsonGenerator) null));
         JacksonPrinter jacksonPrinter = new JacksonPrinter(objectMapper);
-        Dto dto = new Dto();
+        String string = "string";
         // when
-        jacksonPrinter.serialize(dto);
+        jacksonPrinter.serialize(string);
         // then expected exception
     }
 

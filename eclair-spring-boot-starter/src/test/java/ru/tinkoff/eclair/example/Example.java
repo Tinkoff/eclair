@@ -537,12 +537,12 @@ class Example {
     /**
      * equals to next
      */
-    @Log.in(level = INFO, ifEnabled = WARN, verbose = ERROR, printer = "json")
-    @Log.out(level = INFO, ifEnabled = WARN, verbose = ERROR, printer = "json")
+    @Log.in(level = INFO, ifEnabled = OFF, verbose = ERROR, printer = "json")
+    @Log.out(level = INFO, ifEnabled = OFF, verbose = ERROR, printer = "json")
     public void inAndOut() {
     }
 
-    @Log(level = INFO, ifEnabled = WARN, verbose = ERROR, printer = "json")
+    @Log(level = INFO, ifEnabled = OFF, verbose = ERROR, printer = "json")
     public void logEqualsToInAndOut() {
     }
 
@@ -597,40 +597,40 @@ class Example {
     /**
      * TODO: add javadoc
      */
-    @Log(logger = "simpleLogger")
-    @Log(logger = "auditLogger")
+//    @Log(logger = "simpleLogger")
+//    @Log(logger = "auditLogger")
     public void logMultiLogger() {
     }
 
     /**
      * TODO: add javadoc
      */
-    @Log.in(logger = "simpleLogger")
-    @Log.in(logger = "auditLogger")
+//    @Log.in(logger = "simpleLogger")
+//    @Log.in(logger = "auditLogger")
     public void logInMultiLogger() {
     }
 
     /**
      * TODO: add javadoc
      */
-    @Log.out(logger = "simpleLogger")
-    @Log.out(logger = "auditLogger")
+//    @Log.out(logger = "simpleLogger")
+//    @Log.out(logger = "auditLogger")
     public void logOutMultiLogger() {
     }
 
     /**
      * TODO: add javadoc
      */
-    @Log.error(logger = "simpleLogger")
-    @Log.error(logger = "auditLogger")
+//    @Log.error(logger = "simpleLogger")
+//    @Log.error(logger = "auditLogger")
     public void logErrorMultiLogger() {
     }
 
     /**
      * TODO: add javadoc
      */
-    public void parameterLogMultiLogger(@Log(logger = "simpleLogger")
-                                  @Log(logger = "auditLogger") Dto dto) {
+    public void parameterLogMultiLogger(/*@Log(logger = "simpleLogger")
+                                  @Log(logger = "auditLogger")*/ Dto dto) {
     }
 
     /**

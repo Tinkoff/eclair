@@ -15,9 +15,6 @@
 
 package ru.tinkoff.eclair.example;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
@@ -26,18 +23,29 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlRootElement
 @XmlType(name = "dto")
-@Getter
-@Setter
 public class Dto {
 
     private int i;
     private String s;
 
+    public int getI() {
+        return i;
+    }
+
+    public void setI(int i) {
+        this.i = i;
+    }
+
+    public String getS() {
+        return s;
+    }
+
+    public void setS(String s) {
+        this.s = s;
+    }
+
     @Override
     public String toString() {
-        return "Dto{" +
-                "i=" + i +
-                ", s='" + s + '\'' +
-                '}';
+        return "Dto{i=" + i + ", s='" + s + "'}";
     }
 }

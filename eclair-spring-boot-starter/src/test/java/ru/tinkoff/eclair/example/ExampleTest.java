@@ -27,25 +27,14 @@ import org.springframework.boot.logging.LogLevel;
 import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.expression.BeanFactoryResolver;
-import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.spel.SpelCompilerMode;
-import org.springframework.expression.spel.SpelParserConfiguration;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
-import ru.tinkoff.eclair.aop.EclairProxyCreator;
-import ru.tinkoff.eclair.core.*;
+import ru.tinkoff.eclair.autoconfigure.EclairAutoConfiguration;
+import ru.tinkoff.eclair.core.LoggerNameBuilder;
 import ru.tinkoff.eclair.logger.EclairLogger;
 import ru.tinkoff.eclair.logger.SimpleLogger;
 import ru.tinkoff.eclair.logger.facade.LoggerFacadeFactory;
-import ru.tinkoff.eclair.printer.*;
-import ru.tinkoff.eclair.printer.processor.JaxbElementWrapper;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -61,7 +50,10 @@ import static org.springframework.boot.logging.LogLevel.values;
  * @author Vyacheslav Klapatnyuk
  */
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = ExampleTest.TestConfiguration.class)
+@ContextConfiguration(classes = {
+        EclairAutoConfiguration.class,
+        ExampleTest.TestConfiguration.class
+})
 public class ExampleTest {
 
     private static final LoggingSystem loggingSystem = LoggingSystem.get(ExampleTest.class.getClassLoader());
@@ -202,23 +194,10 @@ public class ExampleTest {
         }
 
         @Bean
-        @Order(0)
-        public OverriddenToStringPrinter overriddenToStringPrinter() {
-            return new OverriddenToStringPrinter();
-        }
-
-        @Bean
         public Jaxb2Marshaller jaxb2Marshaller() {
             Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
             marshaller.setClassesToBeBound(Dto.class);
             return marshaller;
-        }
-
-        @Bean
-        @Order(100)
-        public Printer jaxb2Printer(Jaxb2Marshaller jaxb2Marshaller) {
-            return new Jaxb2Printer(jaxb2Marshaller)
-                    .addPreProcessor(new JaxbElementWrapper(jaxb2Marshaller));
         }
 
         @Bean
@@ -227,45 +206,8 @@ public class ExampleTest {
         }
 
         @Bean
-        @Order(200)
-        public JacksonPrinter jacksonPrinter(ObjectMapper objectMapper) {
-            return new JacksonPrinter(objectMapper);
-        }
-
-        @Bean
-        @Order(300)
-        public ToStringPrinter toStringPrinter() {
-            return new ToStringPrinter();
-        }
-
-        @Bean
         public EclairLogger eclairLogger() {
             return new SimpleLogger(loggerFacadeFactory, LoggingSystem.get(SimpleLogger.class.getClassLoader()));
-        }
-
-        @Bean
-        public ExpressionEvaluator expressionEvaluator(GenericApplicationContext applicationContext) {
-            ExpressionParser expressionParser = new SpelExpressionParser(new SpelParserConfiguration(SpelCompilerMode.MIXED, null));
-            StandardEvaluationContext evaluationContext = new StandardEvaluationContext();
-            evaluationContext.setBeanResolver(new BeanFactoryResolver(applicationContext));
-            return new ExpressionEvaluator(expressionParser, evaluationContext);
-        }
-
-        @Bean
-        public EclairProxyCreator eclairProxyCreator(List<Printer> printerList,
-                                                     Map<String, EclairLogger> loggerMap,
-                                                     GenericApplicationContext applicationContext,
-                                                     ExpressionEvaluator expressionEvaluator) {
-            PrinterResolver printerResolver = new PrinterResolver(applicationContext, printerList);
-            AnnotationDefinitionFactory annotationDefinitionFactory = new AnnotationDefinitionFactory(printerResolver);
-            Map<String, EclairLogger> loggers = new LoggerMapSorter().sort(loggerMap);
-
-            EclairProxyCreator eclairProxyCreator =
-                    new EclairProxyCreator(applicationContext, annotationDefinitionFactory, loggers, expressionEvaluator);
-            eclairProxyCreator.setOrder(Ordered.HIGHEST_PRECEDENCE);
-            eclairProxyCreator.setFrozen(false);
-            eclairProxyCreator.setValidate(false);
-            return eclairProxyCreator;
         }
     }
 }
