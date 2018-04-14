@@ -200,10 +200,10 @@ All available log levels in order from the most common `TRACE` to the rarest `FA
 void simple() {
 }
 ```
- Enabled level      | `simple();` | `simple(new RuntimeException());`
-:-------------------|:------------|:-----
- `TRACE` `DEBUG`    | `DEBUG [] r.t.eclair.example.Example.simple >`<br>`DEBUG [] r.t.eclair.example.Example.simple <` | `some`
- `INFO` .. `OFF`    | - | -
+ Enabled level      | Log sample
+--------------------|------------
+ `TRACE` `DEBUG`    | `DEBUG [] r.t.eclair.example.Example.simple >`<br>`DEBUG [] r.t.eclair.example.Example.simple <`
+ `INFO` .. `OFF`    | -
 
 #### With thrown exception
 ```java
