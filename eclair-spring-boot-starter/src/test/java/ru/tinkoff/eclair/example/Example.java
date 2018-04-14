@@ -69,20 +69,15 @@ class Example {
     public void inOut(Dto dto, String s, Integer i) {
     }
 
+    @Log.error
+    public void error() {
+        throw new RuntimeException("Something strange happened");
+    }
+
     @Log.in(INFO)
     public void parameterLevels(@Log(INFO) Double d,
                                 @Log(DEBUG) String s,
                                 @Log(TRACE) Integer i) {
-    }
-
-    /**
-     * ERROR [] ru.tinkoff.eclair.example.Example.simpleErrorEvent ! java.lang.RuntimeException: message
-     * java.lang.RuntimeException: message
-     *     at ru.tinkoff.eclair.example.Example.simpleErrorEvent(Example.java:167)
-     */
-    @Log.error
-    public void simpleErrorEvent() {
-        throw new RuntimeException("message");
     }
 
     /**

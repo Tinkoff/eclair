@@ -304,6 +304,18 @@ void inOut(Dto dto, String s, Integer i) {
  `INFO`             | `INFO  [] r.t.eclair.example.Example.inOut >`
  `WARN` .. `OFF`    | -
 
+#### Error 
+```java
+@Log.error
+void error() {
+    throw new RuntimeException("Something strange happened");
+}
+```
+ Enabled level      | Log sample
+--------------------|------------
+ `TRACE` .. `FATAL` | `ERROR [] r.t.eclair.example.Example.error ! java.lang.RuntimeException: Something strange happened`<br>`java.lang.RuntimeException: Something strange happened`<br>`	at ru.tinkoff.eclair.example.Example.error(Example.java:74)`<br>`..`
+ `OFF`              | -
+
 #### Configured parameter levels
 ```java
 @Log.in(INFO)

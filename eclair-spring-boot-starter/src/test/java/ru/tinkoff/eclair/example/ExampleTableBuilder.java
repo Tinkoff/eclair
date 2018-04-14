@@ -21,6 +21,7 @@ import org.springframework.boot.logging.LogLevel;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.joining;
 
@@ -35,6 +36,8 @@ class ExampleTableBuilder {
      * ' `LEVEL` .. `LEVEL` '
      */
     private static final int LEVELS_CELL_WIDTH = 1 + 7 + 1 + 2 + 1 + 7 + 1;
+    private static final int MULTI_LINE_MAX_LENGTH = 3;
+    private static final String LINE_SEPARATOR = "<br>";
 
     private boolean hide = true;
     private PatternLayout patternLayout;
@@ -51,7 +54,22 @@ class ExampleTableBuilder {
         if (events.isEmpty()) {
             return "-";
         }
-        return events.stream().map(patternLayout::doLayout).map(this::asCode).collect(joining("<br>"));
+        return events.stream()
+                .map(patternLayout::doLayout)
+                .map(this::processMultiLineEventString)
+                .collect(joining(LINE_SEPARATOR));
+    }
+
+    private String processMultiLineEventString(String input) {
+        String[] lines = input.split("\\r?\\n");
+        String result = Stream.of(lines)
+                .map(this::asCode)
+                .limit(MULTI_LINE_MAX_LENGTH)
+                .collect(joining(LINE_SEPARATOR));
+        if (lines.length > MULTI_LINE_MAX_LENGTH) {
+            result += LINE_SEPARATOR + "`..`";
+        }
+        return result;
     }
 
     String buildTable(Map<String, List<LogLevel>> levels) {

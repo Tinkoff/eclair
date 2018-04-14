@@ -66,7 +66,7 @@ public class ExampleTest {
     private static final LoggerNameBuilder loggerNameBuilder = LoggerNameBuilder.getInstance();
     private static final String ROOT_LOGGER_NAME = "ru.tinkoff.eclair.example.Example";
 
-    private static final String PATTERN = "%-5level [%X] %logger{35} %msg";
+    private static final String PATTERN = "%-5level [%X] %logger{35} %msg%n";
 
     @Autowired
     private Example example;
@@ -210,6 +210,20 @@ public class ExampleTest {
                 " `INFO`             | `INFO  [] r.t.eclair.example.Example.inOut >`\n" +
                 " `WARN` .. `OFF`    | -";
         String loggerName = loggerNameBuilder.build(Example.class.getMethod("inOut", Dto.class, String.class, Integer.class));
+        String actual = exampleTableBuilder.buildTable(groupLevels(loggerName));
+        System.out.println(actual);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void error() throws NoSuchMethodException {
+        // given, when
+        forEachLevel(() -> example.error());
+        // then
+        String expected = ExampleTableBuilder.TABLE_HEADER +
+                " `TRACE` .. `FATAL` | `ERROR [] r.t.eclair.example.Example.error ! java.lang.RuntimeException: Something strange happened`<br>`java.lang.RuntimeException: Something strange happened`<br>`\tat ru.tinkoff.eclair.example.Example.error(Example.java:74)`<br>`..`\n" +
+                " `OFF`              | -";
+        String loggerName = loggerNameBuilder.build(Example.class.getMethod("error"));
         String actual = exampleTableBuilder.buildTable(groupLevels(loggerName));
         System.out.println(actual);
         assertEquals(expected, actual);
