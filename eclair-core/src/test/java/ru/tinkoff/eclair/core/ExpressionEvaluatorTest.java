@@ -28,7 +28,6 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
-import ru.tinkoff.eclair.example.Example;
 
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
@@ -167,7 +166,7 @@ public class ExpressionEvaluatorTest {
     }
 
     /**
-     * TODO: add to {@link Example}
+     * TODO: add to {@link ru.tinkoff.eclair.example.Example}
      */
     @Test
     public void evaluateToString() {

@@ -36,7 +36,10 @@ public final class LoggerNameBuilder {
     }
 
     public String build(MethodInvocation invocation) {
-        Method method = invocation.getMethod();
+        return build(invocation.getMethod());
+    }
+
+    public String build(Method method) {
         return build(method.getDeclaringClass().getName(), method.getName());
     }
 

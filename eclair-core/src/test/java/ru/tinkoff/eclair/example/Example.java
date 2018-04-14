@@ -16,66 +16,40 @@
 package ru.tinkoff.eclair.example;
 
 import org.slf4j.MDC;
-import org.springframework.beans.factory.annotation.Autowired;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.annotation.Mdc;
-import ru.tinkoff.eclair.logger.Dto;
-import ru.tinkoff.eclair.logger.ManualLogger;
 
 import java.util.Random;
-import java.util.function.Supplier;
 
 import static org.springframework.boot.logging.LogLevel.*;
 
 /**
- * Estimated configuration:
- * logging.pattern.console: '%-5level [%X] %logger{50} %msg%n'
- *
  * @author Vyacheslav Klapatnyuk
  */
 @SuppressWarnings("unused")
-public class Example {
+class Example {
 
-    /**
-     * DEBUG [] ru.tinkoff.eclair.example.Example.simple >
-     * DEBUG [] ru.tinkoff.eclair.example.Example.simple <
-     */
     @Log
     public void simple() {
     }
 
-    /**
-     * DEBUG [] ru.tinkoff.eclair.example.Example.simpleWithError >
-     * DEBUG [] ru.tinkoff.eclair.example.Example.simpleWithError !
-     */
     @Log
-    public void simpleWithError() {
+    public void simpleError() {
         throw new RuntimeException();
     }
 
-    /**
-     * if logger level = INFO
-     * INFO  [] ru.tinkoff.eclair.example.Example.level >
-     * INFO  [] ru.tinkoff.eclair.example.Example.level <
-     */
     @Log(INFO)
     public void level() {
     }
 
-    /**
-     * if logger level = INFO
-     * (nothing to log)
-     *
-     * if logger level = DEBUG
-     * INFO  [] ru.tinkoff.eclair.example.Example.levelIfEnabled >
-     * INFO  [] ru.tinkoff.eclair.example.Example.levelIfEnabled <
-     *
-     * if logger level = TRACE
-     * INFO  [] ru.tinkoff.eclair.example.Example.levelIfEnabled >
-     * INFO  [] ru.tinkoff.eclair.example.Example.levelIfEnabled <
-     */
     @Log(level = INFO, ifEnabled = DEBUG)
-    public void levelIfEnabled() {
+    public void ifEnabled() {
+    }
+
+    @Log.in(INFO)
+    public void parameterLevels(@Log(INFO) Double d,
+                                @Log(DEBUG) String s,
+                                @Log(TRACE) Integer i) {
     }
 
     /**
@@ -179,7 +153,7 @@ public class Example {
      * DEBUG [] r.t.e.e.Example.verboseDtoToXmlOrJsonOrString <
      *
      * or else Object.toString()
-     * DEBUG [] r.t.e.e.Example.verboseDtoToXmlOrJsonOrString > dto=ru.tinkoff.eclair.logger.Dto@6b884d57, i=0
+     * DEBUG [] r.t.e.e.Example.verboseDtoToXmlOrJsonOrString > dto=ru.tinkoff.eclair.example.Dto@6b884d57, i=0
      * DEBUG [] r.t.e.e.Example.verboseDtoToXmlOrJsonOrString <
      */
     @Log
@@ -315,25 +289,6 @@ public class Example {
                                          Integer i) {
     }
 
-    /**
-     * if logger level > INFO
-     * (nothing to log)
-     *
-     * else if logger level = INFO
-     * INFO  [] r.t.eclair.example.Example.inEventWithLevelVerbose > d=0.0
-     *
-     * else if logger level = DEBUG
-     * INFO  [] r.t.eclair.example.Example.inEventWithLevelVerbose > d=0.0, s="s"
-     *
-     * else if logger level = TRACE
-     * INFO  [] r.t.eclair.example.Example.inEventWithLevelVerbose > d=0.0, s="s", i=0
-     */
-    @Log.in(INFO)
-    public void inEventWithLevelVerbose(@Log(INFO) Double d,
-                                        @Log(DEBUG) String s,
-                                        @Log(TRACE) Integer i) {
-    }
-
     // TODO: add example with several mask expressions
     // TODO: add example of return value masking
 
@@ -413,46 +368,6 @@ public class Example {
                          @Mdc(key = "staticString", value = "some string", global = true) Dto dto) {
     }
 
-    /*if (annotatedElement.isParameter) {
-        // for annotated parameter
-        if (key.hasText) {
-            if (value.hasText) {
-                // key and value
-                MDC.put(key, spel(value)); // 1
-            } else {
-                // only key
-                MDC.put(key, parameter.value); // 2
-            }
-        } else if (value.hasText) {
-            // only value
-            MDC.put(parameter.name, spel(value)); // 3
-        } else {
-            // nothing
-            MDC.put(parameter.name, parameter.value); // 4
-        }
-    } else if (annotatedElement.isMethod) {
-        // for annotated method
-        if (key.hasText) {
-            if (value.hasText) {
-                // key and value
-                MDC.put(key, spel(value)); // 5
-            } else {
-                // only key
-                MDC.put(key[parameter0.name], parameter0.value); // 6
-                ..
-                MDC.put(key[parameterN.name], parameterN.value);
-            }
-        } else if (value.hasText) {
-            // only value
-            MDC.put(method.name, spel(value)); // 7
-        } else {
-            // nothing
-            MDC.put(method.name[parameter0.name], parameter0.value); // 8
-            ..
-            MDC.put(method.name[parameterN.name], parameterN.value);
-        }
-    }*/
-
     /**
      * DEBUG [parameterSKey=parameterSValue, parameterIKey=parameterIValue] ru.tinkoff.eclair.example.Example.mdc > s="s", i=0
      */
@@ -524,8 +439,8 @@ public class Example {
 
     // TODO: add example for MDC with bean referencing
 
-    @Autowired
-    private ManualLogger logger;
+//    @Autowired
+//    private ManualLogger logger;
 
     /**
      * if logger level <= DEBUG
@@ -538,8 +453,8 @@ public class Example {
     @Log
     public void manualLogging() {
         MDC.put("key", "value");
-        logger.debug("Manual logging: {}", new Random().nextDouble());
-        logger.info("Lazy manual logging: {}", (Supplier) () -> new Random().nextDouble());
+//        logger.debug("Manual logging: {}", new Random().nextDouble());
+//        logger.info("Lazy manual logging: {}", (Supplier) () -> new Random().nextDouble());
     }
 
     /**
@@ -573,7 +488,7 @@ public class Example {
         // INFO  [] r.t.eclair.example.Example.manualLevelLogging - true
         // INFO  [] r.t.eclair.example.Example.manualLevelLogging - true
         // INFO  [] r.t.eclair.example.Example.manualLevelLogging - false
-        logger.info(Boolean.toString(logger.isTraceLogEnabled()));
+        /*logger.info(Boolean.toString(logger.isTraceLogEnabled()));
         logger.info(Boolean.toString(logger.isDebugLogEnabled()));
         logger.info(Boolean.toString(logger.isInfoLogEnabled()));
         logger.info(Boolean.toString(logger.isWarnLogEnabled()));
@@ -616,7 +531,7 @@ public class Example {
         logger.errorIfTraceEnabled("errorIfTraceEnabled");
 
         // ERROR [] r.t.eclair.example.Example.manualLevelLogging - log
-        logger.log(ERROR, "log");
+        logger.log(ERROR, "log");*/
     }
 
     /**

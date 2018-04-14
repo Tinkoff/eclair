@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package ru.tinkoff.eclair.logger;
+package ru.tinkoff.eclair.example;
 
 import lombok.Getter;
 import lombok.Setter;

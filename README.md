@@ -185,3 +185,65 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ```
+
+## All examples
+
+#### Simplest
+```java
+@Log
+void simple() {
+}
+```
+Enabled level|Log sample
+---|---
+`TRACE > DEBUG`|`DEBUG [] r.t.eclair.example.Example.simple >`<br>`DEBUG [] r.t.eclair.example.Example.simple <`
+`INFO > WARN > ERROR > FATAL > OFF`|-
+
+#### With thrown exception
+```java
+@Log
+void simpleError() {
+    throw new RuntimeException();
+}
+```
+Enabled level|Log sample
+---|---
+`TRACE > DEBUG`|`DEBUG [] r.t.e.example.Example.simpleError >`<br>`DEBUG [] r.t.e.example.Example.simpleError !`
+`INFO > WARN > ERROR > FATAL > OFF`|-
+
+#### Explicit `INFO` level
+```java
+@Log(INFO)
+void level() {
+}
+```
+Enabled level|Log sample
+---|---
+`TRACE > DEBUG > INFO`|`INFO  [] r.t.eclair.example.Example.level >`<br>`INFO  [] r.t.eclair.example.Example.level <`
+`WARN > ERROR > FATAL > OFF`|-
+
+#### Log as `INFO` if enabled `DEBUG` level
+```java
+@Log(level = INFO, ifEnabled = DEBUG)
+void ifEnabled() {
+}
+```
+Enabled level|Log sample
+---|---
+`TRACE > DEBUG`|`INFO  [] r.t.e.example.Example.ifEnabled >`<br>`INFO  [] r.t.e.example.Example.ifEnabled <`
+`INFO > WARN > ERROR > FATAL > OFF`|-
+
+#### Configured parameter levels
+```java
+@Log.in(INFO)
+void parameterLevels(@Log(INFO) Double d,
+                     @Log(DEBUG) String s,
+                     @Log(TRACE) Integer i) {
+}
+```
+Enabled level|Log sample
+---|---
+`TRACE`|`INFO  [] r.t.e.e.Example.parameterLevels > d=0.0, s="s", i=0`
+`DEBUG`|`INFO  [] r.t.e.e.Example.parameterLevels > d=0.0, s="s"`
+`INFO`|`INFO  [] r.t.e.e.Example.parameterLevels > 0.0`
+`WARN > ERROR > FATAL > OFF`|-

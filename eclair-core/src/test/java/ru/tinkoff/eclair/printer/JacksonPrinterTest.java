@@ -25,7 +25,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.junit.Before;
 import org.junit.Test;
-import ru.tinkoff.eclair.logger.Dto;
+import ru.tinkoff.eclair.example.Dto;
 
 import javax.xml.bind.annotation.*;
 

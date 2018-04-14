@@ -27,6 +27,7 @@ import ru.tinkoff.eclair.core.PrinterResolver;
 import ru.tinkoff.eclair.definition.InLog;
 import ru.tinkoff.eclair.definition.MethodLog;
 import ru.tinkoff.eclair.definition.ParameterLog;
+import ru.tinkoff.eclair.example.Dto;
 import ru.tinkoff.eclair.logger.facade.LoggerFacadeFactory;
 import ru.tinkoff.eclair.printer.JacksonPrinter;
 import ru.tinkoff.eclair.printer.Jaxb2Printer;

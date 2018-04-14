@@ -107,18 +107,18 @@ public class EclairAutoConfiguration {
     public EclairProxyCreator eclairProxyCreator(List<Printer> printerList,
                                                  Map<String, EclairLogger> loggerMap,
                                                  GenericApplicationContext applicationContext,
-                                                 BeanClassValidator beanClassValidator,
-                                                 EclairProperties eclairProperties,
+//                                                 BeanClassValidator beanClassValidator,
+//                                                 EclairProperties eclairProperties,
                                                  ExpressionEvaluator expressionEvaluator) {
         PrinterResolver printerResolver = new PrinterResolver(applicationContext, printerList);
         AnnotationDefinitionFactory annotationDefinitionFactory = new AnnotationDefinitionFactory(printerResolver);
         Map<String, EclairLogger> loggers = new LoggerMapSorter().sort(loggerMap);
 
         EclairProxyCreator eclairProxyCreator =
-                new EclairProxyCreator(applicationContext, annotationDefinitionFactory, loggers, beanClassValidator, expressionEvaluator);
+                new EclairProxyCreator(applicationContext, annotationDefinitionFactory, loggers, /*beanClassValidator, */expressionEvaluator);
         eclairProxyCreator.setOrder(Ordered.HIGHEST_PRECEDENCE);
         eclairProxyCreator.setFrozen(false);
-        eclairProxyCreator.setValidate(eclairProperties.isValidate());
+//        eclairProxyCreator.setValidate(eclairProperties.isValidate());
         return eclairProxyCreator;
     }
 }
