@@ -196,8 +196,8 @@ void simple() {
 ```
 Enabled level|Log sample
 ---|---
-`TRACE > DEBUG`|`DEBUG [] r.t.eclair.example.Example.simple >`<br>`DEBUG [] r.t.eclair.example.Example.simple <`
-`INFO > WARN > ERROR > FATAL > OFF`|-
+`TRACE` > `DEBUG`|`DEBUG [] r.t.eclair.example.Example.simple >`<br>`DEBUG [] r.t.eclair.example.Example.simple <`
+`INFO` > `WARN` > `ERROR` > `FATAL` > `OFF`|-
 
 #### With thrown exception
 ```java
@@ -209,7 +209,7 @@ void simpleError() {
 Enabled level|Log sample
 ---|---
 `TRACE > DEBUG`|`DEBUG [] r.t.e.example.Example.simpleError >`<br>`DEBUG [] r.t.e.example.Example.simpleError !`
-`INFO > WARN > ERROR > FATAL > OFF`|-
+`INFO` > .. > `OFF`|-
 
 #### Explicit `INFO` level
 ```java

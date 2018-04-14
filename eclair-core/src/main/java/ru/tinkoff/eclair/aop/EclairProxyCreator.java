@@ -107,12 +107,11 @@ public class EclairProxyCreator extends AbstractAutoProxyCreator {
         return composedAdvisors.length == 0 ? AbstractAutoProxyCreator.DO_NOT_PROXY : composedAdvisors;
     }
 
-    public boolean supports(Class<?> clazz) {
+    private boolean supports(Class<?> clazz) {
         return annotationExtractor.getCandidateMethods(clazz).stream()
                 .anyMatch(method ->
                         annotationExtractor.hasAnyAnnotation(method) ||
                                 Stream.of(method.getParameters()).anyMatch(annotationExtractor::hasAnyAnnotation)
-
                 );
     }
 
