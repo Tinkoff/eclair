@@ -221,9 +221,23 @@ public class ExampleTest {
         forEachLevel(() -> example.error());
         // then
         String expected = ExampleTableBuilder.TABLE_HEADER +
+                " `TRACE` `DEBUG`    | `WARN  [] r.t.e.e.Example.warningOnDebug ! java.lang.RuntimeException: Something strange happened, but it doesn't matter`<br>`java.lang.RuntimeException: Something strange happened, but it doesn't matter`<br>`\tat ru.tinkoff.eclair.example.Example.warningOnDebug(Example.java:79)`<br>..\n" +
+                " `INFO` .. `OFF`    | -";
+        String loggerName = loggerNameBuilder.build(Example.class.getMethod("error"));
+        String actual = exampleTableBuilder.buildTable(groupLevels(loggerName));
+        System.out.println(actual);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void warningOnDebug() throws NoSuchMethodException {
+        // given, when
+        forEachLevel(() -> example.warningOnDebug());
+        // then
+        String expected = ExampleTableBuilder.TABLE_HEADER +
                 " `TRACE` .. `FATAL` | `ERROR [] r.t.eclair.example.Example.error ! java.lang.RuntimeException: Something strange happened`<br>`java.lang.RuntimeException: Something strange happened`<br>`\tat ru.tinkoff.eclair.example.Example.error(Example.java:74)`<br>..\n" +
                 " `OFF`              | -";
-        String loggerName = loggerNameBuilder.build(Example.class.getMethod("error"));
+        String loggerName = loggerNameBuilder.build(Example.class.getMethod("warningOnDebug"));
         String actual = exampleTableBuilder.buildTable(groupLevels(loggerName));
         System.out.println(actual);
         assertEquals(expected, actual);

@@ -19,8 +19,6 @@ import org.slf4j.MDC;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.annotation.Mdc;
 
-import java.util.Random;
-
 import static org.springframework.boot.logging.LogLevel.*;
 
 /**
@@ -74,75 +72,21 @@ class Example {
         throw new RuntimeException("Something strange happened");
     }
 
+    @Log.error(level = WARN, ifEnabled = DEBUG)
+    public void warningOnDebug() {
+        throw new RuntimeException("Something strange happened, but it doesn't matter");
+    }
+
     @Log.in(INFO)
     public void parameterLevels(@Log(INFO) Double d,
                                 @Log(DEBUG) String s,
                                 @Log(TRACE) Integer i) {
     }
 
-    /**
-     * WARN  [] ru.tinkoff.eclair.example.Example.levelErrorEvent ! java.lang.RuntimeException: message
-     * java.lang.RuntimeException: message
-     *     at ru.tinkoff.eclair.example.Example.levelErrorEvent(Example.java:167)
-     */
-    @Log.error(WARN)
-    public void levelErrorEvent() {
-        throw new RuntimeException("message");
-    }
-
-    /**
-     * if logger level = DEBUG
-     * WARN  [] r.t.e.example.Example.levelIfEnabledErrorEvent ! java.lang.RuntimeException: message
-     * java.lang.RuntimeException: message
-     *     at r.t.e.example.Example.levelIfEnabledErrorEvent(Example.java:167)
-     *
-     * if logger level = INFO
-     * (nothing to log)
-     */
-    @Log.error(ifEnabled = DEBUG)
-    public void levelIfEnabledErrorEvent() {
-        throw new RuntimeException("message");
-    }
-
-    /**
-     * ERROR [] r.tinkoff.eclair.example.Example.verboseErrorEvent ! java.lang.RuntimeException: runtimeException
-     * java.lang.RuntimeException: runtimeException
-     *     at r.tinkoff.eclair.example.Example.verboseErrorEvent(Example.java:167)
-     *
-     * or else
-     * WARN  [] r.tinkoff.eclair.example.Example.verboseErrorEvent ! java.lang.NullPointerException: nullPointerException
-     * java.lang.NullPointerException: nullPointerException
-     *     at r.tinkoff.eclair.example.Example.verboseErrorEvent(Example.java:167)
-     *
-     * or else
-     * (nothing to log)
-     */
-    @Log.error(ofType = RuntimeException.class)
-    @Log.error(level = WARN, ofType = NullPointerException.class)
-    public void verboseErrorEvent() throws Exception {
-        if (new Random().nextBoolean()) {
-            throw new RuntimeException("runtimeException");
-        }
-        if (new Random().nextBoolean()) {
-            throw new NullPointerException("nullPointerException");
-        }
-        throw new Exception();
-    }
-
-    /**
-     * ERROR [] r.t.e.e.Example.verboseWithExcludesErrorEvent ! java.lang.RuntimeException: runtimeException
-     * java.lang.RuntimeException: runtimeException
-     *     at r.t.e.e.Example.verboseWithExcludesErrorEvent(Example.java:167)
-     *
-     * or else
-     * (nothing to log)
-     */
-    @Log.error(ofType = RuntimeException.class, exclude = {IllegalArgumentException.class, NullPointerException.class})
-    public void verboseWithExcludesErrorEvent() {
-        if (new Random().nextBoolean()) {
-            throw new RuntimeException("runtimeException");
-        }
-        throw new IllegalArgumentException("message");
+    @Log.error(level = WARN, ofType = {NullPointerException.class, IndexOutOfBoundsException.class})
+    @Log.error(exclude = Error.class)
+    public void filterErrorsNpe(Throwable e) throws Throwable {
+        throw e;
     }
 
     /**

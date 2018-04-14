@@ -200,10 +200,10 @@ All available log levels in order from the most common `TRACE` to the rarest `FA
 void simple() {
 }
 ```
- Enabled level      | Log sample
---------------------|------------
- `TRACE` `DEBUG`    | `DEBUG [] r.t.eclair.example.Example.simple >`<br>`DEBUG [] r.t.eclair.example.Example.simple <`
- `INFO` .. `OFF`    | -
+ Enabled level      | `simple();` | `simple(new RuntimeException());`
+:-------------------|:------------|:-----
+ `TRACE` `DEBUG`    | `DEBUG [] r.t.eclair.example.Example.simple >`<br>`DEBUG [] r.t.eclair.example.Example.simple <` | `some`
+ `INFO` .. `OFF`    | - | -
 
 #### With thrown exception
 ```java
@@ -292,8 +292,8 @@ void verboseXml(Dto dto, Integer i) {
 #### Separate `in` and `out` events 
 Logging of `in` and `out` events could be declared separately with own settings.
 ```java
-@Log.in(level = INFO)
-@Log.out
+@Log.in(INFO)
+@Log.out(TRACE)
 void inOut(Dto dto, String s, Integer i) {
 }
 ```
@@ -304,7 +304,8 @@ void inOut(Dto dto, String s, Integer i) {
  `INFO`             | `INFO  [] r.t.eclair.example.Example.inOut >`
  `WARN` .. `OFF`    | -
 
-#### Error 
+#### Error
+Errors logged on `ERROR` level by default. So it is visible for all levels except `OFF`. 
 ```java
 @Log.error
 void error() {
@@ -315,6 +316,19 @@ void error() {
 --------------------|------------
  `TRACE` .. `FATAL` | `ERROR [] r.t.eclair.example.Example.error ! java.lang.RuntimeException: Something strange happened`<br>`java.lang.RuntimeException: Something strange happened`<br>`	at ru.tinkoff.eclair.example.Example.error(Example.java:74)`<br>..
  `OFF`              | -
+
+#### Warning on `DEBUG`
+You may want to log minor error, if enabled `DEBUG` level. 
+```java
+@Log.error(level = WARN, ifEnabled = DEBUG)
+void warningOnDebug() {
+    throw new RuntimeException("Something strange happened, but it doesn't matter");
+}
+```
+ Enabled level      | Log sample
+--------------------|------------
+ `TRACE` `DEBUG`    | `WARN  [] r.t.e.e.Example.warningOnDebug ! java.lang.RuntimeException: Something strange happened, but it doesn't matter`<br>`java.lang.RuntimeException: Something strange happened, but it doesn't matter`<br>`	at ru.tinkoff.eclair.example.Example.warningOnDebug(Example.java:79)`<br>..
+ `INFO` .. `OFF`    | -
 
 #### Configured parameter levels
 ```java
