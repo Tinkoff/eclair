@@ -46,152 +46,33 @@ class Example {
     public void ifEnabled() {
     }
 
+    @Log(INFO)
+    public boolean verboseLevel(String s, Integer i, Double d) {
+        return false;
+    }
+
+    @Log(verbose = OFF)
+    public boolean verboseDisabled(String s, Integer i, Double d) {
+        return false;
+    }
+
+    @Log(printer = "jacksonPrinter")
+    public void verboseJson(Dto dto, Integer i) {
+    }
+
+    @Log(printer = "jaxb2Printer")
+    public void verboseXml(Dto dto, Integer i) {
+    }
+
+    @Log.in(INFO)
+    @Log.out(TRACE)
+    public void inOut(Dto dto, String s, Integer i) {
+    }
+
     @Log.in(INFO)
     public void parameterLevels(@Log(INFO) Double d,
                                 @Log(DEBUG) String s,
                                 @Log(TRACE) Integer i) {
-    }
-
-    /**
-     * if logger level = INFO
-     * INFO  [] ru.tinkoff.eclair.example.Example.levelWithError >
-     * INFO  [] ru.tinkoff.eclair.example.Example.levelWithError !
-     */
-    @Log(INFO)
-    public void levelWithError() {
-        throw new RuntimeException();
-    }
-
-    /**
-     * if logger level = DEBUG
-     * INFO  [] ru.tinkoff.eclair.example.Example.verboseLevel > s="a", i=0, d=0.0
-     * INFO  [] ru.tinkoff.eclair.example.Example.verboseLevel < false
-     *
-     * else if logger level = INFO
-     * INFO  [] ru.tinkoff.eclair.example.Example.verboseLevel >
-     * INFO  [] ru.tinkoff.eclair.example.Example.verboseLevel <
-     */
-    @Log(INFO)
-    public Boolean verboseLevel(String s, Integer i, Double d) {
-        return false;
-    }
-
-    /**
-     * if logger level = TRACE
-     * TRACE [] ru.tinkoff.eclair.example.Example.verboseLowest > s="a", i=0, d=0.0
-     * TRACE [] ru.tinkoff.eclair.example.Example.verboseLowest < false
-     *
-     * for any other logger level
-     * TRACE [] ru.tinkoff.eclair.example.Example.verboseLowest >
-     * TRACE [] ru.tinkoff.eclair.example.Example.verboseLowest <
-     */
-    @Log(level = TRACE, verbose = TRACE)
-    public Boolean verboseLowest(String s, Integer i, Double d) {
-        return false;
-    }
-
-    /**
-     * for any logger level
-     * DEBUG [] ru.tinkoff.eclair.example.Example.verboseHighest > s="a", i=0, d=0.0
-     * DEBUG [] ru.tinkoff.eclair.example.Example.verboseHighest < false
-     */
-    @Log(verbose = OFF)
-    public Boolean verboseHighest(String s, Integer i, Double d) {
-        return false;
-    }
-
-    /**
-     * if logger level <= DEBUG
-     * DEBUG [] ru.tinkoff.eclair.example.Example.verboseWithError > s="a", i=0, d=0.0
-     * DEBUG [] ru.tinkoff.eclair.example.Example.verboseWithError !
-     */
-    @Log
-    public Boolean verboseWithError(String s, Integer i, Double d) {
-        throw new RuntimeException();
-    }
-
-    /**
-     * if logger level <= DEBUG
-     * DEBUG [] r.t.eclair.example.Example.verboseDtoToString > dto=Dto{i=0, s='null'}, i=0
-     * DEBUG [] r.t.eclair.example.Example.verboseDtoToString <
-     */
-    @Log
-    public void verboseDtoToString(Dto dto, Integer i) {
-    }
-
-    /**
-     * if logger level <= DEBUG
-     * DEBUG [] ru.tinkoff.eclair.example.Example.verboseDtoToJson > dto={"i":0,"s":null}, i=0
-     * DEBUG [] ru.tinkoff.eclair.example.Example.verboseDtoToJson <
-     */
-    @Log(printer = "json")
-    public void verboseDtoToJson(Dto dto, Integer i) {
-    }
-
-    /**
-     * if logger level <= DEBUG
-     * DEBUG [] ru.tinkoff.eclair.example.Example.verboseDtoToXml > dto=<dto><i>0</i></dto>, i=0
-     * DEBUG [] ru.tinkoff.eclair.example.Example.verboseDtoToXml <
-     */
-    @Log(printer = "xml")
-    public void verboseDtoToXml(Dto dto, Integer i) {
-    }
-
-    /**
-     * if logger level <= DEBUG && applied auto-configuration
-     *
-     * has overridden toString()
-     * DEBUG [] r.t.e.e.Example.verboseDtoToXmlOrJsonOrString > dto=Dto{i=0, s='null'}, i=0
-     * DEBUG [] r.t.e.e.Example.verboseDtoToXmlOrJsonOrString <
-     *
-     * or else "xml"
-     * DEBUG [] r.t.e.e.Example.verboseDtoToXmlOrJsonOrString > dto=<dto><i>0</i></dto>, i=0
-     * DEBUG [] r.t.e.e.Example.verboseDtoToXmlOrJsonOrString <
-     *
-     * or else "json"
-     * DEBUG [] r.t.e.e.Example.verboseDtoToXmlOrJsonOrString > dto={"i":0,"s":null}, i=0
-     * DEBUG [] r.t.e.e.Example.verboseDtoToXmlOrJsonOrString <
-     *
-     * or else Object.toString()
-     * DEBUG [] r.t.e.e.Example.verboseDtoToXmlOrJsonOrString > dto=ru.tinkoff.eclair.example.Dto@6b884d57, i=0
-     * DEBUG [] r.t.e.e.Example.verboseDtoToXmlOrJsonOrString <
-     */
-    @Log
-    public void verboseDtoToXmlOrJsonOrString(Dto dto, Integer i) {
-    }
-
-    // TODO: add example for @Log.error#verbose()
-
-    /**
-     * if logger level <= DEBUG
-     * DEBUG [] ru.tinkoff.eclair.example.Example.simpleInEvent >
-     */
-    @Log.in
-    public void simpleInEvent() {
-    }
-
-    /**
-     * if logger level <= DEBUG
-     * INFO  [] ru.tinkoff.eclair.example.Example.inEvent > dto={"i":0,"s":null}, s=null, i=0
-     */
-    @Log.in(level = INFO, printer = "json")
-    public void inEvent(Dto dto, String s, Integer i) {
-    }
-
-    /**
-     * if logger level <= DEBUG
-     * DEBUG [] ru.tinkoff.eclair.example.Example.simpleOutEvent <
-     */
-    @Log.out
-    public void simpleOutEvent() {
-    }
-
-    /**
-     * if logger level <= DEBUG
-     * INFO  [] ru.tinkoff.eclair.example.Example.outEvent <
-     */
-    @Log.out(INFO)
-    public void outEvent(Dto dto, String s, Integer i) {
     }
 
     /**

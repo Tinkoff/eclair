@@ -36,11 +36,13 @@ import ru.tinkoff.eclair.logger.EclairLogger;
 import ru.tinkoff.eclair.logger.SimpleLogger;
 import ru.tinkoff.eclair.logger.facade.LoggerFacadeFactory;
 
+import javax.xml.bind.Marshaller;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static java.util.Collections.singletonMap;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.*;
 import static org.junit.Assert.assertEquals;
@@ -51,8 +53,8 @@ import static org.springframework.boot.logging.LogLevel.values;
  */
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = {
-        EclairAutoConfiguration.class,
-        ExampleTest.TestConfiguration.class
+        ExampleTest.TestConfiguration.class,
+        EclairAutoConfiguration.class
 })
 public class ExampleTest {
 
@@ -141,9 +143,81 @@ public class ExampleTest {
     }
 
     @Test
+    public void verboseLevel() throws NoSuchMethodException {
+        // given, when
+        forEachLevel(() -> example.verboseLevel("s", 4, 5.6));
+        // then
+        String expected = ExampleTableBuilder.TABLE_HEADER +
+                "`TRACE` `DEBUG`|`INFO  [] r.t.e.example.Example.verboseLevel > s=\"s\", i=4, d=5.6`<br>`INFO  [] r.t.e.example.Example.verboseLevel < false`\n" +
+                "`INFO`|`INFO  [] r.t.e.example.Example.verboseLevel >`<br>`INFO  [] r.t.e.example.Example.verboseLevel <`\n" +
+                "`WARN` .. `OFF`|-";
+        String loggerName = loggerNameBuilder.build(Example.class.getMethod("verboseLevel", String.class, Integer.class, Double.class));
+        String actual = exampleTableBuilder.buildTable(groupLevels(loggerName));
+        System.out.println(actual);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void verboseDisabled() throws NoSuchMethodException {
+        // given, when
+        forEachLevel(() -> example.verboseDisabled("s", 4, 5.6));
+        // then
+        String expected = ExampleTableBuilder.TABLE_HEADER +
+                "`TRACE` `DEBUG`|`DEBUG [] r.t.e.e.Example.verboseDisabled >`<br>`DEBUG [] r.t.e.e.Example.verboseDisabled <`\n" +
+                "`INFO` .. `OFF`|-";
+        String loggerName = loggerNameBuilder.build(Example.class.getMethod("verboseDisabled", String.class, Integer.class, Double.class));
+        String actual = exampleTableBuilder.buildTable(groupLevels(loggerName));
+        System.out.println(actual);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void verboseJson() throws NoSuchMethodException {
+        // given, when
+        forEachLevel(() -> example.verboseJson(new Dto(), 8));
+        // then
+        String expected = ExampleTableBuilder.TABLE_HEADER +
+                "`TRACE` `DEBUG`|`DEBUG [] r.t.e.example.Example.verboseJson > dto={\"i\":0,\"s\":null}, i=8`<br>`DEBUG [] r.t.e.example.Example.verboseJson <`\n" +
+                "`INFO` .. `OFF`|-";
+        String loggerName = loggerNameBuilder.build(Example.class.getMethod("verboseJson", Dto.class, Integer.class));
+        String actual = exampleTableBuilder.buildTable(groupLevels(loggerName));
+        System.out.println(actual);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void verboseXml() throws NoSuchMethodException {
+        // given, when
+        forEachLevel(() -> example.verboseXml(new Dto(), 7));
+        // then
+        String expected = ExampleTableBuilder.TABLE_HEADER +
+                "`TRACE` `DEBUG`|`DEBUG [] r.t.e.example.Example.verboseXml > dto=<dto><i>0</i></dto>, i=7`<br>`DEBUG [] r.t.e.example.Example.verboseXml <`\n" +
+                "`INFO` .. `OFF`|-";
+        String loggerName = loggerNameBuilder.build(Example.class.getMethod("verboseXml", Dto.class, Integer.class));
+        String actual = exampleTableBuilder.buildTable(groupLevels(loggerName));
+        System.out.println(actual);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void inOut() throws NoSuchMethodException {
+        // given, when
+        forEachLevel(() -> example.inOut(new Dto(), "s", 3));
+        // then
+        String expected = ExampleTableBuilder.TABLE_HEADER +
+                "`TRACE`|`INFO  [] r.t.eclair.example.Example.inOut > dto=Dto{i=0, s='null'}, s=\"s\", i=3`<br>`TRACE [] r.t.eclair.example.Example.inOut <`\n" +
+                "`DEBUG`|`INFO  [] r.t.eclair.example.Example.inOut > dto=Dto{i=0, s='null'}, s=\"s\", i=3`\n" +
+                "`INFO`|`INFO  [] r.t.eclair.example.Example.inOut >`\n" +
+                "`WARN` .. `OFF`|-";
+        String loggerName = loggerNameBuilder.build(Example.class.getMethod("inOut", Dto.class, String.class, Integer.class));
+        String actual = exampleTableBuilder.buildTable(groupLevels(loggerName));
+        System.out.println(actual);
+        assertEquals(expected, actual);
+    }
+
+    @Test
     public void parameterLevels() throws NoSuchMethodException {
-        // given
-        // when
+        // given, when
         forEachLevel(() -> example.parameterLevels(0.0, "s", 0));
         // then
         String expected = ExampleTableBuilder.TABLE_HEADER +
@@ -197,6 +271,7 @@ public class ExampleTest {
         public Jaxb2Marshaller jaxb2Marshaller() {
             Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
             marshaller.setClassesToBeBound(Dto.class);
+            marshaller.setMarshallerProperties(singletonMap(Marshaller.JAXB_FRAGMENT, true));
             return marshaller;
         }
 

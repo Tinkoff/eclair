@@ -239,6 +239,71 @@ Enabled level|Log sample
 `TRACE` `DEBUG`|`INFO  [] r.t.e.example.Example.ifEnabled >`<br>`INFO  [] r.t.e.example.Example.ifEnabled <`
 `INFO` .. `OFF`|-
 
+#### Influence of configured level to verbosity
+```java
+@Log(INFO)
+boolean verboseLevel(String s, Integer i, Double d) {
+    return false;
+}
+```
+Enabled level|Log sample
+---|---
+`TRACE` `DEBUG`|`INFO  [] r.t.e.example.Example.verboseLevel > s="s", i=4, d=5.6`<br>`INFO  [] r.t.e.example.Example.verboseLevel < false`
+`INFO`|`INFO  [] r.t.e.example.Example.verboseLevel >`<br>`INFO  [] r.t.e.example.Example.verboseLevel <`
+`WARN` .. `OFF`|-
+
+#### Verbosity disabled
+Parameters / return value not printed for any level.
+```java
+@Log(verbose = OFF)
+boolean verboseDisabled(String s, Integer i, Double d) {
+    return false;
+}
+```
+Enabled level|Log sample
+---|---
+`TRACE` `DEBUG`|`DEBUG [] r.t.e.e.Example.verboseDisabled >`<br>`DEBUG [] r.t.e.e.Example.verboseDisabled <`
+`INFO` .. `OFF`|-
+
+#### Try to print arguments by `JacksonPrinter` as `JSON`
+You can specify printer's bean name or alias. Arguments / return values will be serialized with `#toString()` invocation by default. 
+```java
+@Log(printer = "jacksonPrinter")
+void verboseJson(Dto dto, Integer i) {
+}
+```
+Enabled level|Log sample
+---|---
+`TRACE` `DEBUG`|`DEBUG [] r.t.e.example.Example.verboseJson > dto={"i":0,"s":null}, i=8`<br>`DEBUG [] r.t.e.example.Example.verboseJson <`
+`INFO` .. `OFF`|-
+
+#### Try to print arguments by `Jaxb2Printer` as `XML`
+You can specify printer's bean name or alias.
+```java
+@Log(printer = "jaxb2Printer")
+void verboseXml(Dto dto, Integer i) {
+}
+```
+Enabled level|Log sample
+---|---
+`TRACE` `DEBUG`|`DEBUG [] r.t.e.example.Example.verboseXml > dto=<dto><i>0</i></dto>, i=7`<br>`DEBUG [] r.t.e.example.Example.verboseXml <`
+`INFO` .. `OFF`|-
+
+#### Separate `in` and `out` events 
+Logging of `in` and `out` events could be declared separately with own settings.
+```java
+@Log.in(level = INFO)
+@Log.out
+void inOut(Dto dto, String s, Integer i) {
+}
+```
+Enabled level|Log sample
+---|---
+`TRACE`|`INFO  [] r.t.eclair.example.Example.inOut > dto=Dto{i=0, s='null'}, s="s", i=3`<br>`TRACE [] r.t.eclair.example.Example.inOut <`
+`DEBUG`|`INFO  [] r.t.eclair.example.Example.inOut > dto=Dto{i=0, s='null'}, s="s", i=3`
+`INFO`|`INFO  [] r.t.eclair.example.Example.inOut >`
+`WARN` .. `OFF`|-
+
 #### Configured parameter levels
 ```java
 @Log.in(INFO)

@@ -47,8 +47,9 @@ public abstract class Printer {
 
     /**
      * @param input never {@code null}
+     * @throws RuntimeException Any thrown exceptions should be handled by invoker.
      */
-    public String print(Object input) {
+    public String print(Object input) throws RuntimeException {
         for (PrinterPreProcessor preProcessor : preProcessors) {
             input = preProcessor.process(input);
         }
@@ -61,6 +62,8 @@ public abstract class Printer {
 
     /**
      * TODO: parameterize?
+     *
+     * @throws RuntimeException Any thrown exceptions should be handled by invoker.
      */
-    protected abstract String serialize(Object input);
+    protected abstract String serialize(Object input) throws RuntimeException;
 }
