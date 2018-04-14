@@ -219,8 +219,8 @@ void level() {
 ```
 Enabled level|Log sample
 ---|---
-`TRACE > DEBUG > INFO`|`INFO  [] r.t.eclair.example.Example.level >`<br>`INFO  [] r.t.eclair.example.Example.level <`
-`WARN > ERROR > FATAL > OFF`|-
+`TRACE` `DEBUG` `INFO`|`INFO  [] r.t.eclair.example.Example.level >`<br>`INFO  [] r.t.eclair.example.Example.level <`
+`WARN` .. `OFF`|-
 
 #### Log as `INFO` if enabled `DEBUG` level
 ```java
