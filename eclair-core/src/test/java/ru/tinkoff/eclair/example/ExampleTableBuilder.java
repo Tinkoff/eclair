@@ -31,17 +31,22 @@ class ExampleTableBuilder {
 
     static final String TABLE_HEADER = "Enabled level|Log sample\n---|---\n";
 
+    private boolean hide = true;
     private PatternLayout patternLayout;
 
     void setPatternLayout(PatternLayout patternLayout) {
         this.patternLayout = patternLayout;
     }
 
+    public void setHide(boolean hide) {
+        this.hide = hide;
+    }
+
     String buildSampleCell(List<ILoggingEvent> events) {
         if (events.isEmpty()) {
             return "-";
         }
-        return events.stream().map(patternLayout::doLayout).map(s -> '`' + s + '`').collect(joining("<br>"));
+        return events.stream().map(patternLayout::doLayout).map(this::asCode).collect(joining("<br>"));
     }
 
     String buildTable(Map<String, List<LogLevel>> levels) {
@@ -56,6 +61,13 @@ class ExampleTableBuilder {
     }
 
     private String buildLevelsCell(List<LogLevel> logLevels) {
-        return '`' + logLevels.stream().map(Enum::name).collect(joining(" > ")) + '`';
+        if (hide && logLevels.size() > 2) {
+            return asCode(logLevels.get(0).name()) + " .. " + asCode(logLevels.get(logLevels.size() - 1).name());
+        }
+        return logLevels.stream().map(Enum::name).map(this::asCode).collect(joining(" "));
+    }
+
+    private String asCode(String input) {
+        return '`' + input + '`';
     }
 }

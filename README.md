@@ -196,8 +196,8 @@ void simple() {
 ```
 Enabled level|Log sample
 ---|---
-`TRACE` > `DEBUG`|`DEBUG [] r.t.eclair.example.Example.simple >`<br>`DEBUG [] r.t.eclair.example.Example.simple <`
-`INFO` > `WARN` > `ERROR` > `FATAL` > `OFF`|-
+`TRACE` `DEBUG`|`DEBUG [] r.t.eclair.example.Example.simple >`<br>`DEBUG [] r.t.eclair.example.Example.simple <`
+`INFO` .. `OFF`|-
 
 #### With thrown exception
 ```java
@@ -208,8 +208,8 @@ void simpleError() {
 ```
 Enabled level|Log sample
 ---|---
-`TRACE > DEBUG`|`DEBUG [] r.t.e.example.Example.simpleError >`<br>`DEBUG [] r.t.e.example.Example.simpleError !`
-`INFO` > .. > `OFF`|-
+`TRACE` `DEBUG`|`DEBUG [] r.t.e.example.Example.simpleError >`<br>`DEBUG [] r.t.e.example.Example.simpleError !`
+`INFO` .. `OFF`|-
 
 #### Explicit `INFO` level
 ```java
@@ -219,7 +219,7 @@ void level() {
 ```
 Enabled level|Log sample
 ---|---
-`TRACE` `DEBUG` `INFO`|`INFO  [] r.t.eclair.example.Example.level >`<br>`INFO  [] r.t.eclair.example.Example.level <`
+`TRACE` .. `INFO`|`INFO  [] r.t.eclair.example.Example.level >`<br>`INFO  [] r.t.eclair.example.Example.level <`
 `WARN` .. `OFF`|-
 
 #### Log as `INFO` if enabled `DEBUG` level
@@ -230,8 +230,8 @@ void ifEnabled() {
 ```
 Enabled level|Log sample
 ---|---
-`TRACE > DEBUG`|`INFO  [] r.t.e.example.Example.ifEnabled >`<br>`INFO  [] r.t.e.example.Example.ifEnabled <`
-`INFO > WARN > ERROR > FATAL > OFF`|-
+`TRACE` `DEBUG`|`INFO  [] r.t.e.example.Example.ifEnabled >`<br>`INFO  [] r.t.e.example.Example.ifEnabled <`
+`INFO` .. `OFF`|-
 
 #### Configured parameter levels
 ```java
@@ -246,4 +246,4 @@ Enabled level|Log sample
 `TRACE`|`INFO  [] r.t.e.e.Example.parameterLevels > d=0.0, s="s", i=0`
 `DEBUG`|`INFO  [] r.t.e.e.Example.parameterLevels > d=0.0, s="s"`
 `INFO`|`INFO  [] r.t.e.e.Example.parameterLevels > 0.0`
-`WARN > ERROR > FATAL > OFF`|-
+`WARN` .. `OFF`|-

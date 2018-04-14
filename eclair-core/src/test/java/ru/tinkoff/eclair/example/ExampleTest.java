@@ -95,8 +95,8 @@ public class ExampleTest {
         forEachLevel(() -> example.simple());
         // then
         String expected = ExampleTableBuilder.TABLE_HEADER +
-                "`TRACE > DEBUG`|`DEBUG [] r.t.eclair.example.Example.simple >`<br>`DEBUG [] r.t.eclair.example.Example.simple <`\n" +
-                "`INFO > WARN > ERROR > FATAL > OFF`|-";
+                "`TRACE` `DEBUG`|`DEBUG [] r.t.eclair.example.Example.simple >`<br>`DEBUG [] r.t.eclair.example.Example.simple <`\n" +
+                "`INFO` .. `OFF`|-";
         String loggerName = loggerNameBuilder.build(Example.class.getMethod("simple"));
         String actual = exampleTableBuilder.buildTable(groupLevels(loggerName));
         System.out.println(actual);
@@ -110,8 +110,8 @@ public class ExampleTest {
         forEachLevel(() -> example.simpleError());
         // then
         String expected = ExampleTableBuilder.TABLE_HEADER +
-                "`TRACE > DEBUG`|`DEBUG [] r.t.e.example.Example.simpleError >`<br>`DEBUG [] r.t.e.example.Example.simpleError !`\n" +
-                "`INFO > WARN > ERROR > FATAL > OFF`|-";
+                "`TRACE` `DEBUG`|`DEBUG [] r.t.e.example.Example.simpleError >`<br>`DEBUG [] r.t.e.example.Example.simpleError !`\n" +
+                "`INFO` .. `OFF`|-";
         String loggerName = loggerNameBuilder.build(Example.class.getMethod("simpleError"));
         String actual = exampleTableBuilder.buildTable(groupLevels(loggerName));
         System.out.println(actual);
@@ -125,8 +125,8 @@ public class ExampleTest {
         forEachLevel(() -> example.level());
         // then
         String expected = ExampleTableBuilder.TABLE_HEADER +
-                "`TRACE > DEBUG > INFO`|`INFO  [] r.t.eclair.example.Example.level >`<br>`INFO  [] r.t.eclair.example.Example.level <`\n" +
-                "`WARN > ERROR > FATAL > OFF`|-";
+                "`TRACE` .. `INFO`|`INFO  [] r.t.eclair.example.Example.level >`<br>`INFO  [] r.t.eclair.example.Example.level <`\n" +
+                "`WARN` .. `OFF`|-";
         String loggerName = loggerNameBuilder.build(Example.class.getMethod("level"));
         String actual = exampleTableBuilder.buildTable(groupLevels(loggerName));
         System.out.println(actual);
@@ -140,8 +140,8 @@ public class ExampleTest {
         forEachLevel(() -> example.ifEnabled());
         // then
         String expected = ExampleTableBuilder.TABLE_HEADER +
-                "`TRACE > DEBUG`|`INFO  [] r.t.e.example.Example.ifEnabled >`<br>`INFO  [] r.t.e.example.Example.ifEnabled <`\n" +
-                "`INFO > WARN > ERROR > FATAL > OFF`|-";
+                "`TRACE` `DEBUG`|`INFO  [] r.t.e.example.Example.ifEnabled >`<br>`INFO  [] r.t.e.example.Example.ifEnabled <`\n" +
+                "`INFO` .. `OFF`|-";
         String loggerName = loggerNameBuilder.build(Example.class.getMethod("ifEnabled"));
         String actual = exampleTableBuilder.buildTable(groupLevels(loggerName));
         System.out.println(actual);
@@ -158,7 +158,7 @@ public class ExampleTest {
                 "`TRACE`|`INFO  [] r.t.e.e.Example.parameterLevels > d=0.0, s=\"s\", i=0`\n" +
                 "`DEBUG`|`INFO  [] r.t.e.e.Example.parameterLevels > d=0.0, s=\"s\"`\n" +
                 "`INFO`|`INFO  [] r.t.e.e.Example.parameterLevels > 0.0`\n" +
-                "`WARN > ERROR > FATAL > OFF`|-";
+                "`WARN` .. `OFF`|-";
         String loggerName = loggerNameBuilder.build(Example.class.getMethod("parameterLevels", Double.class, String.class, Integer.class));
         String actual = exampleTableBuilder.buildTable(groupLevels(loggerName));
         System.out.println(actual);
