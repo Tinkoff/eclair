@@ -29,7 +29,12 @@ import static java.util.stream.Collectors.joining;
  */
 class ExampleTableBuilder {
 
-    static final String TABLE_HEADER = "Enabled level|Log sample\n---|---\n";
+    static final String TABLE_HEADER = " Enabled level      | Log sample\n--------------------|------------\n";
+
+    /**
+     * ' `LEVEL` .. `LEVEL` '
+     */
+    private static final int LEVELS_CELL_WIDTH = 1 + 7 + 1 + 2 + 1 + 7 + 1;
 
     private boolean hide = true;
     private PatternLayout patternLayout;
@@ -56,14 +61,24 @@ class ExampleTableBuilder {
 
     private String buildTableBody(Map<String, List<LogLevel>> levels) {
         return levels.entrySet().stream()
-                .map(entry -> buildLevelsCell(entry.getValue()) + "|" + entry.getKey())
+                .map(entry -> buildLevelsCell(entry.getValue()) + "| " + entry.getKey())
                 .collect(joining("\n"));
     }
 
     private String buildLevelsCell(List<LogLevel> logLevels) {
-        if (hide && logLevels.size() > 2) {
-            return asCode(logLevels.get(0).name()) + " .. " + asCode(logLevels.get(logLevels.size() - 1).name());
+        StringBuilder payload = new StringBuilder(" ");
+        payload.append((hide && logLevels.size() > 2) ? buildCroppedLevelsCell(logLevels) : buildFullLevelsCell(logLevels));
+        while (payload.length() < LEVELS_CELL_WIDTH) {
+            payload.append(" ");
         }
+        return payload.toString();
+    }
+
+    private String buildCroppedLevelsCell(List<LogLevel> logLevels) {
+        return asCode(logLevels.get(0).name()) + " .. " + asCode(logLevels.get(logLevels.size() - 1).name());
+    }
+
+    private String buildFullLevelsCell(List<LogLevel> logLevels) {
         return logLevels.stream().map(Enum::name).map(this::asCode).collect(joining(" "));
     }
 

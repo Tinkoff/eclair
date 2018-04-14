@@ -200,10 +200,10 @@ All available log levels in order from the most common `TRACE` to the rarest `FA
 void simple() {
 }
 ```
-Enabled level|Log sample
----|---
-`TRACE` `DEBUG`|`DEBUG [] r.t.eclair.example.Example.simple >`<br>`DEBUG [] r.t.eclair.example.Example.simple <`
-`INFO` .. `OFF`|-
+ Enabled level      | Log sample
+--------------------|------------
+ `TRACE` `DEBUG`    | `DEBUG [] r.t.eclair.example.Example.simple >`<br>`DEBUG [] r.t.eclair.example.Example.simple <`
+ `INFO` .. `OFF`    | -
 
 #### With thrown exception
 ```java
@@ -212,10 +212,10 @@ void simpleError() {
     throw new RuntimeException();
 }
 ```
-Enabled level|Log sample
----|---
-`TRACE` `DEBUG`|`DEBUG [] r.t.e.example.Example.simpleError >`<br>`DEBUG [] r.t.e.example.Example.simpleError !`
-`INFO` .. `OFF`|-
+ Enabled level      | Log sample
+--------------------|------------
+ `TRACE` `DEBUG`    | `DEBUG [] r.t.e.example.Example.simpleError >`<br>`DEBUG [] r.t.e.example.Example.simpleError !`
+ `INFO` .. `OFF`    | -
 
 #### Explicit `INFO` level
 ```java
@@ -223,10 +223,10 @@ Enabled level|Log sample
 void level() {
 }
 ```
-Enabled level|Log sample
----|---
-`TRACE` .. `INFO`|`INFO  [] r.t.eclair.example.Example.level >`<br>`INFO  [] r.t.eclair.example.Example.level <`
-`WARN` .. `OFF`|-
+ Enabled level      | Log sample
+--------------------|------------
+ `TRACE` .. `INFO`  | `INFO  [] r.t.eclair.example.Example.level >`<br>`INFO  [] r.t.eclair.example.Example.level <`
+ `WARN` .. `OFF`    | -
 
 #### Log as `INFO` if enabled `DEBUG` level
 ```java
@@ -234,10 +234,10 @@ Enabled level|Log sample
 void ifEnabled() {
 }
 ```
-Enabled level|Log sample
----|---
-`TRACE` `DEBUG`|`INFO  [] r.t.e.example.Example.ifEnabled >`<br>`INFO  [] r.t.e.example.Example.ifEnabled <`
-`INFO` .. `OFF`|-
+ Enabled level      | Log sample
+--------------------|------------
+ `TRACE` `DEBUG`    | `INFO  [] r.t.e.example.Example.ifEnabled >`<br>`INFO  [] r.t.e.example.Example.ifEnabled <`
+ `INFO` .. `OFF`    | -
 
 #### Influence of configured level to verbosity
 ```java
@@ -246,36 +246,36 @@ boolean verboseLevel(String s, Integer i, Double d) {
     return false;
 }
 ```
-Enabled level|Log sample
----|---
-`TRACE` `DEBUG`|`INFO  [] r.t.e.example.Example.verboseLevel > s="s", i=4, d=5.6`<br>`INFO  [] r.t.e.example.Example.verboseLevel < false`
-`INFO`|`INFO  [] r.t.e.example.Example.verboseLevel >`<br>`INFO  [] r.t.e.example.Example.verboseLevel <`
-`WARN` .. `OFF`|-
+ Enabled level      | Log sample
+--------------------|------------
+ `TRACE` `DEBUG`    | `INFO  [] r.t.e.example.Example.verboseLevel > s="s", i=4, d=5.6`<br>`INFO  [] r.t.e.example.Example.verboseLevel < false`
+ `INFO`             | `INFO  [] r.t.e.example.Example.verboseLevel >`<br>`INFO  [] r.t.e.example.Example.verboseLevel <`
+ `WARN` .. `OFF`    | -
 
 #### Verbosity disabled
-Parameters / return value not printed for any level.
+Arguments and return value not printed for any level.
 ```java
 @Log(verbose = OFF)
 boolean verboseDisabled(String s, Integer i, Double d) {
     return false;
 }
 ```
-Enabled level|Log sample
----|---
-`TRACE` `DEBUG`|`DEBUG [] r.t.e.e.Example.verboseDisabled >`<br>`DEBUG [] r.t.e.e.Example.verboseDisabled <`
-`INFO` .. `OFF`|-
+ Enabled level      | Log sample
+--------------------|------------
+ `TRACE` `DEBUG`    | `DEBUG [] r.t.e.e.Example.verboseDisabled >`<br>`DEBUG [] r.t.e.e.Example.verboseDisabled <`
+ `INFO` .. `OFF`    | -
 
 #### Try to print arguments by `JacksonPrinter` as `JSON`
-You can specify printer's bean name or alias. Arguments / return values will be serialized with `#toString()` invocation by default. 
+You can specify printer's bean name or alias. Arguments and return values will be serialized with `#toString()` invocation by default. 
 ```java
 @Log(printer = "jacksonPrinter")
 void verboseJson(Dto dto, Integer i) {
 }
 ```
-Enabled level|Log sample
----|---
-`TRACE` `DEBUG`|`DEBUG [] r.t.e.example.Example.verboseJson > dto={"i":0,"s":null}, i=8`<br>`DEBUG [] r.t.e.example.Example.verboseJson <`
-`INFO` .. `OFF`|-
+ Enabled level      | Log sample
+--------------------|------------
+ `TRACE` `DEBUG`    | `DEBUG [] r.t.e.example.Example.verboseJson > dto={"i":0,"s":null}, i=8`<br>`DEBUG [] r.t.e.example.Example.verboseJson <`
+ `INFO` .. `OFF`    | -
 
 #### Try to print arguments by `Jaxb2Printer` as `XML`
 You can specify printer's bean name or alias.
@@ -284,10 +284,10 @@ You can specify printer's bean name or alias.
 void verboseXml(Dto dto, Integer i) {
 }
 ```
-Enabled level|Log sample
----|---
-`TRACE` `DEBUG`|`DEBUG [] r.t.e.example.Example.verboseXml > dto=<dto><i>0</i></dto>, i=7`<br>`DEBUG [] r.t.e.example.Example.verboseXml <`
-`INFO` .. `OFF`|-
+ Enabled level      | Log sample
+--------------------|------------
+ `TRACE` `DEBUG`    | `DEBUG [] r.t.e.example.Example.verboseXml > dto=<dto><i>0</i></dto>, i=7`<br>`DEBUG [] r.t.e.example.Example.verboseXml <`
+ `INFO` .. `OFF`    | -
 
 #### Separate `in` and `out` events 
 Logging of `in` and `out` events could be declared separately with own settings.
@@ -297,12 +297,12 @@ Logging of `in` and `out` events could be declared separately with own settings.
 void inOut(Dto dto, String s, Integer i) {
 }
 ```
-Enabled level|Log sample
----|---
-`TRACE`|`INFO  [] r.t.eclair.example.Example.inOut > dto=Dto{i=0, s='null'}, s="s", i=3`<br>`TRACE [] r.t.eclair.example.Example.inOut <`
-`DEBUG`|`INFO  [] r.t.eclair.example.Example.inOut > dto=Dto{i=0, s='null'}, s="s", i=3`
-`INFO`|`INFO  [] r.t.eclair.example.Example.inOut >`
-`WARN` .. `OFF`|-
+ Enabled level      | Log sample
+--------------------|------------
+ `TRACE`            | `INFO  [] r.t.eclair.example.Example.inOut > dto=Dto{i=0, s='null'}, s="s", i=3`<br>`TRACE [] r.t.eclair.example.Example.inOut <`
+ `DEBUG`            | `INFO  [] r.t.eclair.example.Example.inOut > dto=Dto{i=0, s='null'}, s="s", i=3`
+ `INFO`             | `INFO  [] r.t.eclair.example.Example.inOut >`
+ `WARN` .. `OFF`    | -
 
 #### Configured parameter levels
 ```java
@@ -312,9 +312,9 @@ void parameterLevels(@Log(INFO) Double d,
                      @Log(TRACE) Integer i) {
 }
 ```
-Enabled level|Log sample
----|---
-`TRACE`|`INFO  [] r.t.e.e.Example.parameterLevels > d=0.0, s="s", i=0`
-`DEBUG`|`INFO  [] r.t.e.e.Example.parameterLevels > d=0.0, s="s"`
-`INFO`|`INFO  [] r.t.e.e.Example.parameterLevels > 0.0`
-`WARN` .. `OFF`|-
+ Enabled level      | Log sample
+--------------------|------------
+ `TRACE`            | `INFO  [] r.t.e.e.Example.parameterLevels > d=0.0, s="s", i=0`
+ `DEBUG`            | `INFO  [] r.t.e.e.Example.parameterLevels > d=0.0, s="s"`
+ `INFO`             | `INFO  [] r.t.e.e.Example.parameterLevels > 0.0`
+ `WARN` .. `OFF`    | -
