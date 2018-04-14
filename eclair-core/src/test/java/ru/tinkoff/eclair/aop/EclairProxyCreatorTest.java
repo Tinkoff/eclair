@@ -32,13 +32,6 @@ import ru.tinkoff.eclair.core.PrinterResolver;
 import ru.tinkoff.eclair.logger.SimpleLogger;
 import ru.tinkoff.eclair.printer.Printer;
 import ru.tinkoff.eclair.printer.ToStringPrinter;
-import ru.tinkoff.eclair.validate.BeanClassValidator;
-import ru.tinkoff.eclair.validate.BeanMethodValidator;
-import ru.tinkoff.eclair.validate.log.group.*;
-import ru.tinkoff.eclair.validate.log.single.*;
-import ru.tinkoff.eclair.validate.mdc.MdcValidator;
-import ru.tinkoff.eclair.validate.mdc.MdcsValidator;
-import ru.tinkoff.eclair.validate.mdc.MergedMdcsValidator;
 
 import java.util.Map;
 
@@ -55,22 +48,6 @@ import static org.junit.Assert.assertTrue;
         StandardEvaluationContext.class,
         AnnotationDefinitionFactory.class,
         PrinterResolver.class,
-
-        BeanClassValidator.class,
-        BeanMethodValidator.class,
-        LogsValidator.class,
-        LogValidator.class,
-        LogInsValidator.class,
-        LogInValidator.class,
-        LogOutsValidator.class,
-        LogOutValidator.class,
-        LogErrorsValidator.class,
-        LogErrorValidator.class,
-        ParameterLogsValidator.class,
-        ParameterLogValidator.class,
-        MdcsValidator.class,
-        MdcValidator.class,
-        MergedMdcsValidator.class,
 
         EclairProxyCreatorTest.InfrastructureTestConfiguration.class,
         EclairProxyCreatorTest.TestConfiguration.class

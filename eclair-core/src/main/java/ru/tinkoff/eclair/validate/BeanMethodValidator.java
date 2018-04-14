@@ -15,23 +15,20 @@
 
 package ru.tinkoff.eclair.validate;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.annotation.Mdc;
 import ru.tinkoff.eclair.core.AnnotationExtractor;
+import ru.tinkoff.eclair.logger.EclairLogger;
 import ru.tinkoff.eclair.validate.log.group.*;
 import ru.tinkoff.eclair.validate.mdc.MdcsValidator;
 import ru.tinkoff.eclair.validate.mdc.MergedMdcsValidator;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toSet;
@@ -39,19 +36,27 @@ import static java.util.stream.Collectors.toSet;
 /**
  * @author Vyacheslav Klapatnyuk
  */
-@Component
-@RequiredArgsConstructor
 public class BeanMethodValidator implements Validator {
+
+    private final AnnotationExtractor annotationExtractor = AnnotationExtractor.getInstance();
 
     private final LogsValidator logsValidator;
     private final LogInsValidator logInsValidator;
     private final LogOutsValidator logOutsValidator;
     private final LogErrorsValidator logErrorsValidator;
     private final ParameterLogsValidator parameterLogsValidator;
-    private final MdcsValidator mdcsValidator;
-    private final MergedMdcsValidator mergedMdcsValidator;
 
-    private final AnnotationExtractor annotationExtractor = AnnotationExtractor.getInstance();
+    private final MdcsValidator mdcsValidator = new MdcsValidator();
+    private final MergedMdcsValidator mergedMdcsValidator = new MergedMdcsValidator();
+
+    BeanMethodValidator(GenericApplicationContext applicationContext,
+                        Map<String, EclairLogger> loggers) {
+        this.logsValidator = new LogsValidator(applicationContext, loggers);
+        this.logInsValidator = new LogInsValidator(applicationContext, loggers);
+        this.logOutsValidator = new LogOutsValidator(applicationContext, loggers);
+        this.logErrorsValidator = new LogErrorsValidator(applicationContext, loggers);
+        this.parameterLogsValidator = new ParameterLogsValidator(applicationContext, loggers);
+    }
 
     @Override
     public boolean supports(Class<?> clazz) {

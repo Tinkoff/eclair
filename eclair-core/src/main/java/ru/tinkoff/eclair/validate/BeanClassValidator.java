@@ -15,24 +15,28 @@
 
 package ru.tinkoff.eclair.validate;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import ru.tinkoff.eclair.core.AnnotationExtractor;
+import ru.tinkoff.eclair.logger.EclairLogger;
 
+import java.util.Map;
 import java.util.stream.Stream;
 
 /**
  * @author Vyacheslav Klapatnyuk
  */
-@Component
-@RequiredArgsConstructor
 public class BeanClassValidator implements Validator {
+
+    private final AnnotationExtractor annotationExtractor = AnnotationExtractor.getInstance();
 
     private final BeanMethodValidator beanMethodValidator;
 
-    private final AnnotationExtractor annotationExtractor = AnnotationExtractor.getInstance();
+    public BeanClassValidator(GenericApplicationContext applicationContext,
+                              Map<String, EclairLogger> loggers) {
+        this.beanMethodValidator = new BeanMethodValidator(applicationContext, loggers);
+    }
 
     @Override
     public boolean supports(Class<?> clazz) {

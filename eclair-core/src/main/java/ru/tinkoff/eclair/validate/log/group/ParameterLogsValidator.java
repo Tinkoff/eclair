@@ -15,9 +15,7 @@
 
 package ru.tinkoff.eclair.validate.log.group;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import ru.tinkoff.eclair.logger.EclairLogger;
 import ru.tinkoff.eclair.validate.log.single.ParameterLogValidator;
@@ -27,17 +25,13 @@ import java.util.Map;
 /**
  * @author Vyacheslav Klapatnyuk
  */
-@Component
 public class ParameterLogsValidator extends LoggerSpecificLogAnnotationsValidator {
 
-    private final ParameterLogValidator parameterLogValidator;
+    private final ParameterLogValidator parameterLogValidator = new ParameterLogValidator();
 
-    @Autowired
     public ParameterLogsValidator(GenericApplicationContext applicationContext,
-                                  Map<String, EclairLogger> loggers,
-                                  ParameterLogValidator parameterLogValidator) {
+                                  Map<String, EclairLogger> loggers) {
         super(applicationContext, loggers);
-        this.parameterLogValidator = parameterLogValidator;
     }
 
     @Override

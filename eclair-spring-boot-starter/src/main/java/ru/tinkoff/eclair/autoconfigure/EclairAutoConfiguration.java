@@ -21,7 +21,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.expression.BeanFactoryResolver;
 import org.springframework.context.support.GenericApplicationContext;
@@ -42,7 +41,6 @@ import ru.tinkoff.eclair.logger.EclairLogger;
 import ru.tinkoff.eclair.logger.SimpleLogger;
 import ru.tinkoff.eclair.printer.*;
 import ru.tinkoff.eclair.printer.processor.JaxbElementWrapper;
-import ru.tinkoff.eclair.validate.BeanClassValidator;
 
 import java.util.List;
 import java.util.Map;
@@ -52,7 +50,6 @@ import java.util.Map;
  */
 @Configuration
 @EnableConfigurationProperties(EclairProperties.class)
-@ComponentScan("ru.tinkoff.eclair")
 public class EclairAutoConfiguration {
 
     @Bean
@@ -107,18 +104,17 @@ public class EclairAutoConfiguration {
     public EclairProxyCreator eclairProxyCreator(List<Printer> printerList,
                                                  Map<String, EclairLogger> loggerMap,
                                                  GenericApplicationContext applicationContext,
-//                                                 BeanClassValidator beanClassValidator,
-//                                                 EclairProperties eclairProperties,
+                                                 EclairProperties eclairProperties,
                                                  ExpressionEvaluator expressionEvaluator) {
         PrinterResolver printerResolver = new PrinterResolver(applicationContext, printerList);
         AnnotationDefinitionFactory annotationDefinitionFactory = new AnnotationDefinitionFactory(printerResolver);
         Map<String, EclairLogger> loggers = new LoggerMapSorter().sort(loggerMap);
 
         EclairProxyCreator eclairProxyCreator =
-                new EclairProxyCreator(applicationContext, annotationDefinitionFactory, loggers, /*beanClassValidator, */expressionEvaluator);
+                new EclairProxyCreator(applicationContext, annotationDefinitionFactory, loggers, expressionEvaluator);
         eclairProxyCreator.setOrder(Ordered.HIGHEST_PRECEDENCE);
         eclairProxyCreator.setFrozen(false);
-//        eclairProxyCreator.setValidate(eclairProperties.isValidate());
+        eclairProxyCreator.setValidate(eclairProperties.isValidate());
         return eclairProxyCreator;
     }
 }

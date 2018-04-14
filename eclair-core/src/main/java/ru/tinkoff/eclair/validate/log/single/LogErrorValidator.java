@@ -15,7 +15,6 @@
 
 package ru.tinkoff.eclair.validate.log.single;
 
-import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.core.ErrorFilterFactory;
@@ -28,7 +27,6 @@ import static java.lang.String.format;
 /**
  * @author Vyacheslav Klapatnyuk
  */
-@Component
 public class LogErrorValidator extends MethodTargetLogAnnotationValidator {
 
     private final ErrorFilterFactory errorFilterFactory = ErrorFilterFactory.getInstance();

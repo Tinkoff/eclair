@@ -15,9 +15,7 @@
 
 package ru.tinkoff.eclair.validate.log.group;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import ru.tinkoff.eclair.logger.EclairLogger;
 import ru.tinkoff.eclair.validate.log.single.LogOutValidator;
@@ -27,17 +25,13 @@ import java.util.Map;
 /**
  * @author Vyacheslav Klapatnyuk
  */
-@Component
 public class LogOutsValidator extends LoggerSpecificLogAnnotationsValidator {
 
-    private final LogOutValidator logOutValidator;
+    private final LogOutValidator logOutValidator = new LogOutValidator();
 
-    @Autowired
     public LogOutsValidator(GenericApplicationContext applicationContext,
-                            Map<String, EclairLogger> loggers,
-                            LogOutValidator logOutValidator) {
+                            Map<String, EclairLogger> loggers) {
         super(applicationContext, loggers);
-        this.logOutValidator = logOutValidator;
     }
 
     @Override

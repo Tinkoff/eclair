@@ -15,13 +15,11 @@
 
 package ru.tinkoff.eclair.validate.log.single;
 
-import org.springframework.stereotype.Component;
 import ru.tinkoff.eclair.annotation.Log;
 
 /**
  * @author Vyacheslav Klapatnyuk
  */
-@Component
 public class LogInValidator extends MethodTargetLogAnnotationValidator {
 
     @Override

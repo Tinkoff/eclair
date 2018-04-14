@@ -15,7 +15,6 @@
 
 package ru.tinkoff.eclair.validate.mdc;
 
-import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import ru.tinkoff.eclair.annotation.Mdc;
@@ -23,7 +22,6 @@ import ru.tinkoff.eclair.annotation.Mdc;
 /**
  * @author Vyacheslav Klapatnyuk
  */
-@Component
 public class MdcValidator implements Validator {
 
     @Override

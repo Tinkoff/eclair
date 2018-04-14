@@ -255,17 +255,16 @@ public class ExampleTest {
         public EclairProxyCreator eclairProxyCreator(List<Printer> printerList,
                                                      Map<String, EclairLogger> loggerMap,
                                                      GenericApplicationContext applicationContext,
-//                                                     BeanClassValidator beanClassValidator,
                                                      ExpressionEvaluator expressionEvaluator) {
             PrinterResolver printerResolver = new PrinterResolver(applicationContext, printerList);
             AnnotationDefinitionFactory annotationDefinitionFactory = new AnnotationDefinitionFactory(printerResolver);
             Map<String, EclairLogger> loggers = new LoggerMapSorter().sort(loggerMap);
 
             EclairProxyCreator eclairProxyCreator =
-                    new EclairProxyCreator(applicationContext, annotationDefinitionFactory, loggers, /*beanClassValidator, */expressionEvaluator);
+                    new EclairProxyCreator(applicationContext, annotationDefinitionFactory, loggers, expressionEvaluator);
             eclairProxyCreator.setOrder(Ordered.HIGHEST_PRECEDENCE);
             eclairProxyCreator.setFrozen(false);
-//            eclairProxyCreator.setValidate(false);
+            eclairProxyCreator.setValidate(false);
             return eclairProxyCreator;
         }
     }

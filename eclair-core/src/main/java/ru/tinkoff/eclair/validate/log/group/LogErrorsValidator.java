@@ -15,9 +15,7 @@
 
 package ru.tinkoff.eclair.validate.log.group;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.core.ErrorFilterFactory;
@@ -35,18 +33,15 @@ import static java.lang.String.format;
 /**
  * @author Vyacheslav Klapatnyuk
  */
-@Component
 public class LogErrorsValidator extends LoggerSpecificLogAnnotationsValidator {
 
     private final ErrorFilterFactory errorFilterFactory = ErrorFilterFactory.getInstance();
-    private final LogErrorValidator logErrorValidator;
 
-    @Autowired
+    private final LogErrorValidator logErrorValidator = new LogErrorValidator();
+
     public LogErrorsValidator(GenericApplicationContext applicationContext,
-                              Map<String, EclairLogger> loggers,
-                              LogErrorValidator logErrorValidator) {
+                              Map<String, EclairLogger> loggers) {
         super(applicationContext, loggers);
-        this.logErrorValidator = logErrorValidator;
     }
 
     @Override

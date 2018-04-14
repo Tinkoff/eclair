@@ -187,8 +187,14 @@ limitations under the License.
 ```
 
 ## All examples
+The left column shows the configured available logging level for the current method.<br>
+The right column shows an example log for the specified level.
+
+All available log levels in order from the most common `TRACE` to the rarest `FATAL` (`OFF` deactivates logging completely):<br>
+`TRACE` > `DEBUG` > `INFO` > `WARN` > `ERROR` > `FATAL` > `OFF`
 
 #### Simplest
+`DEBUG` level by default.
 ```java
 @Log
 void simple() {

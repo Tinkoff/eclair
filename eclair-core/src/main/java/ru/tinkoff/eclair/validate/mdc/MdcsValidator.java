@@ -15,8 +15,6 @@
 
 package ru.tinkoff.eclair.validate.mdc;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import ru.tinkoff.eclair.annotation.Mdc;
@@ -29,11 +27,9 @@ import static java.util.stream.Collectors.groupingBy;
 /**
  * @author Vyacheslav Klapatnyuk
  */
-@Component
-@RequiredArgsConstructor
 public class MdcsValidator implements Validator {
 
-    private final MdcValidator mdcValidator;
+    private final MdcValidator mdcValidator = new MdcValidator();
 
     @Override
     public boolean supports(Class<?> clazz) {
