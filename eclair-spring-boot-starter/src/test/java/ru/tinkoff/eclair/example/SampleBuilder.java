@@ -29,7 +29,7 @@ abstract class SampleBuilder {
     private static final Pattern uuid = Pattern.compile("(?i)^(.*)[\\da-z]{8}-[\\da-z]{4}-[\\da-z]{4}-[\\da-z]{4}-[\\da-z]{12}(.*)$");
 
     private static final String STACK_TRACE_ELEMENT_REPLACEMENT = "0";
-    private static final String UUID_REPLACEMENT = "c118fe51-a7da-48ec-b53a-a6a5871d9ae6";
+    private static final String UUID_REPLACEMENT = "01234567-89ab-cdef-ghij-klmnopqrstuv";
 
     PatternLayout patternLayout;
 
@@ -56,7 +56,7 @@ abstract class SampleBuilder {
      * Before:
      * `DEBUG [staticMethod=79383d64-3c70-4f7d-ae22-ad0d357bcbca] r.t.eclair.example.Example.mdc >`
      * After:
-     * `DEBUG [staticMethod=c118fe51-a7da-48ec-b53a-a6a5871d9ae6] r.t.eclair.example.Example.mdc >`
+     * `DEBUG [staticMethod=01234567-89ab-cdef-ghij-klmnopqrstuv] r.t.eclair.example.Example.mdc >`
      */
     String maskUuid(String line) {
         Matcher matcher = uuid.matcher(line);

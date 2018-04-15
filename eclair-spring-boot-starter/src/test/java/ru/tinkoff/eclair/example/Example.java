@@ -132,7 +132,7 @@ class Example {
     @Mdc(key = "sum", value = "1 + 1", global = true)
     @Mdc(key = "beanReference", value = "@jacksonPrinter.print(new ru.tinkoff.eclair.example.Dto())")
     @Mdc(key = "staticMethod", value = "T(java.util.UUID).randomUUID()")
-    @Log.in
+    @Log
     void mdc() {
         self.inner();
     }
@@ -146,27 +146,9 @@ class Example {
                               @Mdc(key = "length", value = "s.length()") Dto dto) {
     }
 
-    /**
-     * DEBUG [parameterSKey=parameterSValue, parameterIKey=parameterIValue] ru.tinkoff.eclair.example.Example.mdc > s="s", i=0
-     */
+    @Mdc
     @Log.in
-    public void mdc1(@Mdc(key = "parameterSKey", value = "parameterSValue") String s, @Mdc(key = "parameterIKey", value = "parameterIValue") Integer i) {
-    }
-
-    /**
-     * DEBUG [parameterSKey=s, parameterIKey=0] ru.tinkoff.eclair.example.Example.mdc > s="s", i=0
-     */
-    @Log.in
-    public void mdc2(@Mdc(key = "parameterSKey") String s, @Mdc(key = "parameterIKey") Integer i) {
-    }
-
-    /**
-     * DEBUG [s=parameterSValue, i=parameterIValue] ru.tinkoff.eclair.example.Example.mdc > s="s", i=0
-     * else if parameter names not enabled
-     * DEBUG [mdc[0]=parameterSValue, mdc[1]=parameterIValue] ru.tinkoff.eclair.example.Example.mdc > "s", 0
-     */
-    @Log.in
-    public void mdc3(@Mdc("parameterSValue") String s, @Mdc("parameterIValue") Integer i) {
+    void mdcByDefault(String first, Double second) {
     }
 
     /**
@@ -175,47 +157,35 @@ class Example {
      * DEBUG [mdc[0]=s, mdc[1]=0] ru.tinkoff.eclair.example.Example.mdc > "s", 0
      */
     @Log.in
-    public void mdc4(@Mdc String s, @Mdc Integer i) {
-    }
-
-    /**
-     * DEBUG [methodKey=methodValue] ru.tinkoff.eclair.example.Example.mdc > s="s", i=0
-     */
-    @Mdc(key = "methodKey", value = "methodValue")
-    @Log.in
-    public void mdc5(String s, Integer i) {
+    public void mdc(@Mdc String s, @Mdc Integer i) {
     }
 
     /**
      * DEBUG [methodKey[s]=s, methodKey[i]=0] ru.tinkoff.eclair.example.Example.mdc > s="s", i=0
-     * else if parameter names not enabled
-     * DEBUG [methodKey[0]=s, methodKey[1]=0] ru.tinkoff.eclair.example.Example.mdc > "s", 0
      */
     @Mdc(key = "methodKey")
     @Log.in
-    public void mdc6(String s, Integer i) {
+    public void mdc1(String s, Integer i) {
     }
 
     /**
-     * DEBUG [mdc=methodValue] ru.tinkoff.eclair.example.Example.mdc > s="s", i=0
+     * DEBUG [mdc2=methodValue] ru.tinkoff.eclair.example.Example.mdc > s="s", i=0
      */
     @Mdc("methodValue")
     @Log.in
-    public void mdc7(String s, Integer i) {
+    public void mdc2(String s, Integer i) {
     }
 
     /**
-     * Equals to {@link #mdc4}
+     * Equals to {@link Example#mdc(java.lang.String, java.lang.Integer)}
      * DEBUG [s=s, i=0] ru.tinkoff.eclair.example.Example.mdc > s="s", i=0
      * else if parameter names not enabled
-     * DEBUG [mdc[0]=s, mdc[1]=0] ru.tinkoff.eclair.example.Example.mdc > "s", 0
+     * DEBUG [mdc3[0]=s, mdc3[1]=0] ru.tinkoff.eclair.example.Example.mdc > "s", 0
      */
     @Mdc
     @Log.in
-    public void mdc8(String s, Integer i) {
+    public void mdc3(String s, Integer i) {
     }
-
-    // TODO: add example for MDC with bean referencing
 
 //    @Autowired
 //    private ManualLogger logger;
@@ -310,18 +280,6 @@ class Example {
 
         // ERROR [] r.t.eclair.example.Example.manualLevelLogging - log
         logger.log(ERROR, "log");*/
-    }
-
-    /**
-     * equals to next
-     */
-    @Log.in(level = INFO, ifEnabled = OFF, verbose = ERROR, printer = "json")
-    @Log.out(level = INFO, ifEnabled = OFF, verbose = ERROR, printer = "json")
-    public void inAndOut() {
-    }
-
-    @Log(level = INFO, ifEnabled = OFF, verbose = ERROR, printer = "json")
-    public void logEqualsToInAndOut() {
     }
 
     /**

@@ -409,8 +409,9 @@ public class ExampleTest {
         // then
         String expected = "```\n" +
                 "DEBUG [] r.t.eclair.example.Example.outer >\n" +
-                "DEBUG [beanReference={\"i\":0,\"s\":null}, sum=2, static=string, staticMethod=c118fe51-a7da-48ec-b53a-a6a5871d9ae6] r.t.eclair.example.Example.mdc >\n" +
-                "DEBUG [beanReference={\"i\":0,\"s\":null}, sum=2, static=string, staticMethod=c118fe51-a7da-48ec-b53a-a6a5871d9ae6] r.t.eclair.example.Example.inner >\n" +
+                "DEBUG [beanReference={\"i\":0,\"s\":null}, sum=2, static=string, staticMethod=01234567-89ab-cdef-ghij-klmnopqrstuv] r.t.eclair.example.Example.mdc >\n" +
+                "DEBUG [beanReference={\"i\":0,\"s\":null}, sum=2, static=string, staticMethod=01234567-89ab-cdef-ghij-klmnopqrstuv] r.t.eclair.example.Example.inner >\n" +
+                "DEBUG [beanReference={\"i\":0,\"s\":null}, sum=2, static=string, staticMethod=01234567-89ab-cdef-ghij-klmnopqrstuv] r.t.eclair.example.Example.mdc <\n" +
                 "DEBUG [sum=2] r.t.eclair.example.Example.outer <\n" +
                 "```";
         String actual = exampleCodeBuilder.buildMultilineBlock(listAppender.list);
@@ -430,6 +431,25 @@ public class ExampleTest {
         // then
         String expected = "```\n" +
                 "DEBUG [length=8, dto=Dto{i=12, s='password'}] r.t.e.example.Example.mdcByArgument > dto=Dto{i=12, s='password'}\n" +
+                "```";
+        String actual = exampleCodeBuilder.buildMultilineBlock(listAppender.list);
+        MDC.clear();
+        listAppender.list.clear();
+        System.out.println(actual);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void mdcByDefault() throws NoSuchMethodException {
+        // given
+        listAppender.list.clear();
+        String first = "content";
+        Double second = Math.PI;
+        // when
+        invoke(() -> example.mdcByDefault(first, second), DEBUG);
+        // then
+        String expected = "```\n" +
+                "DEBUG [first=content, second=3.141592653589793] r.t.e.example.Example.mdcByDefault > first=\"content\", second=3.141592653589793\n" +
                 "```";
         String actual = exampleCodeBuilder.buildMultilineBlock(listAppender.list);
         MDC.clear();

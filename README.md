@@ -437,7 +437,9 @@ Dto mix(@Log(printer = "jaxb2Printer") Dto xml,
 #### Mapped Diagnostic Context (MDC)
 Key/value pair defined by annotation automatically cleared after exit from the method.<br>
 `global` MDC is available within `ThreadLocal` scope.<br>
-`value` attribute could contain SpEL expression and invoke static methods or beans by id from the application context.
+`value` attribute could contain SpEL expression and invoke static methods or beans by id from the application context.<br>
+Before method execution beginning, `@Mdc` annotations will be processed first and after ending cleared last.<br>
+So annotations `@Log` / `@Log.in` / `@Log.out` of the same method will be processed *inside* `@Mdc` processing. 
 > Note: MDC is level-insensitive and printed every time.<br>
 > Note: MDC does not guarantee order of elements when printing.
 ```java
@@ -450,7 +452,7 @@ void outer() {
 @Mdc(key = "sum", value = "1 + 1", global = true)
 @Mdc(key = "beanReference", value = "@jacksonPrinter.print(new ru.tinkoff.eclair.example.Dto())")
 @Mdc(key = "staticMethod", value = "T(java.util.UUID).randomUUID()")
-@Log.in
+@Log
 void mdc() {
     self.inner();
 }
@@ -462,8 +464,9 @@ void inner() {
 ##### Log sample
 ```
 DEBUG [] r.t.eclair.example.Example.outer >
-DEBUG [beanReference={"i":0,"s":null}, sum=2, static=string, staticMethod=c118fe51-a7da-48ec-b53a-a6a5871d9ae6] r.t.eclair.example.Example.mdc >
-DEBUG [beanReference={"i":0,"s":null}, sum=2, static=string, staticMethod=c118fe51-a7da-48ec-b53a-a6a5871d9ae6] r.t.eclair.example.Example.inner >
+DEBUG [beanReference={"i":0,"s":null}, sum=2, static=string, staticMethod=01234567-89ab-cdef-ghij-klmnopqrstuv] r.t.eclair.example.Example.mdc >
+DEBUG [beanReference={"i":0,"s":null}, sum=2, static=string, staticMethod=01234567-89ab-cdef-ghij-klmnopqrstuv] r.t.eclair.example.Example.inner >
+DEBUG [beanReference={"i":0,"s":null}, sum=2, static=string, staticMethod=01234567-89ab-cdef-ghij-klmnopqrstuv] r.t.eclair.example.Example.mdc <
 DEBUG [sum=2] r.t.eclair.example.Example.outer <
 ```
 
@@ -478,4 +481,26 @@ void mdcByArgument(@Mdc(key = "dto", value = "#this")
 ##### Log sample
 ```
 DEBUG [length=8, dto=Dto{i=12, s='password'}] r.t.e.example.Example.mdcByArgument > dto=Dto{i=12, s='password'}
+```
+
+#### MDC defined by default
+If `key` or `value` of `@Mdc` annotation is empty, it will be synthesized by code meta-data:<br>
+* if `@Mdc` defined above the method with empty `value`, each method's parameter will be saved as MDC entry
+* if `@Mdc` defined above the parameter:
+    * empty `key` will be replaced by annotated parameter name
+    * empty `value` will be replaced by annotated parameter value
+```java
+@Mdc
+@Log.in
+void mdcByDefault(String first, Double second) {
+}
+```
+##### Log sample
+```
+DEBUG [first=content, second=3.141592653589793] r.t.e.example.Example.mdcByDefault > first="content", second=3.141592653589793
+```
+> It is not always possible to obtain information about parameter names at runtime.<br>
+In that case, MDC keys will contain method name and parameter index.
+```
+DEBUG [mdcByDefault[0]=content, mdcByDefault[1]=3.141592653589793] r.t.e.example.Example.mdcByDefault > first="content", second=3.141592653589793
 ```
