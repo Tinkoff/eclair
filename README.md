@@ -1,5 +1,5 @@
 # Eclair
-> Java Spring library for AOP logging
+Eclair - Java Spring library for AOP logging.
 
 Provides annotations for declarative logging of annotated method execution.
 Includes abstractions for annotations processing, simple implementation and Spring Boot starter with auto-configuration.
@@ -433,3 +433,49 @@ Dto mix(@Log(printer = "jaxb2Printer") Dto xml,
  `INFO`             | `INFO  [] r.t.eclair.example.Example.mix >`<br>`WARN  [] r.t.eclair.example.Example.mix ! java.lang.IllegalArgumentException: Something strange happened`<br>`java.lang.IllegalArgumentException: Something strange happened`<br>`	at ru.tinkoff.eclair.example.Example.mix(Example.java:0)`<br>..
  `WARN`             | `WARN  [] r.t.eclair.example.Example.mix ! java.lang.IllegalArgumentException: Something strange happened`<br>`java.lang.IllegalArgumentException: Something strange happened`<br>`	at ru.tinkoff.eclair.example.Example.mix(Example.java:0)`<br>..
  `ERROR` .. `OFF`   | -
+
+#### Mapped Diagnostic Context (MDC)
+Key/value pair defined by annotation automatically cleared after exit from the method.<br>
+`global` MDC is available within `ThreadLocal` scope.<br>
+`value` attribute could contain SpEL expression and invoke static methods or beans by id from the application context.
+> Note: MDC is level-insensitive and printed every time.<br>
+> Note: MDC does not guarantee order of elements when printing.
+```java
+@Log
+void outer() {
+    self.mdc();
+}
+
+@Mdc(key = "static", value = "string")
+@Mdc(key = "sum", value = "1 + 1", global = true)
+@Mdc(key = "beanReference", value = "@jacksonPrinter.print(new ru.tinkoff.eclair.example.Dto())")
+@Mdc(key = "staticMethod", value = "T(java.util.UUID).randomUUID()")
+@Log.in
+void mdc() {
+    self.inner();
+}
+
+@Log.in
+void inner() {
+}
+```
+##### Log sample
+```
+DEBUG [] r.t.eclair.example.Example.outer >
+DEBUG [beanReference={"i":0,"s":null}, sum=2, static=string, staticMethod=c118fe51-a7da-48ec-b53a-a6a5871d9ae6] r.t.eclair.example.Example.mdc >
+DEBUG [beanReference={"i":0,"s":null}, sum=2, static=string, staticMethod=c118fe51-a7da-48ec-b53a-a6a5871d9ae6] r.t.eclair.example.Example.inner >
+DEBUG [sum=2] r.t.eclair.example.Example.outer <
+```
+
+#### MDC defined by argument
+MDC could get access to annotated parameter value with SpEL as root object of evaluation context.
+```java
+@Log.in
+void mdcByArgument(@Mdc(key = "dto", value = "#this")
+                   @Mdc(key = "length", value = "s.length()") Dto dto) {
+}
+```
+##### Log sample
+```
+DEBUG [length=8, dto=Dto{i=12, s='password'}] r.t.e.example.Example.mdcByArgument > dto=Dto{i=12, s='password'}
+```

@@ -17,11 +17,14 @@ package ru.tinkoff.eclair.example;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.PatternLayout;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.logging.LogLevel;
 import org.springframework.boot.logging.LoggingSystem;
@@ -48,10 +51,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.*;
 import static org.junit.Assert.assertEquals;
+import static org.springframework.boot.logging.LogLevel.DEBUG;
 import static org.springframework.boot.logging.LogLevel.values;
 
 /**
@@ -67,8 +72,10 @@ public class ExampleTest {
     private static final LoggingSystem loggingSystem = LoggingSystem.get(ExampleTest.class.getClassLoader());
     private static final ExampleAppender exampleAppender = new ExampleAppender();
     private static final PatternLayout patternLayout = new PatternLayout();
-    private static final LoggerFacadeFactory loggerFacadeFactory = new ExampleLoggerFacadeFactory(exampleAppender);
+    private static final ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+    private static final LoggerFacadeFactory loggerFacadeFactory = new ExampleLoggerFacadeFactory(asList(exampleAppender, listAppender));
     private static final ExampleTableBuilder exampleTableBuilder = new ExampleTableBuilder();
+    private static final ExampleCodeBuilder exampleCodeBuilder = new ExampleCodeBuilder();
     private static final LoggerNameBuilder loggerNameBuilder = LoggerNameBuilder.getInstance();
     private static final String ROOT_LOGGER_NAME = "ru.tinkoff.eclair.example.Example";
 
@@ -80,18 +87,20 @@ public class ExampleTest {
     @BeforeClass
     public static void init() {
         exampleAppender.start();
+        listAppender.start();
 
         patternLayout.setPattern(PATTERN);
         patternLayout.setContext((LoggerContext) LoggerFactory.getILoggerFactory());
         patternLayout.start();
 
         exampleTableBuilder.setPatternLayout(patternLayout);
+        exampleCodeBuilder.setPatternLayout(patternLayout);
     }
 
     @Test
     public void simple() throws NoSuchMethodException {
         // given, when
-        forEachLevel(() -> example.simple());
+        invokeForEachLevel(() -> example.simple());
         // then
         String expected = ExampleTableBuilder.TABLE_HEADER +
                 " `TRACE` `DEBUG`    | `DEBUG [] r.t.eclair.example.Example.simple >`<br>`DEBUG [] r.t.eclair.example.Example.simple <`\n" +
@@ -105,7 +114,7 @@ public class ExampleTest {
     @Test
     public void simpleError() throws NoSuchMethodException {
         // given, when
-        forEachLevel(() -> example.simpleError());
+        invokeForEachLevel(() -> example.simpleError());
         // then
         String expected = ExampleTableBuilder.TABLE_HEADER +
                 " `TRACE` `DEBUG`    | `DEBUG [] r.t.e.example.Example.simpleError >`<br>`DEBUG [] r.t.e.example.Example.simpleError !`\n" +
@@ -119,7 +128,7 @@ public class ExampleTest {
     @Test
     public void level() throws NoSuchMethodException {
         // given, when
-        forEachLevel(() -> example.level());
+        invokeForEachLevel(() -> example.level());
         // then
         String expected = ExampleTableBuilder.TABLE_HEADER +
                 " `TRACE` .. `INFO`  | `INFO  [] r.t.eclair.example.Example.level >`<br>`INFO  [] r.t.eclair.example.Example.level <`\n" +
@@ -133,7 +142,7 @@ public class ExampleTest {
     @Test
     public void ifEnabled() throws NoSuchMethodException {
         // given, when
-        forEachLevel(() -> example.ifEnabled());
+        invokeForEachLevel(() -> example.ifEnabled());
         // then
         String expected = ExampleTableBuilder.TABLE_HEADER +
                 " `TRACE` `DEBUG`    | `INFO  [] r.t.e.example.Example.ifEnabled >`<br>`INFO  [] r.t.e.example.Example.ifEnabled <`\n" +
@@ -151,7 +160,7 @@ public class ExampleTest {
         Integer i = 4;
         Double d = 5.6;
         // when
-        forEachLevel(() -> example.verbose(s, i, d));
+        invokeForEachLevel(() -> example.verbose(s, i, d));
         // then
         String expected = ExampleTableBuilder.TABLE_HEADER +
                 " `TRACE` `DEBUG`    | `INFO  [] r.t.eclair.example.Example.verbose > s=\"s\", i=4, d=5.6`<br>`INFO  [] r.t.eclair.example.Example.verbose < false`\n" +
@@ -170,7 +179,7 @@ public class ExampleTest {
         Integer i = 9;
         Double d = 3.1;
         // when
-        forEachLevel(() -> example.verboseDisabled(s, i, d));
+        invokeForEachLevel(() -> example.verboseDisabled(s, i, d));
         // then
         String expected = ExampleTableBuilder.TABLE_HEADER +
                 " `TRACE` `DEBUG`    | `DEBUG [] r.t.e.e.Example.verboseDisabled >`<br>`DEBUG [] r.t.e.e.Example.verboseDisabled <`\n" +
@@ -187,7 +196,7 @@ public class ExampleTest {
         Dto json = new Dto(2, "r");
         Integer i = 8;
         // when
-        forEachLevel(() -> example.json(json, i));
+        invokeForEachLevel(() -> example.json(json, i));
         // then
         String expected = ExampleTableBuilder.TABLE_HEADER +
                 " `TRACE` `DEBUG`    | `DEBUG [] r.t.eclair.example.Example.json > dto={\"i\":2,\"s\":\"r\"}, i=8`<br>`DEBUG [] r.t.eclair.example.Example.json <`\n" +
@@ -204,7 +213,7 @@ public class ExampleTest {
         Dto xml = new Dto(4, "k");
         Integer i = 7;
         // when
-        forEachLevel(() -> example.xml(xml, i));
+        invokeForEachLevel(() -> example.xml(xml, i));
         // then
         String expected = ExampleTableBuilder.TABLE_HEADER +
                 " `TRACE` `DEBUG`    | `DEBUG [] r.t.eclair.example.Example.xml > dto=<dto><i>4</i><s>k</s></dto>, i=7`<br>`DEBUG [] r.t.eclair.example.Example.xml <`\n" +
@@ -222,7 +231,7 @@ public class ExampleTest {
         String s = "s";
         Integer i = 3;
         // when
-        forEachLevel(() -> example.inOut(dto, s, i));
+        invokeForEachLevel(() -> example.inOut(dto, s, i));
         // then
         String expected = ExampleTableBuilder.TABLE_HEADER +
                 " `TRACE`            | `INFO  [] r.t.eclair.example.Example.inOut > dto=Dto{i=3, s='m'}, s=\"s\", i=3`<br>`TRACE [] r.t.eclair.example.Example.inOut <`\n" +
@@ -238,7 +247,7 @@ public class ExampleTest {
     @Test
     public void error() throws NoSuchMethodException {
         // given, when
-        forEachLevel(() -> example.error());
+        invokeForEachLevel(() -> example.error());
         // then
         String expected = ExampleTableBuilder.TABLE_HEADER +
                 " `TRACE` .. `FATAL` | `ERROR [] r.t.eclair.example.Example.error ! java.lang.RuntimeException: Something strange happened`<br>`java.lang.RuntimeException: Something strange happened`<br>`\tat ru.tinkoff.eclair.example.Example.error(Example.java:0)`<br>..\n" +
@@ -252,7 +261,7 @@ public class ExampleTest {
     @Test
     public void warningOnDebug() throws NoSuchMethodException {
         // given, when
-        forEachLevel(() -> example.warningOnDebug());
+        invokeForEachLevel(() -> example.warningOnDebug());
         // then
         String expected = ExampleTableBuilder.TABLE_HEADER +
                 " `TRACE` `DEBUG`    | `WARN  [] r.t.e.e.Example.warningOnDebug ! java.lang.RuntimeException: Something strange happened, but it doesn't matter`<br>`java.lang.RuntimeException: Something strange happened, but it doesn't matter`<br>`\tat ru.tinkoff.eclair.example.Example.warningOnDebug(Example.java:0)`<br>..\n" +
@@ -270,9 +279,9 @@ public class ExampleTest {
         Throwable throwable1 = new Exception();
         Throwable throwable2 = new Error();
         // when
-        forEachLevel(() -> example.filterErrors(throwable));
-        forEachLevel(() -> example.filterErrors(throwable1));
-        forEachLevel(() -> example.filterErrors(throwable2));
+        invokeForEachLevel(() -> example.filterErrors(throwable));
+        invokeForEachLevel(() -> example.filterErrors(throwable1));
+        invokeForEachLevel(() -> example.filterErrors(throwable2));
         // then
         String expected = ExampleTableBuilder.TABLE_HEADER +
                 " `TRACE` .. `WARN`  | `WARN  [] r.t.e.example.Example.filterErrors ! java.lang.NullPointerException`<br>`java.lang.NullPointerException: null`<br>`\tat ru.tinkoff.eclair.example.ExampleTest.filterErrors(ExampleTest.java:0)`<br>..<br>`ERROR [] r.t.e.example.Example.filterErrors ! java.lang.Exception`<br>`java.lang.Exception: null`<br>`\tat ru.tinkoff.eclair.example.ExampleTest.filterErrors(ExampleTest.java:0)`<br>..\n" +
@@ -287,7 +296,7 @@ public class ExampleTest {
     @Test
     public void mostSpecific() throws NoSuchMethodException {
         // given, when
-        forEachLevel(() -> example.mostSpecific());
+        invokeForEachLevel(() -> example.mostSpecific());
         // then
         String expected = ExampleTableBuilder.TABLE_HEADER +
                 " `TRACE` .. `WARN`  | `WARN  [] r.t.e.example.Example.mostSpecific ! java.lang.IllegalArgumentException`<br>`java.lang.IllegalArgumentException: null`<br>`\tat ru.tinkoff.eclair.example.Example.mostSpecific(Example.java:0)`<br>..\n" +
@@ -305,7 +314,7 @@ public class ExampleTest {
         String s = "s";
         Integer i = 3;
         // when
-        forEachLevel(() -> example.parameter(dto, s, i));
+        invokeForEachLevel(() -> example.parameter(dto, s, i));
         // then
         String expected = ExampleTableBuilder.TABLE_HEADER +
                 " `TRACE` `DEBUG`    | `INFO  [] r.t.e.example.Example.parameter > dto=Dto{i=0, s='u'}`\n" +
@@ -323,7 +332,7 @@ public class ExampleTest {
         Dto dto = new Dto(5, "password");
         Integer i = 4;
         // when
-        forEachLevel(() -> example.printers(dto, dto, i));
+        invokeForEachLevel(() -> example.printers(dto, dto, i));
         // then
         String expected = ExampleTableBuilder.TABLE_HEADER +
                 " `TRACE` `DEBUG`    | `DEBUG [] r.t.eclair.example.Example.printers > xml=<dto><i>5</i><s>********</s></dto>, json={\"i\":5,\"s\":\"password\"}`<br>`DEBUG [] r.t.eclair.example.Example.printers < <dto><i>5</i><s>********</s></dto>`\n" +
@@ -341,7 +350,7 @@ public class ExampleTest {
         String s = "v";
         Integer i = 7;
         // when
-        forEachLevel(() -> example.parameterLevels(d, s, i));
+        invokeForEachLevel(() -> example.parameterLevels(d, s, i));
         // then
         String expected = ExampleTableBuilder.TABLE_HEADER +
                 " `TRACE`            | `INFO  [] r.t.e.e.Example.parameterLevels > d=9.4, s=\"v\", i=7`\n" +
@@ -361,7 +370,7 @@ public class ExampleTest {
         Dto json = new Dto(7, "b");
         Integer i = 1;
         // when
-        forEachLevel(() -> example.mix(xml, json, i));
+        invokeForEachLevel(() -> example.mix(xml, json, i));
         // then
         String expected = ExampleTableBuilder.TABLE_HEADER +
                 " `TRACE`            | `INFO  [] r.t.eclair.example.Example.mix > xml=<dto><i>5</i><s>a</s></dto>, json={\"i\":7,\"s\":\"b\"}, i=1`<br>`WARN  [] r.t.eclair.example.Example.mix ! java.lang.IllegalArgumentException: Something strange happened`<br>`java.lang.IllegalArgumentException: Something strange happened`<br>`\tat ru.tinkoff.eclair.example.Example.mix(Example.java:0)`<br>..\n" +
@@ -373,18 +382,6 @@ public class ExampleTest {
         String actual = exampleTableBuilder.buildTable(groupLevels(loggerName));
         System.out.println(actual);
         assertEquals(expected, actual);
-    }
-
-    private void forEachLevel(Runnable runnable) {
-        Stream.of(values()).forEach(level -> {
-            loggingSystem.setLogLevel(ROOT_LOGGER_NAME, level);
-            exampleAppender.setLevel(level);
-            try {
-                runnable.run();
-            } catch (Throwable e) {
-                // do nothing
-            }
-        });
     }
 
     private Map<String, List<LogLevel>> groupLevels(String loggerName) {
@@ -401,6 +398,58 @@ public class ExampleTest {
                         },
                         LinkedHashMap::new
                 ));
+    }
+
+    @Test
+    public void mdc() throws NoSuchMethodException {
+        // given
+        listAppender.list.clear();
+        // when
+        invoke(() -> example.outer(), DEBUG);
+        // then
+        String expected = "```\n" +
+                "DEBUG [] r.t.eclair.example.Example.outer >\n" +
+                "DEBUG [beanReference={\"i\":0,\"s\":null}, sum=2, static=string, staticMethod=c118fe51-a7da-48ec-b53a-a6a5871d9ae6] r.t.eclair.example.Example.mdc >\n" +
+                "DEBUG [beanReference={\"i\":0,\"s\":null}, sum=2, static=string, staticMethod=c118fe51-a7da-48ec-b53a-a6a5871d9ae6] r.t.eclair.example.Example.inner >\n" +
+                "DEBUG [sum=2] r.t.eclair.example.Example.outer <\n" +
+                "```";
+        String actual = exampleCodeBuilder.buildMultilineBlock(listAppender.list);
+        MDC.clear();
+        listAppender.list.clear();
+        System.out.println(actual);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void mdcByArgument() throws NoSuchMethodException {
+        // given
+        listAppender.list.clear();
+        Dto dto = new Dto(12, "password");
+        // when
+        invoke(() -> example.mdcByArgument(dto), DEBUG);
+        // then
+        String expected = "```\n" +
+                "DEBUG [length=8, dto=Dto{i=12, s='password'}] r.t.e.example.Example.mdcByArgument > dto=Dto{i=12, s='password'}\n" +
+                "```";
+        String actual = exampleCodeBuilder.buildMultilineBlock(listAppender.list);
+        MDC.clear();
+        listAppender.list.clear();
+        System.out.println(actual);
+        assertEquals(expected, actual);
+    }
+
+    private void invokeForEachLevel(Runnable runnable) {
+        Stream.of(values()).forEach(level -> invoke(runnable, level));
+    }
+
+    private void invoke(Runnable runnable, LogLevel level) {
+        loggingSystem.setLogLevel(ROOT_LOGGER_NAME, level);
+        exampleAppender.setLevel(level);
+        try {
+            runnable.run();
+        } catch (Throwable e) {
+            // do nothing
+        }
     }
 
     private interface Runnable {

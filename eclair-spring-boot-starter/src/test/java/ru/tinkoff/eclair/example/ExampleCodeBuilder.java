@@ -15,31 +15,28 @@
 
 package ru.tinkoff.eclair.example;
 
-import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.Appender;
-import org.slf4j.LoggerFactory;
-import ru.tinkoff.eclair.logger.facade.LoggerFacade;
-import ru.tinkoff.eclair.logger.facade.LoggerFacadeFactory;
-import ru.tinkoff.eclair.logger.facade.Slf4JLoggerFacade;
 
 import java.util.List;
+
+import static java.util.stream.Collectors.joining;
 
 /**
  * @author Vyacheslav Klapatnyuk
  */
-class ExampleLoggerFacadeFactory implements LoggerFacadeFactory {
+class ExampleCodeBuilder extends SampleBuilder {
 
-    private final List<Appender<ILoggingEvent>> appenders;
-
-    ExampleLoggerFacadeFactory(List<Appender<ILoggingEvent>> appenders) {
-        this.appenders = appenders;
+    String buildMultilineBlock(List<ILoggingEvent> events) {
+        String sample = events.stream()
+                .map(patternLayout::doLayout)
+                .map(this::trimLineBreak)
+                .map(this::maskStackTraceElement)
+                .map(this::maskUuid)
+                .collect(joining("\n"));
+        return "```\n" + sample + "\n```";
     }
 
-    @Override
-    public LoggerFacade getLoggerFacade(String loggerName) {
-        Logger logger = (Logger) LoggerFactory.getLogger(loggerName);
-        appenders.forEach(logger::addAppender);
-        return new Slf4JLoggerFacade(logger);
+    private String trimLineBreak(String input) {
+        return input.replaceAll("(.*)\r?\n", "$1");
     }
 }

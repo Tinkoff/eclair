@@ -16,6 +16,7 @@
 package ru.tinkoff.eclair.example;
 
 import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Autowired;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.annotation.Mdc;
 
@@ -115,43 +116,34 @@ class Example {
         throw new IllegalArgumentException("Something strange happened");
     }
 
-    // TODO: add example with bean referencing inside @Mdc
-    // TODO: add example with static method invocation inside @Mdc
-    // TODO: add example of print using 'Printer' bean name inside @Mdc
+    private Example self;
 
-    /**
-     * if logger level <= DEBUG
-     *
-     * DEBUG [] ru.tinkoff.eclair.example.OuterClass.method >
-     * ..
-     * DEBUG [key=value, sum=2] ru.tinkoff.eclair.example.Example.mdcByMethod > Dto{i=0, s='null'}
-     * ..
-     * DEBUG [key=value, sum=2] ru.tinkoff.eclair.example.InnerClass.method >
-     * DEBUG [key=value, sum=2] ru.tinkoff.eclair.example.InnerClass.method <
-     * ..
-     * DEBUG [key=value, sum=2] ru.tinkoff.eclair.example.Example.mdcByMethod <
-     * ..
-     * DEBUG [sum=2] ru.tinkoff.eclair.example.OuterClass.method <
-     */
-    @Mdc(key = "key", value = "value")
-    @Mdc(key = "sum", value = "1 + 1", global = true)
-    @Log
-    public void mdcByMethod(Dto dto) {
+    @Autowired
+    public void setSelf(Example self) {
+        this.self = self;
     }
 
-    /**
-     * if logger level <= DEBUG
-     *
-     * DEBUG [] ru.tinkoff.eclair.example.OuterClass.method >
-     * ..
-     * DEBUG [length=3, staticString=some string] ru.tinkoff.eclair.example.Example.mdcByArg > Dto{i=0, s='null'}
-     * DEBUG [length=3, staticString=some string] ru.tinkoff.eclair.example.Example.mdcByArg <
-     * ..
-     * DEBUG [staticString=some string] ru.tinkoff.eclair.example.OuterClass.method <
-     */
     @Log
-    public void mdcByArg(@Mdc(key = "length", value = "s.length()")
-                         @Mdc(key = "staticString", value = "some string", global = true) Dto dto) {
+    public void outer() {
+        self.mdc();
+    }
+
+    @Mdc(key = "static", value = "string")
+    @Mdc(key = "sum", value = "1 + 1", global = true)
+    @Mdc(key = "beanReference", value = "@jacksonPrinter.print(new ru.tinkoff.eclair.example.Dto())")
+    @Mdc(key = "staticMethod", value = "T(java.util.UUID).randomUUID()")
+    @Log.in
+    void mdc() {
+        self.inner();
+    }
+
+    @Log.in
+    void inner() {
+    }
+
+    @Log.in
+    public void mdcByArgument(@Mdc(key = "dto", value = "#this")
+                              @Mdc(key = "length", value = "s.length()") Dto dto) {
     }
 
     /**
@@ -374,67 +366,17 @@ class Example {
     public void priority() {
     }
 
-    // TODO: add example for {@link LogError} priority (looking for the nearest child)
-
     // TODO: add example for {@link LogError} ordering (in order of appearance)
 
     // TODO: add example for meta-annotation usage
 
     /**
      * TODO: add javadoc
+     * About order
      */
 //    @Log(logger = "simpleLogger")
 //    @Log(logger = "auditLogger")
     public void logMultiLogger() {
-    }
-
-    /**
-     * TODO: add javadoc
-     */
-//    @Log.in(logger = "simpleLogger")
-//    @Log.in(logger = "auditLogger")
-    public void logInMultiLogger() {
-    }
-
-    /**
-     * TODO: add javadoc
-     */
-//    @Log.out(logger = "simpleLogger")
-//    @Log.out(logger = "auditLogger")
-    public void logOutMultiLogger() {
-    }
-
-    /**
-     * TODO: add javadoc
-     */
-//    @Log.error(logger = "simpleLogger")
-//    @Log.error(logger = "auditLogger")
-    public void logErrorMultiLogger() {
-    }
-
-    /**
-     * TODO: add javadoc
-     */
-    public void parameterLogMultiLogger(/*@Log(logger = "simpleLogger")
-                                  @Log(logger = "auditLogger")*/ Dto dto) {
-    }
-
-    /**
-     * TODO: add javadoc
-     */
-    @Log
-    @Log
-    public void duplicatedAnnotation() {
-    }
-
-    // TODO: for several loggers with Orders
-    // TODO: for several loggers without Orders
-
-    /**
-     * (nothing to log)
-     */
-    @Log.in(OFF)
-    public void offLevel() {
     }
 
     /**
@@ -449,12 +391,5 @@ class Example {
      */
     @Log.in
     public void argOffLevel(@Log(OFF) int a) {
-    }
-
-    /**
-     * (nothing to log)
-     */
-    @Log.in(OFF)
-    public void offLevel(@Log(OFF) int a) {
     }
 }
