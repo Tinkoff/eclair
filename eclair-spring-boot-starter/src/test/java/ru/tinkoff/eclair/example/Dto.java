@@ -28,6 +28,14 @@ public class Dto {
     private int i;
     private String s;
 
+    public Dto() {
+    }
+
+    public Dto(int i, String s) {
+        this.i = i;
+        this.s = s;
+    }
+
     public int getI() {
         return i;
     }

@@ -15,13 +15,13 @@
 
 package ru.tinkoff.eclair.printer.processor;
 
-import lombok.Setter;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -35,8 +35,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.List;
+import java.util.Map;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyMap;
 
 /**
  * TODO: add tests
@@ -51,8 +53,8 @@ public class XPathMasker implements PrinterPostProcessor {
 
     private final List<String> xPathExpressions;
 
-    @Setter
     private String replacement;
+    private Map<String, String> outputProperties = emptyMap();
 
     public XPathMasker(String... xPathExpressions) {
         this.xPathExpressions = asList(xPathExpressions);
@@ -74,10 +76,22 @@ public class XPathMasker implements PrinterPostProcessor {
                 }
             }
             StringWriter writer = new StringWriter();
-            transformerFactory.newTransformer().transform(new DOMSource(document), new StreamResult(writer));
+            Transformer transformer = transformerFactory.newTransformer();
+            for (Map.Entry<String, String> entry : outputProperties.entrySet()) {
+                transformer.setOutputProperty(entry.getKey(), entry.getValue());
+            }
+            transformer.transform(new DOMSource(document), new StreamResult(writer));
             return writer.getBuffer().toString();
         } catch (ParserConfigurationException | SAXException | IOException | XPathExpressionException | TransformerException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void setReplacement(String replacement) {
+        this.replacement = replacement;
+    }
+
+    public void setOutputProperties(Map<String, String> outputProperties) {
+        this.outputProperties = outputProperties;
     }
 }

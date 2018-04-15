@@ -242,14 +242,14 @@ void ifEnabled() {
 #### Influence of configured level to verbosity
 ```java
 @Log(INFO)
-boolean verboseLevel(String s, Integer i, Double d) {
+boolean verbose(String s, Integer i, Double d) {
     return false;
 }
 ```
  Enabled level      | Log sample
 --------------------|------------
- `TRACE` `DEBUG`    | `INFO  [] r.t.e.example.Example.verboseLevel > s="s", i=4, d=5.6`<br>`INFO  [] r.t.e.example.Example.verboseLevel < false`
- `INFO`             | `INFO  [] r.t.e.example.Example.verboseLevel >`<br>`INFO  [] r.t.e.example.Example.verboseLevel <`
+ `TRACE` `DEBUG`    | `INFO  [] r.t.eclair.example.Example.verbose > s="s", i=4, d=5.6`<br>`INFO  [] r.t.eclair.example.Example.verbose < false`
+ `INFO`             | `INFO  [] r.t.eclair.example.Example.verbose >`<br>`INFO  [] r.t.eclair.example.Example.verbose <`
  `WARN` .. `OFF`    | -
 
 #### Verbosity disabled
@@ -269,12 +269,12 @@ boolean verboseDisabled(String s, Integer i, Double d) {
 You can specify printer's bean name or alias. Arguments and return values will be serialized with `#toString()` invocation by default. 
 ```java
 @Log(printer = "jacksonPrinter")
-void verboseJson(Dto dto, Integer i) {
+void json(Dto dto, Integer i) {
 }
 ```
  Enabled level      | Log sample
 --------------------|------------
- `TRACE` `DEBUG`    | `DEBUG [] r.t.e.example.Example.verboseJson > dto={"i":0,"s":null}, i=8`<br>`DEBUG [] r.t.e.example.Example.verboseJson <`
+ `TRACE` `DEBUG`    | `DEBUG [] r.t.eclair.example.Example.json > dto={"i":2,"s":"r"}, i=8`<br>`DEBUG [] r.t.eclair.example.Example.json <`
  `INFO` .. `OFF`    | -
 
 #### Try to print arguments by `Jaxb2Printer` as `XML`
@@ -286,7 +286,7 @@ void verboseXml(Dto dto, Integer i) {
 ```
  Enabled level      | Log sample
 --------------------|------------
- `TRACE` `DEBUG`    | `DEBUG [] r.t.e.example.Example.verboseXml > dto=<dto><i>0</i></dto>, i=7`<br>`DEBUG [] r.t.e.example.Example.verboseXml <`
+ `TRACE` `DEBUG`    | `DEBUG [] r.t.eclair.example.Example.xml > dto=<dto><i>4</i><s>k</s></dto>, i=7`<br>`DEBUG [] r.t.eclair.example.Example.xml <`
  `INFO` .. `OFF`    | -
 
 #### Separate `in` and `out` events 
@@ -299,8 +299,8 @@ void inOut(Dto dto, String s, Integer i) {
 ```
  Enabled level      | Log sample
 --------------------|------------
- `TRACE`            | `INFO  [] r.t.eclair.example.Example.inOut > dto=Dto{i=0, s='null'}, s="s", i=3`<br>`TRACE [] r.t.eclair.example.Example.inOut <`
- `DEBUG`            | `INFO  [] r.t.eclair.example.Example.inOut > dto=Dto{i=0, s='null'}, s="s", i=3`
+ `TRACE`            | `INFO  [] r.t.eclair.example.Example.inOut > dto=Dto{i=3, s='m'}, s="s", i=3`<br>`TRACE [] r.t.eclair.example.Example.inOut <`
+ `DEBUG`            | `INFO  [] r.t.eclair.example.Example.inOut > dto=Dto{i=3, s='m'}, s="s", i=3`
  `INFO`             | `INFO  [] r.t.eclair.example.Example.inOut >`
  `WARN` .. `OFF`    | -
 
@@ -314,7 +314,7 @@ void error() {
 ```
  Enabled level      | Log sample
 --------------------|------------
- `TRACE` .. `FATAL` | `ERROR [] r.t.eclair.example.Example.error ! java.lang.RuntimeException: Something strange happened`<br>`java.lang.RuntimeException: Something strange happened`<br>`	at ru.tinkoff.eclair.example.Example.error(Example.java:74)`<br>..
+ `TRACE` .. `FATAL` | `ERROR [] r.t.eclair.example.Example.error ! java.lang.RuntimeException: Something strange happened`<br>`java.lang.RuntimeException: Something strange happened`<br>`	at ru.tinkoff.eclair.example.Example.error(Example.java:0)`<br>..
  `OFF`              | -
 
 #### Warning on `DEBUG`
@@ -327,7 +327,74 @@ void warningOnDebug() {
 ```
  Enabled level      | Log sample
 --------------------|------------
- `TRACE` `DEBUG`    | `WARN  [] r.t.e.e.Example.warningOnDebug ! java.lang.RuntimeException: Something strange happened, but it doesn't matter`<br>`java.lang.RuntimeException: Something strange happened, but it doesn't matter`<br>`	at ru.tinkoff.eclair.example.Example.warningOnDebug(Example.java:79)`<br>..
+ `TRACE` `DEBUG`    | `WARN  [] r.t.e.e.Example.warningOnDebug ! java.lang.RuntimeException: Something strange happened, but it doesn't matter`<br>`java.lang.RuntimeException: Something strange happened, but it doesn't matter`<br>`	at ru.tinkoff.eclair.example.Example.warningOnDebug(Example.java:0)`<br>..
+ `INFO` .. `OFF`    | -
+
+#### Filter errors by type
+Errors could be filtered multiple times by `ofType` and `exclude` attributes.
+If the thrown exception matches any of `@Log.error` filters, it will be logged according to the settings of the corresponding annotation.  
+##### Annotated method
+```java
+@Log.error(level = WARN, ofType = {NullPointerException.class, IndexOutOfBoundsException.class})
+@Log.error(exclude = Error.class)
+void filterErrors(Throwable throwable) throws Throwable {
+    throw throwable;
+}
+```
+##### Invocation statement
+```java
+filterErrors(new NullPointerException());
+filterErrors(new Exception());
+filterErrors(new Error());
+```
+##### Result log
+ Enabled level      | Log sample
+--------------------|------------
+ `TRACE` .. `WARN`  | `WARN  [] r.t.e.example.Example.filterErrors ! java.lang.NullPointerException`<br>`java.lang.NullPointerException: null`<br>`	at ru.tinkoff.eclair.example.ExampleTest.filterErrors(ExampleTest.java:0)`<br>..<br>`ERROR [] r.t.e.example.Example.filterErrors ! java.lang.Exception`<br>`java.lang.Exception: null`<br>`	at ru.tinkoff.eclair.example.ExampleTest.filterErrors(ExampleTest.java:0)`<br>..
+ `ERROR` `FATAL`    | `ERROR [] r.t.e.example.Example.filterErrors ! java.lang.Exception`<br>`java.lang.Exception: null`<br>`	at ru.tinkoff.eclair.example.ExampleTest.filterErrors(ExampleTest.java:0)`<br>..
+ `OFF`              | -
+
+#### The most specific error type
+If thrown exception matches to several filters, the most specific parent type will be used. 
+```java
+@Log.error(level = ERROR, ofType = Exception.class)
+@Log.error(level = WARN, ofType = RuntimeException.class)
+void mostSpecific() {
+    throw new IllegalArgumentException();
+}
+```
+ Enabled level      | Log sample
+--------------------|------------
+ `TRACE` .. `WARN`  | `WARN  [] r.t.e.example.Example.mostSpecific ! java.lang.IllegalArgumentException`<br>`java.lang.IllegalArgumentException: null`<br>`	at ru.tinkoff.eclair.example.Example.mostSpecific(Example.java:0)`<br>..
+ `ERROR` .. `OFF`   | -
+
+#### Log annotated argument only
+> Note: If method is not annotated, log string will have the highest level among annotated parameters.<br>
+> Note: Parameter name printed for `TRACE` and `DEBUG` levels by default.
+```java
+void parameter(@Log(INFO) Dto dto, String s, Integer i) {
+}
+```
+ Enabled level      | Log sample
+--------------------|------------
+ `TRACE` `DEBUG`    | `INFO  [] r.t.e.example.Example.parameter > dto=Dto{i=0, s='u'}`
+ `INFO`             | `INFO  [] r.t.e.example.Example.parameter > Dto{i=0, s='u'}`
+ `WARN` .. `OFF`    | -
+
+#### Specific printer for each argument
+Printer could have pre- and post-processors for manipulating with data before / after serialization.<br>
+For example `maskJaxb2Printer` has `XPathMasker` post-processor for masking elements matched `//s` expression by `********`.
+```java
+@Log.out(printer = "maskJaxb2Printer")
+Dto printers(@Log(printer = "maskJaxb2Printer") Dto xml,
+             @Log(printer = "jacksonPrinter") Dto json,
+             Integer i) {
+    return xml;
+}
+```
+ Enabled level      | Log sample
+--------------------|------------
+ `TRACE` `DEBUG`    | `DEBUG [] r.t.eclair.example.Example.printers > xml=<dto><i>5</i><s>********</s></dto>, json={"i":5,"s":"password"}`<br>`DEBUG [] r.t.eclair.example.Example.printers < <dto><i>5</i><s>********</s></dto>`
  `INFO` .. `OFF`    | -
 
 #### Configured parameter levels
@@ -340,7 +407,27 @@ void parameterLevels(@Log(INFO) Double d,
 ```
  Enabled level      | Log sample
 --------------------|------------
- `TRACE`            | `INFO  [] r.t.e.e.Example.parameterLevels > d=0.0, s="s", i=0`
- `DEBUG`            | `INFO  [] r.t.e.e.Example.parameterLevels > d=0.0, s="s"`
- `INFO`             | `INFO  [] r.t.e.e.Example.parameterLevels > 0.0`
+ `TRACE`            | `INFO  [] r.t.e.e.Example.parameterLevels > d=9.4, s="v", i=7`
+ `DEBUG`            | `INFO  [] r.t.e.e.Example.parameterLevels > d=9.4, s="v"`
+ `INFO`             | `INFO  [] r.t.e.e.Example.parameterLevels > 9.4`
  `WARN` .. `OFF`    | -
+
+#### Mix
+```java
+@Log.in(INFO)
+@Log.out(level = TRACE, verbose = TRACE)
+@Log.error(level = WARN, ofType = RuntimeException.class, exclude = NullPointerException.class)
+@Log.error(level = ERROR, ofType = {Error.class, Exception.class})
+Dto mix(@Log(printer = "jaxb2Printer") Dto xml,
+        @Log(ifEnabled = TRACE, printer = "jacksonPrinter") Dto json,
+        Integer i) {
+    throw new IllegalArgumentException("Something strange happened");
+}
+```
+ Enabled level      | Log sample
+--------------------|------------
+ `TRACE`            | `INFO  [] r.t.eclair.example.Example.mix > xml=<dto><i>5</i><s>a</s></dto>, json={"i":7,"s":"b"}, i=1`<br>`WARN  [] r.t.eclair.example.Example.mix ! java.lang.IllegalArgumentException: Something strange happened`<br>`java.lang.IllegalArgumentException: Something strange happened`<br>`	at ru.tinkoff.eclair.example.Example.mix(Example.java:0)`<br>..
+ `DEBUG`            | `INFO  [] r.t.eclair.example.Example.mix > xml=<dto><i>5</i><s>a</s></dto>, i=1`<br>`WARN  [] r.t.eclair.example.Example.mix ! java.lang.IllegalArgumentException: Something strange happened`<br>`java.lang.IllegalArgumentException: Something strange happened`<br>`	at ru.tinkoff.eclair.example.Example.mix(Example.java:0)`<br>..
+ `INFO`             | `INFO  [] r.t.eclair.example.Example.mix >`<br>`WARN  [] r.t.eclair.example.Example.mix ! java.lang.IllegalArgumentException: Something strange happened`<br>`java.lang.IllegalArgumentException: Something strange happened`<br>`	at ru.tinkoff.eclair.example.Example.mix(Example.java:0)`<br>..
+ `WARN`             | `WARN  [] r.t.eclair.example.Example.mix ! java.lang.IllegalArgumentException: Something strange happened`<br>`java.lang.IllegalArgumentException: Something strange happened`<br>`	at ru.tinkoff.eclair.example.Example.mix(Example.java:0)`<br>..
+ `ERROR` .. `OFF`   | -

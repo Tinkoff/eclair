@@ -45,7 +45,7 @@ class Example {
     }
 
     @Log(INFO)
-    public boolean verboseLevel(String s, Integer i, Double d) {
+    public boolean verbose(String s, Integer i, Double d) {
         return false;
     }
 
@@ -55,11 +55,11 @@ class Example {
     }
 
     @Log(printer = "jacksonPrinter")
-    public void verboseJson(Dto dto, Integer i) {
+    public void json(Dto dto, Integer i) {
     }
 
     @Log(printer = "jaxb2Printer")
-    public void verboseXml(Dto dto, Integer i) {
+    public void xml(Dto dto, Integer i) {
     }
 
     @Log.in(INFO)
@@ -77,76 +77,42 @@ class Example {
         throw new RuntimeException("Something strange happened, but it doesn't matter");
     }
 
+    @Log.error(level = WARN, ofType = {NullPointerException.class, IndexOutOfBoundsException.class})
+    @Log.error(exclude = Error.class)
+    public void filterErrors(Throwable throwable) throws Throwable {
+        throw throwable;
+    }
+
+    @Log.error(level = ERROR, ofType = Exception.class)
+    @Log.error(level = WARN, ofType = RuntimeException.class)
+    public void mostSpecific() {
+        throw new IllegalArgumentException();
+    }
+
+    public void parameter(@Log(INFO) Dto dto, String s, Integer i) {
+    }
+
+    @Log.out(printer = "maskJaxb2Printer")
+    public Dto printers(@Log(printer = "maskJaxb2Printer") Dto xml,
+                        @Log(printer = "jacksonPrinter") Dto json,
+                        Integer i) {
+        return xml;
+    }
+
     @Log.in(INFO)
     public void parameterLevels(@Log(INFO) Double d,
                                 @Log(DEBUG) String s,
                                 @Log(TRACE) Integer i) {
     }
 
-    @Log.error(level = WARN, ofType = {NullPointerException.class, IndexOutOfBoundsException.class})
-    @Log.error(exclude = Error.class)
-    public void filterErrorsNpe(Throwable e) throws Throwable {
-        throw e;
-    }
-
-    /**
-     * DEBUG [] ru.tinkoff.eclair.example.Example.verbose > dto=Dto{i=0, s='null'}
-     */
-    public void verbose(@Log Dto dto, String s, Integer i) {
-    }
-
-    /**
-     * INFO  [] ru.tinkoff.eclair.example.Example.levelVerbose > dto=Dto{i=0, s='null'}
-     */
-    public void levelVerbose(@Log(INFO) Dto dto, String s, Integer i) {
-    }
-
-    /**
-     * DEBUG [] r.t.e.example.Example.verboseToVariousPrinters > xmlDto=<dto><i>0</i></dto>, jsonDto={"i":0,"s":null}
-     */
-    public void verboseToVariousPrinters(@Log(printer = "xml") Dto xmlDto,
-                                         @Log(printer = "json") Dto jsonDto,
-                                         Integer i) {
-    }
-
-    // TODO: add example with several mask expressions
-    // TODO: add example of return value masking
-
-    /**
-     * if logger level = TRACE
-     * INFO  [] ru.tinkoff.eclair.example.Example.mix > xmlDto=<dto><i>0</i></dto>, jsonDto={"i":0,"s":null}
-     * WARN  [] ru.tinkoff.eclair.example.Example.mix ! java.lang.IllegalArgumentException: message
-     * java.lang.IllegalArgumentException: message
-     *     at ru.tinkoff.eclair.example.Example.mix(Example.java:245)
-     *
-     * else if logger level = DEBUG
-     * INFO  [] ru.tinkoff.eclair.example.Example.mix > xmlDto=<dto><i>0</i></dto>
-     * WARN  [] ru.tinkoff.eclair.example.Example.mix ! java.lang.IllegalArgumentException: message
-     * java.lang.IllegalArgumentException: message
-     *     at ru.tinkoff.eclair.example.Example.mix(Example.java:245)
-     *
-     * else if logger level = INFO
-     * INFO  [] ru.tinkoff.eclair.example.Example.mix >
-     * WARN  [] ru.tinkoff.eclair.example.Example.mix ! java.lang.IllegalArgumentException: message
-     * java.lang.IllegalArgumentException: message
-     *     at ru.tinkoff.eclair.example.Example.mix(Example.java:245)
-     *
-     * else if logger level = WARN
-     * WARN  [] ru.tinkoff.eclair.example.Example.mix ! java.lang.IllegalArgumentException: message
-     * java.lang.IllegalArgumentException: message
-     *     at ru.tinkoff.eclair.example.Example.mix(Example.java:245)
-     *
-     * else if logger level = ERROR
-     * (nothing to log)
-     */
     @Log.in(INFO)
     @Log.out(level = TRACE, verbose = TRACE)
     @Log.error(level = WARN, ofType = RuntimeException.class, exclude = NullPointerException.class)
     @Log.error(level = ERROR, ofType = {Error.class, Exception.class})
-    public Dto mix(@Log(printer = "xml") Dto xmlDto,
-                   @Log(ifEnabled = TRACE, printer = "json") Dto jsonDto,
+    public Dto mix(@Log(printer = "jaxb2Printer") Dto xml,
+                   @Log(ifEnabled = TRACE, printer = "jacksonPrinter") Dto json,
                    Integer i) {
-        throw new IllegalArgumentException("message");
+        throw new IllegalArgumentException("Something strange happened");
     }
 
     // TODO: add example with bean referencing inside @Mdc

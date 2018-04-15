@@ -21,6 +21,8 @@ import org.springframework.boot.logging.LogLevel;
 
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.joining;
@@ -38,6 +40,8 @@ class ExampleTableBuilder {
     private static final int LEVELS_CELL_WIDTH = 1 + 7 + 1 + 2 + 1 + 7 + 1;
     private static final int MULTI_LINE_MAX_LENGTH = 3;
     private static final String LINE_SEPARATOR = "<br>";
+
+    private static final Pattern stackTraceElement = Pattern.compile("^(\\s*at \\S+\\(\\S+\\.java:)\\d+(\\))$");
 
     private boolean hide = true;
     private PatternLayout patternLayout;
@@ -63,6 +67,7 @@ class ExampleTableBuilder {
     private String processMultiLineEventString(String input) {
         String[] lines = input.split("\\r?\\n");
         String result = Stream.of(lines)
+                .map(this::maskStackTraceElement)
                 .map(this::asCode)
                 .limit(MULTI_LINE_MAX_LENGTH)
                 .collect(joining(LINE_SEPARATOR));
@@ -70,6 +75,20 @@ class ExampleTableBuilder {
             result += LINE_SEPARATOR + "..";
         }
         return result;
+    }
+
+    /**
+     * Replace line numbers by '0'.
+     * Before:
+     * `	at ru.tinkoff.eclair.example.Example.error(Example.java:74)`
+     * `	at ru.tinkoff.eclair.example.ExampleTest.filterErrors(ExampleTest.java:250)`
+     * After:
+     * `	at ru.tinkoff.eclair.example.Example.error(Example.java:0)`
+     * `	at ru.tinkoff.eclair.example.ExampleTest.filterErrors(ExampleTest.java:0)`
+     */
+    private String maskStackTraceElement(String line) {
+        Matcher matcher = stackTraceElement.matcher(line);
+        return matcher.matches() ? matcher.replaceAll("$10$2") : line;
     }
 
     String buildTable(Map<String, List<LogLevel>> levels) {
