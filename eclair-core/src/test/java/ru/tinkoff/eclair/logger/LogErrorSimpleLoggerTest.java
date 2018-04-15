@@ -210,10 +210,21 @@ public class LogErrorSimpleLoggerTest {
         private LogLevel ifEnabledLevel = OFF;
         private LogLevel verboseLevel = ERROR;
 
+        /**
+         * TODO: add test with differing values
+         */
         private LogLevel outLevel = DEBUG;
+        /**
+         * TODO: add test with differing values
+         */
         private LogLevel outIfEnabledLevel = OFF;
+        /**
+         * TODO: add test with differing values
+         */
         private LogLevel outVerboseLevel = DEBUG;
-
+        /**
+         * TODO: add test with differing values
+         */
         private ErrorLog.Filter filter = defaultFilter;
 
         private LogLevel effectiveLevel;

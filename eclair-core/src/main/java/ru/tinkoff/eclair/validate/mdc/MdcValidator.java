@@ -22,7 +22,7 @@ import ru.tinkoff.eclair.annotation.Mdc;
 /**
  * @author Vyacheslav Klapatnyuk
  */
-public class MdcValidator implements Validator {
+class MdcValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {

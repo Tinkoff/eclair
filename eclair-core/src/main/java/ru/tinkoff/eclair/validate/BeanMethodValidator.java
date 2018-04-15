@@ -37,7 +37,7 @@ import static java.util.stream.Collectors.toSet;
 /**
  * @author Vyacheslav Klapatnyuk
  */
-public class BeanMethodValidator implements Validator {
+class BeanMethodValidator implements Validator {
 
     private final AnnotationExtractor annotationExtractor = AnnotationExtractor.getInstance();
 

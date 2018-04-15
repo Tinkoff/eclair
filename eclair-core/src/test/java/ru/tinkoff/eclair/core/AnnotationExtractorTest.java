@@ -308,11 +308,11 @@ public class AnnotationExtractorTest {
         public void logError() {
         }
 
-        @Mdcs(@Mdc(key = "", value = ""))
+        @Mdcs(@Mdc)
         public void mdcs() {
         }
 
-        @Mdc(key = "", value = "")
+        @Mdc
         public void mdc() {
         }
 
@@ -322,10 +322,10 @@ public class AnnotationExtractorTest {
         public void parameterLog(@Log String input) {
         }
 
-        public void parameterMdcs(@Mdcs(@Mdc(key = "", value = "")) String input) {
+        public void parameterMdcs(@Mdcs(@Mdc) String input) {
         }
 
-        public void parameterMdc(@Mdc(key = "", value = "") String input) {
+        public void parameterMdc(@Mdc String input) {
         }
 
         public void none(String input) {
@@ -510,27 +510,27 @@ public class AnnotationExtractorTest {
         @Log.in(INFO)
         @Log.out(INFO)
         @Log.error(INFO)
-        @Mdc(key = "key", value = "")
+        @Mdc(key = "key")
         public void loggedOverriddenMethod(@Log(INFO)
-                                           @Mdc(key = "key", value = "") T input) {
+                                           @Mdc(key = "key") T input) {
         }
 
         @Log(INFO)
         @Log.in(INFO)
         @Log.out(INFO)
         @Log.error(INFO)
-        @Mdc(key = "key", value = "")
+        @Mdc(key = "key")
         public void overriddenMethod(@Log(INFO)
-                                     @Mdc(key = "key", value = "") T input) {
+                                     @Mdc(key = "key") T input) {
         }
 
         @Log(INFO)
         @Log.in(INFO)
         @Log.out(INFO)
         @Log.error(INFO)
-        @Mdc(key = "key", value = "")
+        @Mdc(key = "key")
         public void overriddenNotGenericMethod(@Log(INFO)
-                                               @Mdc(key = "key", value = "") String input) {
+                                               @Mdc(key = "key") String input) {
         }
     }
 
@@ -541,10 +541,10 @@ public class AnnotationExtractorTest {
         @Log.in(DEBUG)
         @Log.out(DEBUG)
         @Log.error(DEBUG)
-        @Mdc(key = "", value = "")
+        @Mdc
         @Override
         public void loggedOverriddenMethod(@Log(DEBUG)
-                                           @Mdc(key = "", value = "") String input) {
+                                           @Mdc String input) {
         }
 
         @Override

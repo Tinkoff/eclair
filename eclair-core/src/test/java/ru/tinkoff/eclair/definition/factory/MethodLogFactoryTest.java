@@ -31,6 +31,7 @@ import static java.util.Collections.*;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.springframework.core.annotation.AnnotationUtils.synthesizeAnnotation;
 
@@ -52,6 +53,7 @@ public class MethodLogFactoryTest {
         // when
         MethodLog methodLog = MethodLogFactory.newInstance(method, parameterNames, inLog, parameterLogs, outLog, errorLogs);
         // then
+        assertNotNull(methodLog);
         assertThat(methodLog.getMethod(), is(method));
         assertThat(methodLog.getParameterNames(), hasSize(1));
         assertThat(methodLog.getParameterNames().get(0), is("parameterName"));
@@ -87,6 +89,7 @@ public class MethodLogFactoryTest {
         Set<ErrorLog> errorLogs = new HashSet<>();
         // when
         MethodLog methodLog = MethodLogFactory.newInstance(method, parameterNames, inLog, parameterLogs, outLog, errorLogs);
+        assertNotNull(methodLog);
         methodLog.getParameterLogs().add(givenParameterLog());
         // then expected exception
     }
@@ -102,6 +105,7 @@ public class MethodLogFactoryTest {
         Set<ErrorLog> errorLogs = new HashSet<>();
         // when
         MethodLog methodLog = MethodLogFactory.newInstance(method, parameterNames, inLog, parameterLogs, outLog, errorLogs);
+        assertNotNull(methodLog);
         methodLog.getParameterNames().add("name");
         // then expected exception
     }
@@ -119,6 +123,7 @@ public class MethodLogFactoryTest {
         // when
         MethodLog methodLog = MethodLogFactory.newInstance(method, parameterNames, inLog, parameterLogs, outLog, errorLogs);
         // then
+        assertNotNull(methodLog);
         assertThat(methodLog.findErrorLog(Throwable.class), nullValue());
         assertThat(methodLog.findErrorLog(RuntimeException.class), is(errorLog));
         assertThat(methodLog.findErrorLog(RuntimeException.class), is(errorLog));

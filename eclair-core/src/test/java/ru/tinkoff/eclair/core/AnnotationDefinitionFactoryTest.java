@@ -37,6 +37,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.springframework.boot.logging.LogLevel.*;
 
@@ -67,6 +68,7 @@ public class AnnotationDefinitionFactoryTest {
         // when
         InLog inLog = annotationDefinitionFactory.buildInLog(loggerNames, method);
         // then
+        assertNotNull(inLog);
         assertThat(inLog.getLevel(), is(INFO));
     }
 
@@ -78,6 +80,7 @@ public class AnnotationDefinitionFactoryTest {
         // when
         InLog inLog = annotationDefinitionFactory.buildInLog(loggerNames, method);
         // then
+        assertNotNull(inLog);
         assertThat(inLog.getLevel(), is(WARN));
     }
 
@@ -89,6 +92,7 @@ public class AnnotationDefinitionFactoryTest {
         // when
         InLog inLog = annotationDefinitionFactory.buildInLog(loggerNames, method);
         // then
+        assertNotNull(inLog);
         assertThat(inLog.getLevel(), is(WARN));
     }
 
@@ -124,6 +128,7 @@ public class AnnotationDefinitionFactoryTest {
         // when
         InLog inLog = annotationDefinitionFactory.buildInLog(loggerNames, method);
         // then
+        assertNotNull(inLog);
         assertThat(inLog.getLevel(), is(ERROR));
     }
 
@@ -135,6 +140,7 @@ public class AnnotationDefinitionFactoryTest {
         // when
         InLog inLog = annotationDefinitionFactory.buildInLog(loggerNames, method);
         // then
+        assertNotNull(inLog);
         assertThat(inLog.getLevel(), is(ERROR));
     }
 
@@ -177,6 +183,7 @@ public class AnnotationDefinitionFactoryTest {
         // when
         OutLog outLog = annotationDefinitionFactory.buildOutLog(loggerNames, method);
         // then
+        assertNotNull(outLog);
         assertThat(outLog.getLevel(), is(INFO));
     }
 
@@ -188,6 +195,7 @@ public class AnnotationDefinitionFactoryTest {
         // when
         OutLog outLog = annotationDefinitionFactory.buildOutLog(loggerNames, method);
         // then
+        assertNotNull(outLog);
         assertThat(outLog.getLevel(), is(WARN));
         assertThat(outLog.getIfEnabledLevel(), is(ERROR));
         assertThat(outLog.getVerboseLevel(), is(TRACE));
@@ -202,6 +210,7 @@ public class AnnotationDefinitionFactoryTest {
         // when
         OutLog outLog = annotationDefinitionFactory.buildOutLog(loggerNames, method);
         // then
+        assertNotNull(outLog);
         assertThat(outLog.getLevel(), is(WARN));
     }
 
@@ -224,6 +233,7 @@ public class AnnotationDefinitionFactoryTest {
         // when
         OutLog outLog = annotationDefinitionFactory.buildOutLog(loggerNames, method);
         // then
+        assertNotNull(outLog);
         assertThat(outLog.getLevel(), is(ERROR));
     }
 
@@ -235,6 +245,7 @@ public class AnnotationDefinitionFactoryTest {
         // when
         OutLog outLog = annotationDefinitionFactory.buildOutLog(loggerNames, method);
         // then
+        assertNotNull(outLog);
         assertThat(outLog.getLevel(), is(ERROR));
     }
 
@@ -350,8 +361,8 @@ public class AnnotationDefinitionFactoryTest {
     @SuppressWarnings("unused")
     private static class MdcLoggableClass {
 
-        @Mdc(key = "method", value = "")
-        public void mdc(@Mdc(key = "a", value = "") String a, String b) {
+        @Mdc(key = "method")
+        public void mdc(@Mdc(key = "a") String a, String b) {
         }
 
         public void empty() {

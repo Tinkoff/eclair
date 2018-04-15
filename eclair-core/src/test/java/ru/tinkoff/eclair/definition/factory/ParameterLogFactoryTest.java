@@ -29,9 +29,7 @@ import static java.util.Collections.singletonMap;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.springframework.boot.logging.LogLevel.ERROR;
-import static org.springframework.boot.logging.LogLevel.INFO;
-import static org.springframework.boot.logging.LogLevel.WARN;
+import static org.springframework.boot.logging.LogLevel.*;
 import static org.springframework.core.annotation.AnnotationUtils.synthesizeAnnotation;
 
 /**

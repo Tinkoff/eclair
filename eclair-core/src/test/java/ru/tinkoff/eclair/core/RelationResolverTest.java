@@ -17,6 +17,7 @@ package ru.tinkoff.eclair.core;
 
 import org.aopalliance.aop.Advice;
 import org.aopalliance.intercept.MethodInterceptor;
+import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
@@ -163,6 +164,8 @@ public class RelationResolverTest {
         Set<Class<?>> reduced = RelationResolver.reduceDescendants(classes);
         // then
         assertThat(reduced, hasSize(2));
-        assertThat(reduced, Matchers.<Class<?>>containsInAnyOrder(Number.class, AbstractList.class));
+        @SuppressWarnings("unchecked")
+        Matcher<Iterable<? extends Class<?>>> matcher = Matchers.containsInAnyOrder(Number.class, AbstractList.class);
+        assertThat(reduced, matcher);
     }
 }

@@ -28,7 +28,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class OverriddenToStringPrinterTest {
 
-    private OverriddenToStringPrinter printer = new OverriddenToStringPrinter();
+    private final OverriddenToStringPrinter printer = new OverriddenToStringPrinter();
 
     @Test
     public void supportsPrimitives() {

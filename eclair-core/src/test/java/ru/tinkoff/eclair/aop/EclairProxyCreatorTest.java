@@ -105,6 +105,7 @@ public class EclairProxyCreatorTest {
         }
     }
 
+    @SuppressWarnings("unused")
     public static class Simple {
 
         @Log
@@ -112,6 +113,7 @@ public class EclairProxyCreatorTest {
         }
     }
 
+    @SuppressWarnings("unused")
     interface Parent {
 
         @Log

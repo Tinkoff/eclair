@@ -165,9 +165,6 @@ public class ExpressionEvaluatorTest {
         assertThat(result, is("bean string"));
     }
 
-    /**
-     * TODO: add to {@link ru.tinkoff.eclair.example.Example}
-     */
     @Test
     public void evaluateToString() {
         // given

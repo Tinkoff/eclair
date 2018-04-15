@@ -27,6 +27,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.*;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.springframework.core.annotation.AnnotationUtils.synthesizeAnnotation;
 
@@ -45,6 +46,7 @@ public class MethodMdcFactoryTest {
         // when
         MethodMdc methodMdc = MethodMdcFactory.newInstance(method, parameterNames, methodMdcs, argumentMdcs);
         // then
+        assertNotNull(methodMdc);
         assertThat(methodMdc.getMethod(), is(method));
         thenMethodDefinition(methodMdc.getMethodDefinitions());
         thenParameterDefinitions(methodMdc.getParameterDefinitions());
@@ -120,6 +122,7 @@ public class MethodMdcFactoryTest {
         // when
         MethodMdc methodMdc = MethodMdcFactory.newInstance(method, parameterNames, methodMdcs, argumentMdcs);
         // then
+        assertNotNull(methodMdc);
         methodMdc.getMethodDefinitions().add(ParameterMdcFactory.newInstance(givenMdc("")));
     }
 
@@ -133,6 +136,7 @@ public class MethodMdcFactoryTest {
         // when
         MethodMdc methodMdc = MethodMdcFactory.newInstance(method, parameterNames, methodMdcs, argumentMdcs);
         // then
+        assertNotNull(methodMdc);
         methodMdc.getParameterDefinitions().add(emptySet());
     }
 
@@ -146,6 +150,7 @@ public class MethodMdcFactoryTest {
         // when
         MethodMdc methodMdc = MethodMdcFactory.newInstance(method, parameterNames, methodMdcs, argumentMdcs);
         // then
+        assertNotNull(methodMdc);
         methodMdc.getParameterNames().add("");
     }
 }

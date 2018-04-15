@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlRootElement
 @XmlType(name = "dto")
+@SuppressWarnings("unused")
 public class Dto {
 
     private int i;
@@ -31,7 +32,7 @@ public class Dto {
     public Dto() {
     }
 
-    public Dto(int i, String s) {
+    Dto(int i, String s) {
         this.i = i;
         this.s = s;
     }
