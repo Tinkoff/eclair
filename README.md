@@ -331,7 +331,8 @@ void warningOnDebug() {
  `INFO` .. `OFF`    | -
 
 #### Filter errors by type
-Errors could be filtered multiple times by `ofType` and `exclude` attributes.
+Errors could be filtered multiple times by `ofType` and `exclude` attributes.<br>
+By default `ofType` contains `Throwable.class` and includes all subtypes.<br>
 If the thrown exception matches any of `@Log.error` filters, it will be logged according to the settings of the corresponding annotation.  
 ##### Annotated method
 ```java
@@ -355,7 +356,8 @@ filterErrors(new Error());
  `OFF`              | -
 
 #### The most specific error type
-If thrown exception matches to several filters, the most specific parent type will be used. 
+If thrown exception matches to several filters, the most specific parent type will be used.<br>
+`IllegalArgumentException` is child of `Exception` and `RuntimeException` too, but `RuntimeException` is more specific, so `IllegalArgumentException` logged with `WARN` level. 
 ```java
 @Log.error(level = ERROR, ofType = Exception.class)
 @Log.error(level = WARN, ofType = RuntimeException.class)
@@ -383,7 +385,7 @@ void parameter(@Log(INFO) Dto dto, String s, Integer i) {
 
 #### Specific printer for each argument
 Printer could have pre- and post-processors for manipulating with data before / after serialization.<br>
-For example `maskJaxb2Printer` has `XPathMasker` post-processor for masking elements matched `//s` expression by `********`.
+For example `maskJaxb2Printer` was configured with `XPathMasker` post-processor, so all elements matched `//s` expression masked by `********`.
 ```java
 @Log.out(printer = "maskJaxb2Printer")
 Dto printers(@Log(printer = "maskJaxb2Printer") Dto xml,
