@@ -19,12 +19,15 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import ru.tinkoff.eclair.core.AnnotationExtractor;
+import ru.tinkoff.eclair.core.PrinterResolver;
 import ru.tinkoff.eclair.logger.EclairLogger;
 
 import java.util.Map;
 import java.util.stream.Stream;
 
 /**
+ * TODO: add more information about error location (class, method?)
+ *
  * @author Vyacheslav Klapatnyuk
  */
 public class BeanClassValidator implements Validator {
@@ -34,8 +37,9 @@ public class BeanClassValidator implements Validator {
     private final BeanMethodValidator beanMethodValidator;
 
     public BeanClassValidator(GenericApplicationContext applicationContext,
-                              Map<String, EclairLogger> loggers) {
-        this.beanMethodValidator = new BeanMethodValidator(applicationContext, loggers);
+                              Map<String, EclairLogger> loggers,
+                              PrinterResolver printerResolver) {
+        this.beanMethodValidator = new BeanMethodValidator(applicationContext, loggers, printerResolver);
     }
 
     @Override

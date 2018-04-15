@@ -73,12 +73,13 @@ public class EclairProxyCreator extends AbstractAutoProxyCreator {
     public EclairProxyCreator(GenericApplicationContext applicationContext,
                               AnnotationDefinitionFactory annotationDefinitionFactory,
                               Map<String, EclairLogger> loggers,
-                              ExpressionEvaluator expressionEvaluator) {
+                              ExpressionEvaluator expressionEvaluator,
+                              PrinterResolver printerResolver) {
         this.applicationContext = applicationContext;
         this.annotationDefinitionFactory = annotationDefinitionFactory;
         this.loggers = loggers;
         this.expressionEvaluator = expressionEvaluator;
-        this.beanClassValidator = new BeanClassValidator(applicationContext, loggers);
+        this.beanClassValidator = new BeanClassValidator(applicationContext, loggers, printerResolver);
     }
 
     @Override

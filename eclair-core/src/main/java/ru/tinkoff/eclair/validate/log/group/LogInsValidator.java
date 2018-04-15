@@ -17,6 +17,7 @@ package ru.tinkoff.eclair.validate.log.group;
 
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.validation.Errors;
+import ru.tinkoff.eclair.core.PrinterResolver;
 import ru.tinkoff.eclair.logger.EclairLogger;
 import ru.tinkoff.eclair.validate.log.single.LogInValidator;
 
@@ -27,11 +28,13 @@ import java.util.Map;
  */
 public class LogInsValidator extends LoggerSpecificLogAnnotationsValidator {
 
-    private final LogInValidator logInValidator = new LogInValidator();
+    private final LogInValidator logInValidator;
 
     public LogInsValidator(GenericApplicationContext applicationContext,
-                           Map<String, EclairLogger> loggers) {
+                           Map<String, EclairLogger> loggers,
+                           PrinterResolver printerResolver) {
         super(applicationContext, loggers);
+        this.logInValidator = new LogInValidator(printerResolver);
     }
 
     @Override

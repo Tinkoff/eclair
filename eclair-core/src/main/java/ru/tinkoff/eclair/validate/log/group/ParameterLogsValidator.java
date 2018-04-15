@@ -17,6 +17,7 @@ package ru.tinkoff.eclair.validate.log.group;
 
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.validation.Errors;
+import ru.tinkoff.eclair.core.PrinterResolver;
 import ru.tinkoff.eclair.logger.EclairLogger;
 import ru.tinkoff.eclair.validate.log.single.ParameterLogValidator;
 
@@ -27,11 +28,13 @@ import java.util.Map;
  */
 public class ParameterLogsValidator extends LoggerSpecificLogAnnotationsValidator {
 
-    private final ParameterLogValidator parameterLogValidator = new ParameterLogValidator();
+    private final ParameterLogValidator parameterLogValidator;
 
     public ParameterLogsValidator(GenericApplicationContext applicationContext,
-                                  Map<String, EclairLogger> loggers) {
+                                  Map<String, EclairLogger> loggers,
+                                  PrinterResolver printerResolver) {
         super(applicationContext, loggers);
+        this.parameterLogValidator = new ParameterLogValidator(printerResolver);
     }
 
     @Override

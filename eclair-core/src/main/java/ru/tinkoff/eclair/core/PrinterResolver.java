@@ -96,11 +96,11 @@ public class PrinterResolver {
         return isNull(printer) ? printers.getOrDefault(aliases.get(printerName), defaultPrinter) : printer;
     }
 
-    Map<String, Printer> getPrinters() {
+    public Map<String, Printer> getPrinters() {
         return printers;
     }
 
-    Map<String, String> getAliases() {
+    public Map<String, String> getAliases() {
         return aliases;
     }
 }

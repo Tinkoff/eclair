@@ -111,7 +111,7 @@ public class EclairAutoConfiguration {
         Map<String, EclairLogger> loggers = new LoggerMapSorter().sort(loggerMap);
 
         EclairProxyCreator eclairProxyCreator =
-                new EclairProxyCreator(applicationContext, annotationDefinitionFactory, loggers, expressionEvaluator);
+                new EclairProxyCreator(applicationContext, annotationDefinitionFactory, loggers, expressionEvaluator, printerResolver);
         eclairProxyCreator.setOrder(Ordered.HIGHEST_PRECEDENCE);
         eclairProxyCreator.setFrozen(false);
         eclairProxyCreator.setValidate(eclairProperties.isValidate());

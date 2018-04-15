@@ -21,6 +21,7 @@ import org.springframework.validation.Validator;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.annotation.Mdc;
 import ru.tinkoff.eclair.core.AnnotationExtractor;
+import ru.tinkoff.eclair.core.PrinterResolver;
 import ru.tinkoff.eclair.logger.EclairLogger;
 import ru.tinkoff.eclair.validate.log.group.*;
 import ru.tinkoff.eclair.validate.mdc.MdcsValidator;
@@ -50,12 +51,13 @@ public class BeanMethodValidator implements Validator {
     private final MergedMdcsValidator mergedMdcsValidator = new MergedMdcsValidator();
 
     BeanMethodValidator(GenericApplicationContext applicationContext,
-                        Map<String, EclairLogger> loggers) {
-        this.logsValidator = new LogsValidator(applicationContext, loggers);
-        this.logInsValidator = new LogInsValidator(applicationContext, loggers);
-        this.logOutsValidator = new LogOutsValidator(applicationContext, loggers);
-        this.logErrorsValidator = new LogErrorsValidator(applicationContext, loggers);
-        this.parameterLogsValidator = new ParameterLogsValidator(applicationContext, loggers);
+                        Map<String, EclairLogger> loggers,
+                        PrinterResolver printerResolver) {
+        this.logsValidator = new LogsValidator(applicationContext, loggers, printerResolver);
+        this.logInsValidator = new LogInsValidator(applicationContext, loggers, printerResolver);
+        this.logOutsValidator = new LogOutsValidator(applicationContext, loggers, printerResolver);
+        this.logErrorsValidator = new LogErrorsValidator(applicationContext, loggers, printerResolver);
+        this.parameterLogsValidator = new ParameterLogsValidator(applicationContext, loggers, printerResolver);
     }
 
     @Override

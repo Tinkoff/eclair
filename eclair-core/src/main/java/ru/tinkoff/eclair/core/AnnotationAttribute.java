@@ -25,7 +25,8 @@ import static org.springframework.core.annotation.AnnotationUtils.getValue;
 public enum AnnotationAttribute {
     LEVEL("level"),
     IF_ENABLED("ifEnabled"),
-    LOGGER("logger");
+    LOGGER("logger"),
+    PRINTER("printer");
 
     private final String name;
 

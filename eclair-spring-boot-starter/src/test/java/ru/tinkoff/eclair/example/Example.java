@@ -258,12 +258,12 @@ class Example {
 
     @Target({ElementType.METHOD, ElementType.PARAMETER})
     @Retention(RetentionPolicy.RUNTIME)
-    @Log(level = INFO, printer = "xml")
+    @Log(level = INFO, printer = "jaxb2Printer")
     @Log.error(ofType = RuntimeException.class)
     @interface Audit {
     }
 
-    @Log(level = INFO, printer = "xml")
+    @Log(level = INFO, printer = "jaxb2Printer")
     @Log.error(ofType = RuntimeException.class)
     void listing() {
     }

@@ -290,14 +290,14 @@ You can define your own custom annotations that are an amalgamation of many Ecla
 ```java
 @Target({ElementType.METHOD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
-@Log(level = INFO, printer = "xml")
+@Log(level = INFO, printer = "jaxb2Printer")
 @Log.error(ofType = RuntimeException.class)
 @interface Audit {
 }
 ```
 So, if annotation above defined, following examples work absolutely identical.
 ```java
-@Log(level = INFO, printer = "xml")
+@Log(level = INFO, printer = "jaxb2Printer")
 @Log.error(ofType = RuntimeException.class)
 void listing() {
 }

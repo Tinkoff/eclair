@@ -16,11 +16,16 @@
 package ru.tinkoff.eclair.validate.log.single;
 
 import ru.tinkoff.eclair.annotation.Log;
+import ru.tinkoff.eclair.core.PrinterResolver;
 
 /**
  * @author Vyacheslav Klapatnyuk
  */
-public class LogValidator extends MethodTargetLogAnnotationValidator {
+public class LogValidator extends LogAnnotationValidator {
+
+    public LogValidator(PrinterResolver printerResolver) {
+        super(printerResolver);
+    }
 
     @Override
     public boolean supports(Class<?> clazz) {

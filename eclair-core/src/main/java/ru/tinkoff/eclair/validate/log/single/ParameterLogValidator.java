@@ -15,25 +15,20 @@
 
 package ru.tinkoff.eclair.validate.log.single;
 
-import org.springframework.validation.Errors;
-import org.springframework.validation.Validator;
 import ru.tinkoff.eclair.annotation.Log;
+import ru.tinkoff.eclair.core.PrinterResolver;
 
 /**
  * @author Vyacheslav Klapatnyuk
  */
-public class ParameterLogValidator implements Validator {
+public class ParameterLogValidator extends LogAnnotationValidator {
+
+    public ParameterLogValidator(PrinterResolver printerResolver) {
+        super(printerResolver);
+    }
 
     @Override
     public boolean supports(Class<?> clazz) {
         return clazz == Log.class;
-    }
-
-    /**
-     * TODO: implement or remove
-     */
-    @Override
-    public void validate(Object target, Errors errors) {
-        // do nothing
     }
 }

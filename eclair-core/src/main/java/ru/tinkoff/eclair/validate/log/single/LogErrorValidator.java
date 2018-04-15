@@ -18,6 +18,7 @@ package ru.tinkoff.eclair.validate.log.single;
 import org.springframework.validation.Errors;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.core.ErrorFilterFactory;
+import ru.tinkoff.eclair.core.PrinterResolver;
 import ru.tinkoff.eclair.definition.ErrorLog;
 
 import java.util.Set;
@@ -27,9 +28,13 @@ import static java.lang.String.format;
 /**
  * @author Vyacheslav Klapatnyuk
  */
-public class LogErrorValidator extends MethodTargetLogAnnotationValidator {
+public class LogErrorValidator extends LogAnnotationValidator {
 
     private final ErrorFilterFactory errorFilterFactory = ErrorFilterFactory.getInstance();
+
+    public LogErrorValidator(PrinterResolver printerResolver) {
+        super(printerResolver);
+    }
 
     @Override
     public boolean supports(Class<?> clazz) {

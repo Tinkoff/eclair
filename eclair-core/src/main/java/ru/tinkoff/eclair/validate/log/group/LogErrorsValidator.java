@@ -19,6 +19,7 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.validation.Errors;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.core.ErrorFilterFactory;
+import ru.tinkoff.eclair.core.PrinterResolver;
 import ru.tinkoff.eclair.definition.ErrorLog;
 import ru.tinkoff.eclair.logger.EclairLogger;
 import ru.tinkoff.eclair.validate.log.single.LogErrorValidator;
@@ -37,11 +38,13 @@ public class LogErrorsValidator extends LoggerSpecificLogAnnotationsValidator {
 
     private final ErrorFilterFactory errorFilterFactory = ErrorFilterFactory.getInstance();
 
-    private final LogErrorValidator logErrorValidator = new LogErrorValidator();
+    private final LogErrorValidator logErrorValidator;
 
     public LogErrorsValidator(GenericApplicationContext applicationContext,
-                              Map<String, EclairLogger> loggers) {
+                              Map<String, EclairLogger> loggers,
+                              PrinterResolver printerResolver) {
         super(applicationContext, loggers);
+        logErrorValidator = new LogErrorValidator(printerResolver);
     }
 
     @Override
