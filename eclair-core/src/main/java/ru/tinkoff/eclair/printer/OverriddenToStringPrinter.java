@@ -17,10 +17,6 @@ package ru.tinkoff.eclair.printer;
 
 import org.springframework.util.ReflectionUtils;
 
-import java.lang.reflect.Method;
-
-import static java.util.Objects.isNull;
-
 /**
  * @author Vyacheslav Klapatnyuk
  */
@@ -28,7 +24,15 @@ public class OverriddenToStringPrinter extends ToStringPrinter {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        Method toString = ReflectionUtils.findMethod(clazz, "toString");
-        return isNull(toString) || !toString.getDeclaringClass().equals(Object.class);
+        if (clazz.isPrimitive()) {
+            return true;
+        }
+        if (clazz.isInterface()) {
+            return clazz.isAnnotation();
+        }
+        if (clazz.isEnum()) {
+            return true;
+        }
+        return !ReflectionUtils.findMethod(clazz, "toString").getDeclaringClass().equals(Object.class);
     }
 }
