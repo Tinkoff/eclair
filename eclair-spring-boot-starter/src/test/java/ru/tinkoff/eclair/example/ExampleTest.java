@@ -30,6 +30,7 @@ import org.springframework.boot.logging.LogLevel;
 import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.annotation.Order;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.test.context.ContextConfiguration;
@@ -458,6 +459,39 @@ public class ExampleTest {
         assertEquals(expected, actual);
     }
 
+    @Test
+    public void manual() throws NoSuchMethodException {
+        // given, when
+        invokeForEachLevel(() -> example.manual());
+        // then
+        String expected = ExampleTableBuilder.TABLE_HEADER +
+                " `TRACE` `DEBUG`    | `DEBUG [] r.t.eclair.example.Example.manual >`<br>`INFO  [] r.t.eclair.example.Example.manual - Eager logging: 3.141592653589793`<br>`DEBUG [] r.t.eclair.example.Example.manual - Lazy logging: 3.141592653589793`<br>`DEBUG [] r.t.eclair.example.Example.manual <`\n" +
+                " `INFO`             | `INFO  [] r.t.eclair.example.Example.manual - Eager logging: 3.141592653589793`\n" +
+                " `WARN` .. `OFF`    | -";
+        String loggerName = loggerNameBuilder.build(Example.class.getMethod("manual"));
+        String actual = exampleTableBuilder.buildTable(groupLevels(loggerName));
+        System.out.println(actual);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void manualLevel() throws NoSuchMethodException {
+        // given, when
+        invokeForEachLevel(() -> example.manualLevel());
+        // then
+        String expected = ExampleTableBuilder.TABLE_HEADER +
+                " `TRACE`            | `DEBUG [] r.t.e.example.Example.manualLevel >`<br>`ERROR [] r.t.e.example.Example.manualLevel - ERROR`<br>`ERROR [] r.t.e.example.Example.manualLevel - ERROR if WARN enabled`<br>`ERROR [] r.t.e.example.Example.manualLevel - ERROR if INFO enabled`<br>`ERROR [] r.t.e.example.Example.manualLevel - ERROR if DEBUG enabled`<br>`ERROR [] r.t.e.example.Example.manualLevel - ERROR if TRACE enabled`<br>`WARN  [] r.t.e.example.Example.manualLevel - WARN`<br>`WARN  [] r.t.e.example.Example.manualLevel - WARN if INFO enabled`<br>`WARN  [] r.t.e.example.Example.manualLevel - WARN if DEBUG enabled`<br>`WARN  [] r.t.e.example.Example.manualLevel - WARN if TRACE enabled`<br>`INFO  [] r.t.e.example.Example.manualLevel - INFO`<br>`INFO  [] r.t.e.example.Example.manualLevel - INFO if DEBUG enabled`<br>`INFO  [] r.t.e.example.Example.manualLevel - INFO if TRACE enabled`<br>`DEBUG [] r.t.e.example.Example.manualLevel - DEBUG`<br>`DEBUG [] r.t.e.example.Example.manualLevel - DEBUG if TRACE enabled`<br>`TRACE [] r.t.e.example.Example.manualLevel - TRACE`<br>`DEBUG [] r.t.e.example.Example.manualLevel <`\n" +
+                " `DEBUG`            | `DEBUG [] r.t.e.example.Example.manualLevel >`<br>`ERROR [] r.t.e.example.Example.manualLevel - ERROR`<br>`ERROR [] r.t.e.example.Example.manualLevel - ERROR if WARN enabled`<br>`ERROR [] r.t.e.example.Example.manualLevel - ERROR if INFO enabled`<br>`ERROR [] r.t.e.example.Example.manualLevel - ERROR if DEBUG enabled`<br>`WARN  [] r.t.e.example.Example.manualLevel - WARN`<br>`WARN  [] r.t.e.example.Example.manualLevel - WARN if INFO enabled`<br>`WARN  [] r.t.e.example.Example.manualLevel - WARN if DEBUG enabled`<br>`INFO  [] r.t.e.example.Example.manualLevel - INFO`<br>`INFO  [] r.t.e.example.Example.manualLevel - INFO if DEBUG enabled`<br>`DEBUG [] r.t.e.example.Example.manualLevel - DEBUG`<br>`DEBUG [] r.t.e.example.Example.manualLevel <`\n" +
+                " `INFO`             | `ERROR [] r.t.e.example.Example.manualLevel - ERROR`<br>`ERROR [] r.t.e.example.Example.manualLevel - ERROR if WARN enabled`<br>`ERROR [] r.t.e.example.Example.manualLevel - ERROR if INFO enabled`<br>`WARN  [] r.t.e.example.Example.manualLevel - WARN`<br>`WARN  [] r.t.e.example.Example.manualLevel - WARN if INFO enabled`<br>`INFO  [] r.t.e.example.Example.manualLevel - INFO`\n" +
+                " `WARN`             | `ERROR [] r.t.e.example.Example.manualLevel - ERROR`<br>`ERROR [] r.t.e.example.Example.manualLevel - ERROR if WARN enabled`<br>`WARN  [] r.t.e.example.Example.manualLevel - WARN`\n" +
+                " `ERROR` `FATAL`    | `ERROR [] r.t.e.example.Example.manualLevel - ERROR`\n" +
+                " `OFF`              | -";
+        String loggerName = loggerNameBuilder.build(Example.class.getMethod("manualLevel"));
+        String actual = exampleTableBuilder.buildTable(groupLevels(loggerName));
+        System.out.println(actual);
+        assertEquals(expected, actual);
+    }
+
     private void invokeForEachLevel(Runnable runnable) {
         Stream.of(values()).forEach(level -> invoke(runnable, level));
     }
@@ -517,8 +551,14 @@ public class ExampleTest {
         }
 
         @Bean
-        public EclairLogger eclairLogger() {
+        @Primary
+        public EclairLogger simpleLogger() {
             return new SimpleLogger(loggerFacadeFactory, LoggingSystem.get(SimpleLogger.class.getClassLoader()));
+        }
+
+        @Bean
+        public EclairLogger auditLogger() {
+            return new SimpleLogger();
         }
     }
 }

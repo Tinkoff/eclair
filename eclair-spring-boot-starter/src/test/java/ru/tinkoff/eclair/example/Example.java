@@ -15,10 +15,17 @@
 
 package ru.tinkoff.eclair.example;
 
-import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.annotation.Mdc;
+import ru.tinkoff.eclair.logger.ManualLogger;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.util.function.Supplier;
 
 import static org.springframework.boot.logging.LogLevel.*;
 
@@ -142,8 +149,8 @@ class Example {
     }
 
     @Log.in
-    public void mdcByArgument(@Mdc(key = "dto", value = "#this")
-                              @Mdc(key = "length", value = "s.length()") Dto dto) {
+    void mdcByArgument(@Mdc(key = "dto", value = "#this")
+                       @Mdc(key = "length", value = "s.length()") Dto dto) {
     }
 
     @Mdc
@@ -157,7 +164,7 @@ class Example {
      * DEBUG [mdc[0]=s, mdc[1]=0] ru.tinkoff.eclair.example.Example.mdc > "s", 0
      */
     @Log.in
-    public void mdc(@Mdc String s, @Mdc Integer i) {
+    void mdc(@Mdc String s, @Mdc Integer i) {
     }
 
     /**
@@ -165,7 +172,7 @@ class Example {
      */
     @Mdc(key = "methodKey")
     @Log.in
-    public void mdc1(String s, Integer i) {
+    void mdc1(String s, Integer i) {
     }
 
     /**
@@ -173,7 +180,7 @@ class Example {
      */
     @Mdc("methodValue")
     @Log.in
-    public void mdc2(String s, Integer i) {
+    void mdc2(String s, Integer i) {
     }
 
     /**
@@ -184,170 +191,105 @@ class Example {
      */
     @Mdc
     @Log.in
-    public void mdc3(String s, Integer i) {
+    void mdc3(String s, Integer i) {
     }
 
-//    @Autowired
-//    private ManualLogger logger;
+    @Autowired
+    @Qualifier("simpleLogger")
+    private ManualLogger logger;
 
-    /**
-     * if logger level <= DEBUG
-     *
-     * DEBUG [] ru.tinkoff.eclair.example.Example.manualLogging >
-     * DEBUG [key=value] ru.tinkoff.eclair.example.Example.manualLogging - Manual logging: 0.123
-     * INFO  [key=value] ru.tinkoff.eclair.example.Example.manualLogging - Lazy manual logging: 0.456
-     * DEBUG [key=value] ru.tinkoff.eclair.example.Example.manualLogging <
-     */
     @Log
-    public void manualLogging() {
-        MDC.put("key", "value");
-//        logger.debug("Manual logging: {}", new Random().nextDouble());
-//        logger.info("Lazy manual logging: {}", (Supplier) () -> new Random().nextDouble());
+    public void manual() {
+        logger.info("Eager logging: {}", Math.PI);
+        logger.debug("Lazy logging: {}", (Supplier) () -> Math.PI);
     }
 
-    /**
-     * if logger level <= DEBUG
-     *
-     * DEBUG [] r.t.eclair.example.Example.manualLevelLogging >
-     * INFO  [] r.t.eclair.example.Example.manualLevelLogging - false
-     * INFO  [] r.t.eclair.example.Example.manualLevelLogging - true
-     * INFO  [] r.t.eclair.example.Example.manualLevelLogging - true
-     * INFO  [] r.t.eclair.example.Example.manualLevelLogging - true
-     * INFO  [] r.t.eclair.example.Example.manualLevelLogging - true
-     * INFO  [] r.t.eclair.example.Example.manualLevelLogging - false
-     * DEBUG [] r.t.eclair.example.Example.manualLevelLogging - debug
-     * INFO  [] r.t.eclair.example.Example.manualLevelLogging - info
-     * INFO  [] r.t.eclair.example.Example.manualLevelLogging - infoIfDebugEnabled
-     * WARN  [] r.t.eclair.example.Example.manualLevelLogging - warn
-     * WARN  [] r.t.eclair.example.Example.manualLevelLogging - warnIfInfoEnabled
-     * WARN  [] r.t.eclair.example.Example.manualLevelLogging - warnIfDebugEnabled
-     * ERROR [] r.t.eclair.example.Example.manualLevelLogging - error
-     * ERROR [] r.t.eclair.example.Example.manualLevelLogging - errorIfWarnEnabled
-     * ERROR [] r.t.eclair.example.Example.manualLevelLogging - errorIfInfoEnabled
-     * ERROR [] r.t.eclair.example.Example.manualLevelLogging - errorIfDebugEnabled
-     * ERROR [] r.t.eclair.example.Example.manualLevelLogging - log
-     * ERROR [] r.t.eclair.example.Example.manualLevelLogging <
-     */
     @Log
-    public void manualLevelLogging() {
-        // INFO  [] r.t.eclair.example.Example.manualLevelLogging - false
-        // INFO  [] r.t.eclair.example.Example.manualLevelLogging - true
-        // INFO  [] r.t.eclair.example.Example.manualLevelLogging - true
-        // INFO  [] r.t.eclair.example.Example.manualLevelLogging - true
-        // INFO  [] r.t.eclair.example.Example.manualLevelLogging - true
-        // INFO  [] r.t.eclair.example.Example.manualLevelLogging - false
-        /*logger.info(Boolean.toString(logger.isTraceLogEnabled()));
-        logger.info(Boolean.toString(logger.isDebugLogEnabled()));
-        logger.info(Boolean.toString(logger.isInfoLogEnabled()));
-        logger.info(Boolean.toString(logger.isWarnLogEnabled()));
-        logger.info(Boolean.toString(logger.isErrorLogEnabled()));
-        logger.info(Boolean.toString(logger.isLogEnabled(TRACE)));
-
-        // nothing to log
-        logger.trace("trace");
-
-        // DEBUG [] r.t.eclair.example.Example.manualLevelLogging - debug
-        // nothing to log
-        logger.debug("debug");
-        logger.debugIfTraceEnabled("debugIfTraceEnabled");
-
-        // INFO  [] r.t.eclair.example.Example.manualLevelLogging - info
-        // INFO  [] r.t.eclair.example.Example.manualLevelLogging - infoIfDebugEnabled
-        // nothing to log
-        logger.info("info");
-        logger.infoIfDebugEnabled("infoIfDebugEnabled");
-        logger.infoIfTraceEnabled("infoIfTraceEnabled");
-
-        // WARN  [] r.t.eclair.example.Example.manualLevelLogging - warn
-        // WARN  [] r.t.eclair.example.Example.manualLevelLogging - warnIfInfoEnabled
-        // WARN  [] r.t.eclair.example.Example.manualLevelLogging - warnIfDebugEnabled
-        // nothing to log
-        logger.warn("warn");
-        logger.warnIfInfoEnabled("warnIfInfoEnabled");
-        logger.warnIfDebugEnabled("warnIfDebugEnabled");
-        logger.warnIfTraceEnabled("warnIfTraceEnabled");
-
-        // ERROR [] r.t.eclair.example.Example.manualLevelLogging - error
-        // ERROR [] r.t.eclair.example.Example.manualLevelLogging - errorIfWarnEnabled
-        // ERROR [] r.t.eclair.example.Example.manualLevelLogging - errorIfInfoEnabled
-        // ERROR [] r.t.eclair.example.Example.manualLevelLogging - errorIfDebugEnabled
-        // nothing to log
-        logger.error("error");
-        logger.errorIfWarnEnabled("errorIfWarnEnabled");
-        logger.errorIfInfoEnabled("errorIfInfoEnabled");
-        logger.errorIfDebugEnabled("errorIfDebugEnabled");
-        logger.errorIfTraceEnabled("errorIfTraceEnabled");
-
-        // ERROR [] r.t.eclair.example.Example.manualLevelLogging - log
-        logger.log(ERROR, "log");*/
+    public void manualLevel() {
+        // log ERROR
+        logger.error("ERROR");
+        logger.errorIfWarnEnabled("ERROR if WARN enabled");
+        logger.errorIfInfoEnabled("ERROR if INFO enabled");
+        logger.errorIfDebugEnabled("ERROR if DEBUG enabled");
+        logger.errorIfTraceEnabled("ERROR if TRACE enabled");
+        // log WARN
+        logger.warn("WARN");
+        logger.warnIfInfoEnabled("WARN if INFO enabled");
+        logger.warnIfDebugEnabled("WARN if DEBUG enabled");
+        logger.warnIfTraceEnabled("WARN if TRACE enabled");
+        // log INFO
+        logger.info("INFO");
+        logger.infoIfDebugEnabled("INFO if DEBUG enabled");
+        logger.infoIfTraceEnabled("INFO if TRACE enabled");
+        // log DEBUG
+        logger.debug("DEBUG");
+        logger.debugIfTraceEnabled("DEBUG if TRACE enabled");
+        // log TRACE
+        logger.trace("TRACE");
     }
 
     /**
-     * equals to next
+     * Equals to next
      */
-    @Log.in(level = INFO, verbose = TRACE)
-    @Log(level = TRACE, verbose = OFF)
-    public void inAndLog() {
+    @Log.in(ERROR)
+    @Log(TRACE)
+    void inLog() {
     }
 
-    @Log.in(level = INFO, verbose = TRACE)
-    @Log.out(level = TRACE, verbose = OFF)
-    public void inAndOutEqualsToInAndLog() {
+    @Log.in(ERROR)
+    @Log.out(TRACE)
+    void inOut() {
     }
 
     /**
-     * equals to next
+     * Equals to next
      */
-    @Log(level = TRACE, verbose = OFF)
-    @Log.out(level = INFO, verbose = TRACE)
-    public void logAndOut() {
+    @Log.out(ERROR)
+    @Log(TRACE)
+    void outLog() {
     }
 
-    @Log.in(level = TRACE, verbose = OFF)
-    @Log.out(level = INFO, verbose = TRACE)
-    public void inAndOutEqualsToLogAndOut() {
-    }
-
-    /**
-     * if logger level = ERROR or WARN
-     * (nothing to log)
-     *
-     * else if logger level = INFO or DEBUG
-     * INFO  [] ru.tinkoff.eclair.example.Example.priority >
-     *
-     * else if logger level = TRACE
-     * INFO  [] ru.tinkoff.eclair.example.Example.priority >
-     * TRACE [] ru.tinkoff.eclair.example.Example.priority <
-     */
-    @Log.in(level = INFO, verbose = TRACE)
-    @Log(level = TRACE, verbose = OFF)
-    public void priority() {
+    @Log.out(ERROR)
+    @Log.in(TRACE)
+    void outIn() {
     }
 
     // TODO: add example for {@link LogError} ordering (in order of appearance)
 
-    // TODO: add example for meta-annotation usage
+    @Target({ElementType.METHOD, ElementType.PARAMETER})
+    @Retention(RetentionPolicy.RUNTIME)
+    @Log(level = INFO, printer = "xml")
+    @Log.error(ofType = RuntimeException.class)
+    @interface Audit {
+    }
 
-    /**
-     * TODO: add javadoc
-     * About order
-     */
-//    @Log(logger = "simpleLogger")
-//    @Log(logger = "auditLogger")
-    public void logMultiLogger() {
+    @Log(level = INFO, printer = "xml")
+    @Log.error(ofType = RuntimeException.class)
+    void listing() {
+    }
+
+    @Audit
+    void meta() {
+    }
+
+    @Log
+    @Log(logger = "auditLogger")
+    void multiLogger() {
     }
 
     /**
+     * As if there is no '@Log.in' above method:
      * DEBUG [] ru.tinkoff.eclair.example.Example.offLevelWithArg > a=1
      */
     @Log.in(OFF)
-    public void offLevelWithArg(@Log int a) {
+    void offLevelWithArg(@Log int a) {
     }
 
     /**
+     * As if there is no '@Log' above parameter:
      * DEBUG [] ru.tinkoff.eclair.example.Example.offLevelWithArg >
      */
     @Log.in
-    public void argOffLevel(@Log(OFF) int a) {
+    void argOffLevel(@Log(OFF) int a) {
     }
 }

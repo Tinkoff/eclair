@@ -87,7 +87,7 @@ public class EclairAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public EclairLogger eclairLogger() {
+    public EclairLogger simpleLogger() {
         return new SimpleLogger();
     }
 

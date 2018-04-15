@@ -19,9 +19,7 @@ Includes abstractions for annotations processing, simple implementation and Spri
 * manual logging with invoker class detection is also available
 
 ## Getting started
-
 Add this to your POM.
-
 ```xml
 <dependency>
     <groupId>ru.tinkoff</groupId>
@@ -31,167 +29,20 @@ Add this to your POM.
 ```
 
 ## Usage examples
-
 The examples assume that you are using a standard `SimpleLogger` and that you have the following configuration property:
-
 ```yaml
-logging.pattern.console: '%-5level [%X] %logger{80} %msg%n'
+logging.pattern.console: '%-5level [%X] %logger{35} %msg%n'
+```
+All available log levels in order from the most common `TRACE` to the rarest `OFF`:
+ * `OFF` deactivates logging completely
+ * `ERROR` and `FATAL` are identical (here `ERROR` used)
+```
+TRACE > DEBUG > INFO > WARN > ERROR = FATAL > OFF
 ```
 
-#### Basic usage
-
-```java
-class Example {
-
-    /**
-     * DEBUG [] ru.tinkoff.eclair.example.Example.simple > s="a", i=0, d=0.0
-     * DEBUG [] ru.tinkoff.eclair.example.Example.simple < false
-     */
-    @Log
-    public Boolean simple(String s, Integer i, Double d) {
-        return false;
-    }
-
-    /**
-     * if logger level <= DEBUG
-     *
-     * DEBUG [] ru.tinkoff.eclair.example.OuterClass.method >
-     * ..
-     * DEBUG [key=value, sum=2] ru.tinkoff.eclair.example.Example.mdcByMethod > Dto{i=0, s='null'}
-     * ..
-     * DEBUG [key=value, sum=2] ru.tinkoff.eclair.example.InnerClass.method >
-     * DEBUG [key=value, sum=2] ru.tinkoff.eclair.example.InnerClass.method <
-     * ..
-     * DEBUG [key=value, sum=2] ru.tinkoff.eclair.example.Example.mdcByMethod <
-     * ..
-     * DEBUG [sum=2] ru.tinkoff.eclair.example.OuterClass.method <
-     */
-    @Mdc(key = "key", value = "value")
-    @Mdc(key = "sum", value = "1 + 1", global = true)
-    @Log
-    public void mdcByMethod(Dto dto) {
-    }
-
-    @Autowired
-    private ManualLogger logger;
-
-    /**
-     * if logger level <= DEBUG
-     *
-     * DEBUG [] ru.tinkoff.eclair.example.Example.manualLogging >
-     * DEBUG [key=value] ru.tinkoff.eclair.example.Example.manualLogging - Manual logging: 0.123
-     * INFO  [key=value] ru.tinkoff.eclair.example.Example.manualLogging - Lazy manual logging: 0.456
-     * DEBUG [key=value] ru.tinkoff.eclair.example.Example.manualLogging <
-     */
-    @Log
-    public void manualLogging() {
-        MDC.put("key", "value");
-        logger.debug("Manual logging: {}", new Random().nextDouble());
-        logger.info("Lazy manual logging: {}", (Supplier) () -> new Random().nextDouble());
-    }
-}
-```
-
-#### Advanced usage
-
-```java
-class Advanced {
-
-    /**
-     * DEBUG [] ru.tinkoff.eclair.example.Advanced.verboseDtoToXml > dto=<dto><i>0</i></dto>
-     */
-    @Log.in(printer = "xml")
-    public void verboseDtoToXml(Dto dto, Integer i) {
-    }
-
-    /**
-     * if logger level = DEBUG
-     * WARN  [] r.t.e.example.Advanced.levelIfEnabledErrorEvent ! java.lang.RuntimeException: message
-     * java.lang.RuntimeException: message
-     *     at r.t.e.example.Advanced.levelIfEnabledErrorEvent(Example.java:167)
-     *
-     * if logger level = INFO
-     * (nothing to log)
-     */
-    @Log.error(ifEnabled = DEBUG)
-    public void levelIfEnabledErrorEvent() {
-        throw new RuntimeException("message");
-    }
-
-    /**
-     * DEBUG [] r.t.e.example.Advanced.verboseToVariousPrinters > xmlDto=<dto><i>0</i></dto>, jsonDto={"i":0,"s":null}
-     */
-    public void verboseToVariousPrinters(@Log(printer = "xml") Dto xmlDto,
-                                         @Log(printer = "json") Dto jsonDto,
-                                         Integer i) {
-    }
-
-    /**
-     * if logger level <= DEBUG
-     *
-     * DEBUG [] ru.tinkoff.eclair.example.OuterClass.method >
-     * ..
-     * DEBUG [length=3, staticString=some string] ru.tinkoff.eclair.example.Advanced.mdcByArg > Dto{i=0, s='null'}
-     * DEBUG [length=3, staticString=some string] ru.tinkoff.eclair.example.Advanced.mdcByArg <
-     * ..
-     * DEBUG [staticString=some string] ru.tinkoff.eclair.example.OuterClass.method <
-     */
-    @Log
-    public void mdcByArg(@Mdc(key = "length", value = "s.length()")
-                         @Mdc(key = "staticString", value = "some string", global = true) Dto dto) {
-    }
-
-    @Autowired
-    private ManualLogger logger;
-
-    /**
-     * if logger level = DEBUG
-     */
-    public void manualLevelLogging() {
-        // WARN  [] r.t.eclair.example.Advanced.manualLevelLogging - warn
-        // WARN  [] r.t.eclair.example.Advanced.manualLevelLogging - warnIfInfoEnabled
-        // WARN  [] r.t.eclair.example.Advanced.manualLevelLogging - warnIfDebugEnabled
-        // nothing to log
-        logger.warn("warn");
-        logger.warnIfInfoEnabled("warnIfInfoEnabled");
-        logger.warnIfDebugEnabled("warnIfDebugEnabled");
-        logger.warnIfTraceEnabled("warnIfTraceEnabled");
-    }
-
-    @Log
-    @Log(logger = "audit")
-    public void logMultiLogger() {
-    }
-}
-```
-
-## Release History
-
-04.2018 - 1.0.0 Basic features
-
-## License
-
-```
-Copyright 2018 Tinkoff Bank
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-```
-
-## All examples
-The left column shows the configured available logging level for the current method.<br>
-The right column shows an example log for the specified level.
-
-All available log levels in order from the most common `TRACE` to the rarest `FATAL` (`OFF` deactivates logging completely):<br>
-`TRACE` > `DEBUG` > `INFO` > `WARN` > `ERROR` > `FATAL` > `OFF`
+### Declarative logging
+The left table column shows the configured available logging level for the current method.<br>
+The right column shows an sample log for the specified level.
 
 #### Simplest
 `DEBUG` level by default.
@@ -434,14 +285,51 @@ Dto mix(@Log(printer = "jaxb2Printer") Dto xml,
  `WARN`             | `WARN  [] r.t.eclair.example.Example.mix ! java.lang.IllegalArgumentException: Something strange happened`<br>`java.lang.IllegalArgumentException: Something strange happened`<br>`	at ru.tinkoff.eclair.example.Example.mix(Example.java:0)`<br>..
  `ERROR` .. `OFF`   | -
 
-#### Mapped Diagnostic Context (MDC)
+#### Meta-annotation possibilities
+You can define your own custom annotations that are an amalgamation of many Eclair annotations combined into one annotation.
+```java
+@Target({ElementType.METHOD, ElementType.PARAMETER})
+@Retention(RetentionPolicy.RUNTIME)
+@Log(level = INFO, printer = "xml")
+@Log.error(ofType = RuntimeException.class)
+@interface Audit {
+}
+```
+So, if annotation above defined, following examples work absolutely identical.
+```java
+@Log(level = INFO, printer = "xml")
+@Log.error(ofType = RuntimeException.class)
+void listing() {
+}
+
+@Audit
+void meta() {
+}
+```
+
+#### Multiple loggers in application
+You can have several `EclairLogger` implementations in your application context.<br>
+This can be useful for logging various slices of information to different targets.
+> If `logger` attribute not defined, single candidate or `@Primary` bean will be used.
+```java
+@Log
+@Log(logger = "auditLogger")
+void twoLoggers() {
+}
+```
+
+### Declarative MDC management
+MDC - Mapped Diagnostic Context
+
 Key/value pair defined by annotation automatically cleared after exit from the method.<br>
 `global` MDC is available within `ThreadLocal` scope.<br>
 `value` attribute could contain SpEL expression and invoke static methods or beans by id from the application context.<br>
-Before method execution beginning, `@Mdc` annotations will be processed first and after ending cleared last.<br>
-So annotations `@Log` / `@Log.in` / `@Log.out` of the same method will be processed *inside* `@Mdc` processing. 
 > Note: MDC is level-insensitive and printed every time.<br>
 > Note: MDC does not guarantee order of elements when printing.
+
+#### Common usage
+Before method execution beginning, `@Mdc` annotations will be processed first and after ending cleared last.<br>
+So annotations `@Log` / `@Log.in` / `@Log.out` of the same method will be processed *inside* `@Mdc` processing. 
 ```java
 @Log
 void outer() {
@@ -503,4 +391,86 @@ DEBUG [first=content, second=3.141592653589793] r.t.e.example.Example.mdcByDefau
 In that case, MDC keys will contain method name and parameter index.
 ```
 DEBUG [mdcByDefault[0]=content, mdcByDefault[1]=3.141592653589793] r.t.e.example.Example.mdcByDefault > first="content", second=3.141592653589793
+```
+
+### Manual logging
+Inject `ManualLogger` implementation for manual logging.<br>
+> If execution time is important to you, manual logging with `ManualLogger` is not recommended.
+
+#### Manual
+Expensive calculations may be wrapped into Java 8 `Supplier` interface for lazy initialization.
+```java
+@Autowired
+private ManualLogger logger;
+
+@Log
+void manual() {
+    logger.info("Eager logging: {}", Math.PI);
+    logger.debug("Lazy logging: {}", (Supplier) () -> Math.PI);
+}
+```
+ Enabled level      | Log sample
+--------------------|------------
+ `TRACE` `DEBUG`    | `DEBUG [] r.t.eclair.example.Example.manual >`<br>`INFO  [] r.t.eclair.example.Example.manual - Eager logging: 3.141592653589793`<br>`DEBUG [] r.t.eclair.example.Example.manual - Lazy logging: 3.141592653589793`<br>`DEBUG [] r.t.eclair.example.Example.manual <`
+ `INFO`             | `INFO  [] r.t.eclair.example.Example.manual - Eager logging: 3.141592653589793`
+ `WARN` .. `OFF`    | -
+
+#### Manual level control
+Complete example of manual logging with different level settings.
+```java
+@Autowired
+private ManualLogger logger;
+
+@Log
+void manualLevel() {
+    // log ERROR
+    logger.error("ERROR");
+    logger.errorIfWarnEnabled("ERROR if WARN enabled");
+    logger.errorIfInfoEnabled("ERROR if INFO enabled");
+    logger.errorIfDebugEnabled("ERROR if DEBUG enabled");
+    logger.errorIfTraceEnabled("ERROR if TRACE enabled");
+    // log WARN
+    logger.warn("WARN");
+    logger.warnIfInfoEnabled("WARN if INFO enabled");
+    logger.warnIfDebugEnabled("WARN if DEBUG enabled");
+    logger.warnIfTraceEnabled("WARN if TRACE enabled");
+    // log INFO
+    logger.info("INFO");
+    logger.infoIfDebugEnabled("INFO if DEBUG enabled");
+    logger.infoIfTraceEnabled("INFO if TRACE enabled");
+    // log DEBUG
+    logger.debug("DEBUG");
+    logger.debugIfTraceEnabled("DEBUG if TRACE enabled");
+    // log TRACE
+    logger.trace("TRACE");
+}
+```
+ Enabled level      | Log sample
+--------------------|------------
+ `TRACE`            | `DEBUG [] r.t.e.example.Example.manualLevel >`<br>`ERROR [] r.t.e.example.Example.manualLevel - ERROR`<br>`ERROR [] r.t.e.example.Example.manualLevel - ERROR if WARN enabled`<br>`ERROR [] r.t.e.example.Example.manualLevel - ERROR if INFO enabled`<br>`ERROR [] r.t.e.example.Example.manualLevel - ERROR if DEBUG enabled`<br>`ERROR [] r.t.e.example.Example.manualLevel - ERROR if TRACE enabled`<br>`WARN  [] r.t.e.example.Example.manualLevel - WARN`<br>`WARN  [] r.t.e.example.Example.manualLevel - WARN if INFO enabled`<br>`WARN  [] r.t.e.example.Example.manualLevel - WARN if DEBUG enabled`<br>`WARN  [] r.t.e.example.Example.manualLevel - WARN if TRACE enabled`<br>`INFO  [] r.t.e.example.Example.manualLevel - INFO`<br>`INFO  [] r.t.e.example.Example.manualLevel - INFO if DEBUG enabled`<br>`INFO  [] r.t.e.example.Example.manualLevel - INFO if TRACE enabled`<br>`DEBUG [] r.t.e.example.Example.manualLevel - DEBUG`<br>`DEBUG [] r.t.e.example.Example.manualLevel - DEBUG if TRACE enabled`<br>`TRACE [] r.t.e.example.Example.manualLevel - TRACE`<br>`DEBUG [] r.t.e.example.Example.manualLevel <`
+ `DEBUG`            | `DEBUG [] r.t.e.example.Example.manualLevel >`<br>`ERROR [] r.t.e.example.Example.manualLevel - ERROR`<br>`ERROR [] r.t.e.example.Example.manualLevel - ERROR if WARN enabled`<br>`ERROR [] r.t.e.example.Example.manualLevel - ERROR if INFO enabled`<br>`ERROR [] r.t.e.example.Example.manualLevel - ERROR if DEBUG enabled`<br>`WARN  [] r.t.e.example.Example.manualLevel - WARN`<br>`WARN  [] r.t.e.example.Example.manualLevel - WARN if INFO enabled`<br>`WARN  [] r.t.e.example.Example.manualLevel - WARN if DEBUG enabled`<br>`INFO  [] r.t.e.example.Example.manualLevel - INFO`<br>`INFO  [] r.t.e.example.Example.manualLevel - INFO if DEBUG enabled`<br>`DEBUG [] r.t.e.example.Example.manualLevel - DEBUG`<br>`DEBUG [] r.t.e.example.Example.manualLevel <`
+ `INFO`             | `ERROR [] r.t.e.example.Example.manualLevel - ERROR`<br>`ERROR [] r.t.e.example.Example.manualLevel - ERROR if WARN enabled`<br>`ERROR [] r.t.e.example.Example.manualLevel - ERROR if INFO enabled`<br>`WARN  [] r.t.e.example.Example.manualLevel - WARN`<br>`WARN  [] r.t.e.example.Example.manualLevel - WARN if INFO enabled`<br>`INFO  [] r.t.e.example.Example.manualLevel - INFO`
+ `WARN`             | `ERROR [] r.t.e.example.Example.manualLevel - ERROR`<br>`ERROR [] r.t.e.example.Example.manualLevel - ERROR if WARN enabled`<br>`WARN  [] r.t.e.example.Example.manualLevel - WARN`
+ `ERROR` `FATAL`    | `ERROR [] r.t.e.example.Example.manualLevel - ERROR`
+ `OFF`              | -
+
+## Release History
+
+04.2018 - 1.0.0 Basic features
+
+## License
+
+```
+Copyright 2018 Tinkoff Bank
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 ```
