@@ -16,7 +16,6 @@
 package ru.tinkoff.eclair.logger;
 
 import org.aopalliance.intercept.MethodInvocation;
-import org.springframework.core.Ordered;
 import ru.tinkoff.eclair.definition.MethodLog;
 
 import java.util.Objects;
@@ -26,12 +25,7 @@ import static java.util.Objects.nonNull;
 /**
  * @author Vyacheslav Klapatnyuk
  */
-public abstract class EclairLogger implements Ordered {
-
-    @Override
-    public int getOrder() {
-        return 0;
-    }
+public abstract class EclairLogger {
 
     protected abstract String getLoggerName(MethodInvocation invocation);
 

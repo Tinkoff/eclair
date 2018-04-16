@@ -35,7 +35,6 @@ import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import ru.tinkoff.eclair.aop.EclairProxyCreator;
 import ru.tinkoff.eclair.core.AnnotationDefinitionFactory;
 import ru.tinkoff.eclair.core.ExpressionEvaluator;
-import ru.tinkoff.eclair.core.LoggerMapSorter;
 import ru.tinkoff.eclair.core.PrinterResolver;
 import ru.tinkoff.eclair.logger.EclairLogger;
 import ru.tinkoff.eclair.logger.SimpleLogger;
@@ -43,7 +42,6 @@ import ru.tinkoff.eclair.printer.*;
 import ru.tinkoff.eclair.printer.processor.JaxbElementWrapper;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Vyacheslav Klapatnyuk
@@ -101,17 +99,15 @@ public class EclairAutoConfiguration {
     }
 
     @Bean
-    public EclairProxyCreator eclairProxyCreator(List<Printer> printerList,
-                                                 Map<String, EclairLogger> loggerMap,
+    public EclairProxyCreator eclairProxyCreator(List<Printer> orderedPrinters,
+                                                 List<EclairLogger> orderedLoggers,
                                                  GenericApplicationContext applicationContext,
                                                  EclairProperties eclairProperties,
                                                  ExpressionEvaluator expressionEvaluator) {
-        PrinterResolver printerResolver = new PrinterResolver(applicationContext, printerList);
+        PrinterResolver printerResolver = new PrinterResolver(applicationContext, orderedPrinters);
         AnnotationDefinitionFactory annotationDefinitionFactory = new AnnotationDefinitionFactory(printerResolver);
-        Map<String, EclairLogger> loggers = new LoggerMapSorter().sort(loggerMap);
-
         EclairProxyCreator eclairProxyCreator =
-                new EclairProxyCreator(applicationContext, annotationDefinitionFactory, loggers, expressionEvaluator, printerResolver);
+                new EclairProxyCreator(applicationContext, annotationDefinitionFactory, orderedLoggers, expressionEvaluator, printerResolver);
         eclairProxyCreator.setOrder(Ordered.HIGHEST_PRECEDENCE);
         eclairProxyCreator.setFrozen(false);
         eclairProxyCreator.setValidate(eclairProperties.isValidate());

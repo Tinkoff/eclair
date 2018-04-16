@@ -68,16 +68,16 @@ public class EclairProxyCreator extends AbstractAutoProxyCreator {
     private boolean validate = false;
 
     /**
-     * @param loggers in order of execution, if necessary
+     * @param orderedLoggers in order of execution, if necessary
      */
     public EclairProxyCreator(GenericApplicationContext applicationContext,
                               AnnotationDefinitionFactory annotationDefinitionFactory,
-                              Map<String, EclairLogger> loggers,
+                              List<EclairLogger> orderedLoggers,
                               ExpressionEvaluator expressionEvaluator,
                               PrinterResolver printerResolver) {
         this.applicationContext = applicationContext;
         this.annotationDefinitionFactory = annotationDefinitionFactory;
-        this.loggers = loggers;
+        this.loggers = BeanFactoryHelper.getInstance().collectToOrderedMap(applicationContext, EclairLogger.class, orderedLoggers);
         this.expressionEvaluator = expressionEvaluator;
         this.beanClassValidator = new BeanClassValidator(applicationContext, loggers, printerResolver);
     }
@@ -153,7 +153,6 @@ public class EclairProxyCreator extends AbstractAutoProxyCreator {
     }
 
     private List<MethodLog> getMethodLogs(Class<?> beanClass, String loggerName) {
-        // TODO: refactor and/or extract
         Set<String> loggerNames = loggerBeanNamesResolver.resolve(applicationContext, loggerName);
         return annotationExtractor.getCandidateMethods(beanClass).stream()
                 .map(method -> getMethodLog(loggerNames, method))

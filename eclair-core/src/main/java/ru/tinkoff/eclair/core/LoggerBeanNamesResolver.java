@@ -25,6 +25,8 @@ import static java.lang.String.format;
 import static java.util.Arrays.asList;
 
 /**
+ * TODO: merge with {@link BeanFactoryHelper}
+ *
  * @author Vyacheslav Klapatnyuk
  */
 public final class LoggerBeanNamesResolver {

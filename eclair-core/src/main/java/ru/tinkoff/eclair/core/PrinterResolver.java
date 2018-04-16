@@ -15,23 +15,17 @@
 
 package ru.tinkoff.eclair.core;
 
-import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.ListableBeanFactory;
 import ru.tinkoff.eclair.printer.Printer;
 import ru.tinkoff.eclair.printer.ToStringPrinter;
 
-import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static java.lang.String.format;
 import static java.util.Collections.nCopies;
 import static java.util.Objects.isNull;
-import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
 import static org.springframework.util.StringUtils.hasText;
 
 /**
@@ -41,36 +35,18 @@ public class PrinterResolver {
 
     public static final Printer defaultPrinter = new ToStringPrinter();
 
+    private static final BeanFactoryHelper beanFactoryHelper = BeanFactoryHelper.getInstance();
+
     private final Map<String, Printer> printers;
     private final Map<String, String> aliases;
 
-    public PrinterResolver(ListableBeanFactory beanFactory, List<Printer> printerList) {
-        Map<String, Printer> printerMap = beanFactory.getBeansOfType(Printer.class);
-        this.printers = initPrinters(printerMap, printerList);
-        this.aliases = initAliases(beanFactory, printerMap);
-    }
-
-    private Map<String, Printer> initPrinters(Map<String, Printer> printerMap, List<Printer> printerList) {
-        return printerList.stream()
-                .collect(toMap(
-                        printer -> printerMap.entrySet().stream()
-                                .filter(entry -> entry.getValue().equals(printer))
-                                .findFirst()
-                                .map(Map.Entry::getKey)
-                                .orElseThrow(() -> new IllegalArgumentException("Printer bean not found on map")),
-                        identity(),
-                        (printer, printer2) -> {
-                            throw new IllegalArgumentException(format("Printer names not equals: %s, %s", printer, printer2));
-                        },
-                        LinkedHashMap::new
-                ));
-    }
-
-    private Map<String, String> initAliases(BeanFactory beanFactory, Map<String, Printer> printers) {
-        return printers.keySet().stream()
-                .map(name -> Stream.of(beanFactory.getAliases(name)).collect(toMap(identity(), alias -> name)).entrySet())
-                .flatMap(Collection::stream)
-                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
+    /**
+     * @param orderedPrinters Printers in priority order.
+     *                        This order is used when determining a suitable printer that is not explicitly specified.
+     */
+    public PrinterResolver(ListableBeanFactory beanFactory, List<Printer> orderedPrinters) {
+        this.printers = beanFactoryHelper.collectToOrderedMap(beanFactory, Printer.class, orderedPrinters);
+        this.aliases = beanFactoryHelper.getAliases(beanFactory, Printer.class);
     }
 
     List<Printer> resolve(String printerName, Class<?>[] parameterTypes) {
