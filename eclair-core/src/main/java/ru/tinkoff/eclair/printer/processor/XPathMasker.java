@@ -41,8 +41,6 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 
 /**
- * TODO: add tests
- *
  * @author Vyacheslav Klapatnyuk
  */
 public class XPathMasker implements PrinterPostProcessor {
@@ -83,7 +81,7 @@ public class XPathMasker implements PrinterPostProcessor {
             transformer.transform(new DOMSource(document), new StreamResult(writer));
             return writer.getBuffer().toString();
         } catch (ParserConfigurationException | SAXException | IOException | XPathExpressionException | TransformerException e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException(e);
         }
     }
 

@@ -22,8 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TODO: add tests
- *
  * @author Vyacheslav Klapatnyuk
  */
 public abstract class Printer {

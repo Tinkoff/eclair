@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<container>
+    <user>
+        <login>login</login>
+        <password>password</password>
+    </user>
+    <payload>
+        <string>string</string>
+        <number>1</number>
+    </payload>
+</container>
