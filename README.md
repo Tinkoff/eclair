@@ -35,14 +35,14 @@ logging.pattern.console: '%-5level [%X] %logger{35} %msg%n'
 ```
 All available log levels in order from the most common `TRACE` to the rarest `OFF`:
  * `OFF` deactivates logging completely
- * `ERROR` and `FATAL` are identical (here `ERROR` used)
+ * `ERROR` and `FATAL` are identical (`ERROR` is used in examples)
 ```
 TRACE > DEBUG > INFO > WARN > ERROR = FATAL > OFF
 ```
 
 ### Declarative logging
 The left table column shows the configured available logging level for the current method.<br>
-The right column shows an sample log for the specified level.
+The right column shows a log sample or the specified level.
 
 #### Simplest
 `DEBUG` level by default.
@@ -104,7 +104,7 @@ boolean verbose(String s, Integer i, Double d) {
  `WARN` .. `OFF`    | -
 
 #### Verbosity disabled
-Arguments and return value not printed for any level.
+Arguments and return value are not printed for any level.
 ```java
 @Log(verbose = OFF)
 boolean verboseDisabled(String s, Integer i, Double d) {
@@ -141,7 +141,7 @@ void verboseXml(Dto dto, Integer i) {
  `INFO` .. `OFF`    | -
 
 #### Separate `in` and `out` events 
-Logging of `in` and `out` events could be declared separately with own settings.
+Logging of `in` and `out` events can be declared separately with own settings.
 ```java
 @Log.in(INFO)
 @Log.out(TRACE)
@@ -169,7 +169,7 @@ void error() {
  `OFF`              | -
 
 #### Warning on `DEBUG`
-You may want to log minor error, if enabled `DEBUG` level. 
+You may want to log minor error, if `DEBUG` level enabled. 
 ```java
 @Log.error(level = WARN, ifEnabled = DEBUG)
 void warningOnDebug() {
@@ -182,9 +182,9 @@ void warningOnDebug() {
  `INFO` .. `OFF`    | -
 
 #### Filter errors by type
-Errors could be filtered multiple times by `ofType` and `exclude` attributes.<br>
+Errors can be filtered multiple times by `ofType` and `exclude` attributes.<br>
 By default `ofType` contains `Throwable.class` and includes all subtypes.<br>
-If the thrown exception matches any of `@Log.error` filters, it will be logged according to the settings of the corresponding annotation.  
+If the thrown exception matches any of `@Log.error` filters it will be logged according to the settings of the corresponding annotation.  
 ##### Annotated method
 ```java
 @Log.error(level = WARN, ofType = {NullPointerException.class, IndexOutOfBoundsException.class})
@@ -235,8 +235,8 @@ void parameter(@Log(INFO) Dto dto, String s, Integer i) {
  `WARN` .. `OFF`    | -
 
 #### Specific printer for each argument
-Printer could have pre- and post-processors for manipulating with data before / after serialization.<br>
-For example `maskJaxb2Printer` was configured with `XPathMasker` post-processor, so all elements matched `//s` expression masked by `********`.
+Printer can has pre- and post-processors for manipulating with data before / after serialization.<br>
+For example `maskJaxb2Printer` is configured with `XPathMasker` post-processor, so all elements matched `//s` expression masked by `********`.
 ```java
 @Log.out(printer = "maskJaxb2Printer")
 Dto printers(@Log(printer = "maskJaxb2Printer") Dto xml,
@@ -286,7 +286,7 @@ Dto mix(@Log(printer = "jaxb2Printer") Dto xml,
  `ERROR` .. `OFF`   | -
 
 #### Meta-annotation possibilities
-You can define your own custom annotations that are an amalgamation of many Eclair annotations combined into one annotation.
+You can define your own custom annotation to combine several Eclair annotations to one.
 ```java
 @Target({ElementType.METHOD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
@@ -295,7 +295,7 @@ You can define your own custom annotations that are an amalgamation of many Ecla
 @interface Audit {
 }
 ```
-So, if annotation above defined, following examples work absolutely identical.
+So, if annotation above defined the following examples work absolutely identical.
 ```java
 @Log(level = INFO, printer = "jaxb2Printer")
 @Log.error(ofType = RuntimeException.class)
@@ -323,7 +323,7 @@ MDC - Mapped Diagnostic Context
 
 Key/value pair defined by annotation automatically cleared after exit from the method.<br>
 `global` MDC is available within `ThreadLocal` scope.<br>
-`value` attribute could contain SpEL expression and invoke static methods or beans by id from the application context.<br>
+`value` attribute can contain SpEL expression and invoke static methods or beans by id from the application context.<br>
 > Note: MDC is level-insensitive and printed every time.<br>
 > Note: MDC does not guarantee order of elements when printing.
 
@@ -359,7 +359,7 @@ DEBUG [sum=2] r.t.eclair.example.Example.outer <
 ```
 
 #### MDC defined by argument
-MDC could get access to annotated parameter value with SpEL as root object of evaluation context.
+MDC can get access to annotated parameter value with SpEL as root object of evaluation context.
 ```java
 @Log.in
 void mdcByArgument(@Mdc(key = "dto", value = "#this")
