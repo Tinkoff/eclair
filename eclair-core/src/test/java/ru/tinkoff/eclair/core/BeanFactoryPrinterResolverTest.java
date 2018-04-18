@@ -22,12 +22,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
+import ru.tinkoff.eclair.core.printer.BeanFactoryPrinterResolver;
 import ru.tinkoff.eclair.printer.Printer;
 
 import java.util.List;
 
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -35,18 +37,18 @@ import static org.junit.Assert.assertThat;
  */
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = BeanFactoryHelperTest.TestConfiguration.class)
-public class PrinterResolverTest {
+public class BeanFactoryPrinterResolverTest {
 
     @Autowired
     private List<Printer> printers;
     @Autowired
     private ApplicationContext applicationContext;
 
-    private PrinterResolver printerResolver;
+    private BeanFactoryPrinterResolver printerResolver;
 
     @Before
     public void init() {
-        printerResolver = new PrinterResolver(applicationContext, printers);
+        printerResolver = new BeanFactoryPrinterResolver(applicationContext, printers);
     }
 
     @Test
@@ -68,7 +70,7 @@ public class PrinterResolverTest {
         // when
         Printer printer = printerResolver.resolve(printerName, parameterType);
         // then
-        assertThat(printer.print("input"), is("\"input\""));
+        assertNull(printer);
     }
 
     @Test
@@ -79,7 +81,7 @@ public class PrinterResolverTest {
         // when
         Printer printer = printerResolver.resolve(printerName, parameterType);
         // then
-        assertThat(printer.print("input"), is("\"input\""));
+        assertThat(printer.print("input"), is("0"));
     }
 
     @Test
@@ -114,7 +116,7 @@ public class PrinterResolverTest {
         // then
         assertThat(printers, hasSize(2));
         assertThat(printers.get(0).print("input"), is("2"));
-        assertThat(printers.get(1).print("input"), is("2"));
+        assertThat(printers.get(1).print("input"), is("1"));
     }
 
     @Test
@@ -141,6 +143,6 @@ public class PrinterResolverTest {
         assertThat(printers, hasSize(3));
         assertThat(printers.get(0).print("input"), is("0"));
         assertThat(printers.get(1).print("input"), is("1"));
-        assertThat(printers.get(2).print("input"), is("\"input\""));
+        assertNull(printers.get(2));
     }
 }

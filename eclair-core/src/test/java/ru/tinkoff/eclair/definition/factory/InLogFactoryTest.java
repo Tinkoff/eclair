@@ -17,7 +17,7 @@ package ru.tinkoff.eclair.definition.factory;
 
 import org.junit.Test;
 import ru.tinkoff.eclair.annotation.Log;
-import ru.tinkoff.eclair.core.PrinterResolver;
+import ru.tinkoff.eclair.core.printer.PrinterResolver;
 import ru.tinkoff.eclair.definition.InLog;
 import ru.tinkoff.eclair.printer.Printer;
 import ru.tinkoff.eclair.printer.ToStringPrinter;

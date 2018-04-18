@@ -17,7 +17,7 @@ package ru.tinkoff.eclair.validate.log.group;
 
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.validation.Errors;
-import ru.tinkoff.eclair.core.PrinterResolver;
+import ru.tinkoff.eclair.core.printer.PrinterResolver;
 import ru.tinkoff.eclair.logger.EclairLogger;
 import ru.tinkoff.eclair.validate.log.single.LogInValidator;
 

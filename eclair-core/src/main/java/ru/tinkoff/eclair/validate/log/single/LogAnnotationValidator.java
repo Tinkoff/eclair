@@ -20,11 +20,10 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import ru.tinkoff.eclair.core.AnnotationAttribute;
-import ru.tinkoff.eclair.core.PrinterResolver;
+import ru.tinkoff.eclair.core.printer.PrinterResolver;
 import ru.tinkoff.eclair.printer.Printer;
 
 import java.lang.annotation.Annotation;
-import java.util.Map;
 
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
@@ -57,14 +56,10 @@ abstract class LogAnnotationValidator implements Validator {
 
         String printerName = AnnotationAttribute.PRINTER.extract(annotation);
         if (StringUtils.hasText(printerName)) {
-            Map<String, Printer> printers = printerResolver.getPrinters();
-            Printer printer = printers.get(printerName);
+            Printer printer = printerResolver.resolve(printerName);
             if (isNull(printer)) {
-                printer = printers.get(printerResolver.getAliases().get(printerName));
-                if (isNull(printer)) {
-                    errors.reject("printer.unknown",
-                            format("Unknown printer '%s' specified for annotation: %s", printerName, annotation));
-                }
+                errors.reject("printer.unknown",
+                        format("Unknown printer '%s' specified for annotation: %s", printerName, annotation));
             }
         }
     }

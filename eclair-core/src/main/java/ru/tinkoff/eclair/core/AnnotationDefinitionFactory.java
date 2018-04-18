@@ -16,6 +16,7 @@
 package ru.tinkoff.eclair.core;
 
 import ru.tinkoff.eclair.annotation.Log;
+import ru.tinkoff.eclair.core.printer.PrinterResolver;
 import ru.tinkoff.eclair.definition.*;
 import ru.tinkoff.eclair.definition.factory.*;
 import ru.tinkoff.eclair.printer.Printer;
@@ -57,7 +58,7 @@ public final class AnnotationDefinitionFactory {
     }
 
     private InLog buildInLog(Method method, Log.in logIn) {
-        List<Printer> printers = printerResolver.resolve(logIn.printer(), method.getParameterTypes());
+        List<Printer> printers = printerResolver.resolveOrDefault(logIn.printer(), method.getParameterTypes());
         return InLogFactory.newInstance(logIn, printers);
     }
 
@@ -73,7 +74,7 @@ public final class AnnotationDefinitionFactory {
         if (isNull(log)) {
             return null;
         }
-        Printer printer = printerResolver.resolve(log.printer(), parameterType);
+        Printer printer = printerResolver.resolveOrDefault(log.printer(), parameterType);
         return ParameterLogFactory.newInstance(log, printer);
     }
 
@@ -90,7 +91,7 @@ public final class AnnotationDefinitionFactory {
     }
 
     private OutLog buildOutLog(Method method, Log.out logOut) {
-        Printer printer = printerResolver.resolve(logOut.printer(), method.getReturnType());
+        Printer printer = printerResolver.resolveOrDefault(logOut.printer(), method.getReturnType());
         return OutLogFactory.newInstance(logOut, printer);
     }
 

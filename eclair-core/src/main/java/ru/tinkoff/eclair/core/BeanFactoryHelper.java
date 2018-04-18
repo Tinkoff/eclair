@@ -25,6 +25,8 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
 /**
+ * TODO: refactor
+ *
  * @author Vyacheslav Klapatnyuk
  */
 public final class BeanFactoryHelper {
@@ -58,7 +60,7 @@ public final class BeanFactoryHelper {
         throw new IllegalArgumentException(format("Bean names not equals: %s, %s", bean, bean2));
     }
 
-    <T> Map<String, String> getAliases(ListableBeanFactory beanFactory, Class<T> clazz) {
+    public <T> Map<String, String> getAliases(ListableBeanFactory beanFactory, Class<T> clazz) {
         return beanFactory.getBeansOfType(clazz).keySet().stream()
                 .map(name -> getAliasEntrySet(beanFactory, name))
                 .flatMap(Collection::stream)

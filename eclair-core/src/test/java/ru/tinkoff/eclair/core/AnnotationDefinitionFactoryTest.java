@@ -23,6 +23,8 @@ import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.annotation.Logs;
 import ru.tinkoff.eclair.annotation.Mdc;
+import ru.tinkoff.eclair.core.printer.BeanFactoryPrinterResolver;
+import ru.tinkoff.eclair.core.printer.PrinterResolver;
 import ru.tinkoff.eclair.definition.*;
 import ru.tinkoff.eclair.printer.JacksonPrinter;
 import ru.tinkoff.eclair.printer.Jaxb2Printer;
@@ -56,7 +58,7 @@ public class AnnotationDefinitionFactoryTest {
         Map<String, Object> printers = new LinkedHashMap<>();
         printers.put("xml", xmlPrinter);
         printers.put("json", jsonPrinter);
-        PrinterResolver printerResolver = new PrinterResolver(new StaticListableBeanFactory(printers), asList(xmlPrinter, jsonPrinter));
+        PrinterResolver printerResolver = new BeanFactoryPrinterResolver(new StaticListableBeanFactory(printers), asList(xmlPrinter, jsonPrinter));
         annotationDefinitionFactory = new AnnotationDefinitionFactory(printerResolver);
     }
 

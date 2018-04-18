@@ -19,7 +19,7 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.validation.Errors;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.core.ErrorFilterFactory;
-import ru.tinkoff.eclair.core.PrinterResolver;
+import ru.tinkoff.eclair.core.printer.PrinterResolver;
 import ru.tinkoff.eclair.definition.ErrorLog;
 import ru.tinkoff.eclair.logger.EclairLogger;
 import ru.tinkoff.eclair.validate.log.single.LogErrorValidator;

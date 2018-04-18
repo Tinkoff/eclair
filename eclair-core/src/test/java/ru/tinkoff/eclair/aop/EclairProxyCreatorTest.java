@@ -28,7 +28,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.core.AnnotationDefinitionFactory;
 import ru.tinkoff.eclair.core.ExpressionEvaluator;
-import ru.tinkoff.eclair.core.PrinterResolver;
+import ru.tinkoff.eclair.core.printer.BeanFactoryPrinterResolver;
 import ru.tinkoff.eclair.logger.SimpleLogger;
 import ru.tinkoff.eclair.printer.Printer;
 import ru.tinkoff.eclair.printer.ToStringPrinter;
@@ -47,7 +47,7 @@ import static org.junit.Assert.assertTrue;
         SpelExpressionParser.class,
         StandardEvaluationContext.class,
         AnnotationDefinitionFactory.class,
-        PrinterResolver.class,
+        BeanFactoryPrinterResolver.class,
 
         EclairProxyCreatorTest.InfrastructureTestConfiguration.class,
         EclairProxyCreatorTest.TestConfiguration.class
