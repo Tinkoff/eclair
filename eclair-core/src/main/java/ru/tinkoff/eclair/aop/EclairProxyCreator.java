@@ -29,7 +29,7 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import ru.tinkoff.eclair.core.*;
-import ru.tinkoff.eclair.core.printer.PrinterResolver;
+import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
 import ru.tinkoff.eclair.definition.*;
 import ru.tinkoff.eclair.definition.factory.MethodLogFactory;
 import ru.tinkoff.eclair.definition.factory.MethodMdcFactory;

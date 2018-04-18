@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package ru.tinkoff.eclair.core.printer;
+package ru.tinkoff.eclair.printer.resolver;
 
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.util.StringUtils;

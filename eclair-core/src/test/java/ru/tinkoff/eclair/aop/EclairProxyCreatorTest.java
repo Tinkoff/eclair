@@ -28,7 +28,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.core.AnnotationDefinitionFactory;
 import ru.tinkoff.eclair.core.ExpressionEvaluator;
-import ru.tinkoff.eclair.core.printer.BeanFactoryPrinterResolver;
+import ru.tinkoff.eclair.printer.resolver.BeanFactoryPrinterResolver;
 import ru.tinkoff.eclair.logger.SimpleLogger;
 import ru.tinkoff.eclair.printer.Printer;
 import ru.tinkoff.eclair.printer.ToStringPrinter;

@@ -21,7 +21,7 @@ import org.springframework.validation.Validator;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.annotation.Mdc;
 import ru.tinkoff.eclair.core.AnnotationExtractor;
-import ru.tinkoff.eclair.core.printer.PrinterResolver;
+import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
 import ru.tinkoff.eclair.logger.EclairLogger;
 import ru.tinkoff.eclair.validate.log.group.*;
 import ru.tinkoff.eclair.validate.mdc.MdcsValidator;

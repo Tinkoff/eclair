@@ -16,7 +16,7 @@
 package ru.tinkoff.eclair.validate.log.single;
 
 import ru.tinkoff.eclair.annotation.Log;
-import ru.tinkoff.eclair.core.printer.PrinterResolver;
+import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
 
 /**
  * @author Vyacheslav Klapatnyuk

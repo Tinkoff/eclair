@@ -19,7 +19,7 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import ru.tinkoff.eclair.core.AnnotationExtractor;
-import ru.tinkoff.eclair.core.printer.PrinterResolver;
+import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
 import ru.tinkoff.eclair.logger.EclairLogger;
 
 import java.util.Map;

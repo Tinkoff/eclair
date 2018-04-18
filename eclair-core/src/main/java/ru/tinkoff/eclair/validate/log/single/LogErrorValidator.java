@@ -18,7 +18,7 @@ package ru.tinkoff.eclair.validate.log.single;
 import org.springframework.validation.Errors;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.core.ErrorFilterFactory;
-import ru.tinkoff.eclair.core.printer.PrinterResolver;
+import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
 import ru.tinkoff.eclair.definition.ErrorLog;
 
 import java.util.Set;

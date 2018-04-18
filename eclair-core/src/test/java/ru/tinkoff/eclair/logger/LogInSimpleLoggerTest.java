@@ -25,7 +25,7 @@ import org.springframework.boot.logging.LogLevel;
 import org.springframework.boot.logging.LoggerConfiguration;
 import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
-import ru.tinkoff.eclair.core.printer.PrinterResolver;
+import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
 import ru.tinkoff.eclair.definition.InLog;
 import ru.tinkoff.eclair.definition.MethodLog;
 import ru.tinkoff.eclair.definition.ParameterLog;

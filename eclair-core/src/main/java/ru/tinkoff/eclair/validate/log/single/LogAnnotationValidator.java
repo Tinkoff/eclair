@@ -20,7 +20,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import ru.tinkoff.eclair.core.AnnotationAttribute;
-import ru.tinkoff.eclair.core.printer.PrinterResolver;
+import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
 import ru.tinkoff.eclair.printer.Printer;
 
 import java.lang.annotation.Annotation;
