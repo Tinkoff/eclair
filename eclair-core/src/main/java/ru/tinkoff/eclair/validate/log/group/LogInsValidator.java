@@ -15,31 +15,31 @@
 
 package ru.tinkoff.eclair.validate.log.group;
 
-import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.validation.Errors;
+import ru.tinkoff.eclair.annotation.Log;
+import ru.tinkoff.eclair.exception.AnnotationUsageException;
 import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
-import ru.tinkoff.eclair.logger.EclairLogger;
-import ru.tinkoff.eclair.validate.log.single.LogInValidator;
+import ru.tinkoff.eclair.validate.log.single.LogValidator;
 
+import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Vyacheslav Klapatnyuk
  */
-public class LogInsValidator extends LoggerSpecificLogAnnotationsValidator {
+public class LogInsValidator extends GroupLogValidator<Log.in> {
 
-    private final LogInValidator logInValidator;
+    private final LogValidator<Log.in> logInValidator;
 
-    public LogInsValidator(GenericApplicationContext applicationContext,
-                           Map<String, EclairLogger> loggers,
+    public LogInsValidator(Map<String, Set<String>> loggerNames,
                            PrinterResolver printerResolver) {
-        super(applicationContext, loggers);
-        this.logInValidator = new LogInValidator(printerResolver);
+        super(loggerNames);
+        this.logInValidator = new LogValidator<>(printerResolver);
     }
 
     @Override
-    public void validate(Object target, Errors errors) {
-        super.validate(target, errors);
-        ((Iterable<?>) target).forEach(logIn -> logInValidator.validate(logIn, errors));
+    public void validate(Method method, Set<Log.in> target) throws AnnotationUsageException {
+        super.validate(method, target);
+        target.forEach(logIn -> logInValidator.validate(method, logIn));
     }
 }

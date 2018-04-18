@@ -15,31 +15,31 @@
 
 package ru.tinkoff.eclair.validate.log.group;
 
-import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.validation.Errors;
+import ru.tinkoff.eclair.annotation.Log;
+import ru.tinkoff.eclair.exception.AnnotationUsageException;
 import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
-import ru.tinkoff.eclair.logger.EclairLogger;
-import ru.tinkoff.eclair.validate.log.single.ParameterLogValidator;
+import ru.tinkoff.eclair.validate.log.single.LogValidator;
 
+import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Vyacheslav Klapatnyuk
  */
-public class ParameterLogsValidator extends LoggerSpecificLogAnnotationsValidator {
+public class ParameterLogsValidator extends GroupLogValidator<Log> {
 
-    private final ParameterLogValidator parameterLogValidator;
+    private final LogValidator<Log> parameterLogValidator;
 
-    public ParameterLogsValidator(GenericApplicationContext applicationContext,
-                                  Map<String, EclairLogger> loggers,
+    public ParameterLogsValidator(Map<String, Set<String>> loggerNames,
                                   PrinterResolver printerResolver) {
-        super(applicationContext, loggers);
-        this.parameterLogValidator = new ParameterLogValidator(printerResolver);
+        super(loggerNames);
+        this.parameterLogValidator = new LogValidator<>(printerResolver);
     }
 
     @Override
-    public void validate(Object target, Errors errors) {
-        super.validate(target, errors);
-        ((Iterable<?>) target).forEach(log -> parameterLogValidator.validate(log, errors));
+    public void validate(Method method, Set<Log> target) throws AnnotationUsageException {
+        super.validate(method, target);
+        target.forEach(log -> parameterLogValidator.validate(method, log));
     }
 }

@@ -15,31 +15,31 @@
 
 package ru.tinkoff.eclair.validate.log.group;
 
-import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.validation.Errors;
+import ru.tinkoff.eclair.annotation.Log;
+import ru.tinkoff.eclair.exception.AnnotationUsageException;
 import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
-import ru.tinkoff.eclair.logger.EclairLogger;
-import ru.tinkoff.eclair.validate.log.single.LogOutValidator;
+import ru.tinkoff.eclair.validate.log.single.LogValidator;
 
+import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Vyacheslav Klapatnyuk
  */
-public class LogOutsValidator extends LoggerSpecificLogAnnotationsValidator {
+public class LogOutsValidator extends GroupLogValidator<Log.out> {
 
-    private final LogOutValidator logOutValidator;
+    private final LogValidator<Log.out> logOutValidator;
 
-    public LogOutsValidator(GenericApplicationContext applicationContext,
-                            Map<String, EclairLogger> loggers,
+    public LogOutsValidator(Map<String, Set<String>> loggerNames,
                             PrinterResolver printerResolver) {
-        super(applicationContext, loggers);
-        this.logOutValidator = new LogOutValidator(printerResolver);
+        super(loggerNames);
+        this.logOutValidator = new LogValidator<>(printerResolver);
     }
 
     @Override
-    public void validate(Object target, Errors errors) {
-        super.validate(target, errors);
-        ((Iterable<?>) target).forEach(logOut -> logOutValidator.validate(logOut, errors));
+    public void validate(Method method, Set<Log.out> target) throws AnnotationUsageException {
+        super.validate(method, target);
+        target.forEach(logOut -> logOutValidator.validate(method, logOut));
     }
 }

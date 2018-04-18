@@ -15,10 +15,11 @@
 
 package ru.tinkoff.eclair.validate.mdc;
 
-import org.springframework.validation.Errors;
-import org.springframework.validation.Validator;
 import ru.tinkoff.eclair.annotation.Mdc;
+import ru.tinkoff.eclair.exception.AnnotationUsageException;
+import ru.tinkoff.eclair.validate.AnnotationUsageValidator;
 
+import java.lang.reflect.Method;
 import java.util.Collection;
 
 import static java.lang.String.format;
@@ -27,26 +28,18 @@ import static java.util.stream.Collectors.groupingBy;
 /**
  * @author Vyacheslav Klapatnyuk
  */
-public class MdcsValidator implements Validator {
-
-    private final MdcValidator mdcValidator = new MdcValidator();
+public class MdcsValidator implements AnnotationUsageValidator<Collection<Mdc>> {
 
     @Override
-    public boolean supports(Class<?> clazz) {
-        return Collection.class.isAssignableFrom(clazz);
-    }
-
-    @Override
-    public void validate(Object target, Errors errors) {
-        @SuppressWarnings("unchecked")
-        Collection<Mdc> mdcs = (Collection<Mdc>) target;
-
-        mdcs.stream().collect(groupingBy(Mdc::key))
+    public void validate(Method method, Collection<Mdc> target) throws AnnotationUsageException {
+        target.stream().collect(groupingBy(Mdc::key))
                 .entrySet().stream()
                 .filter(entry -> entry.getValue().size() > 1)
-                .forEach(entry -> errors.reject("key.duplicate",
-                        format("Annotations duplicated for key '%s': %s", entry.getKey(), entry.getValue())));
-
-        mdcs.forEach(mdc -> mdcValidator.validate(mdc, errors));
+                .findFirst()
+                .ifPresent(entry -> {
+                    throw new AnnotationUsageException(
+                            format("Annotations duplicated for key '%s': %s", entry.getKey(), entry.getValue()),
+                            method);
+                });
     }
 }

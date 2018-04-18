@@ -15,15 +15,14 @@
 
 package ru.tinkoff.eclair.validate.log.group;
 
-import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.validation.Errors;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.core.ErrorFilterFactory;
-import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
 import ru.tinkoff.eclair.definition.ErrorLog;
-import ru.tinkoff.eclair.logger.EclairLogger;
+import ru.tinkoff.eclair.exception.AnnotationUsageException;
+import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
 import ru.tinkoff.eclair.validate.log.single.LogErrorValidator;
 
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,25 +33,21 @@ import static java.lang.String.format;
 /**
  * @author Vyacheslav Klapatnyuk
  */
-public class LogErrorsValidator extends LoggerSpecificLogAnnotationsValidator {
+public class LogErrorsValidator extends GroupLogValidator<Log.error> {
 
     private final ErrorFilterFactory errorFilterFactory = ErrorFilterFactory.getInstance();
 
     private final LogErrorValidator logErrorValidator;
 
-    public LogErrorsValidator(GenericApplicationContext applicationContext,
-                              Map<String, EclairLogger> loggers,
+    public LogErrorsValidator(Map<String, Set<String>> loggerNames,
                               PrinterResolver printerResolver) {
-        super(applicationContext, loggers);
+        super(loggerNames);
         logErrorValidator = new LogErrorValidator(printerResolver);
     }
 
     @Override
-    public void validate(Object target, Errors errors) {
-        @SuppressWarnings("unchecked")
-        Set<Log.error> logErrors = (Set<Log.error>) target;
-
-        groupAnnotationsByLogger(logErrors, errors).entrySet().stream()
+    public void validate(Method method, Set<Log.error> target) throws AnnotationUsageException {
+        groupAnnotationsByLogger(method, target).entrySet().stream()
                 .filter(entry -> entry.getValue().size() > 1)
                 .forEach(entry -> {
                     List<Log.error> loggerLogErrors = entry.getValue();
@@ -60,11 +55,12 @@ public class LogErrorsValidator extends LoggerSpecificLogAnnotationsValidator {
                             .map(error -> errorFilterFactory.buildErrorFilter(error.ofType(), error.exclude()))
                             .collect(Collectors.toSet());
                     if (loggerLogErrors.size() > filters.size()) {
-                        errors.reject("errors.logger.duplicate",
-                                format("Error filters duplicated for logger bean '%s': %s", entry.getKey(), loggerLogErrors));
+                        throw new AnnotationUsageException(
+                                format("Error filters duplicated for logger '%s': %s", entry.getKey(), loggerLogErrors),
+                                method);
                     }
                 });
 
-        logErrors.forEach(logError -> logErrorValidator.validate(logError, errors));
+        target.forEach(logError -> logErrorValidator.validate(method, logError));
     }
 }

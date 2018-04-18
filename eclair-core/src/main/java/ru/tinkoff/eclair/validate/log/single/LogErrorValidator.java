@@ -15,20 +15,19 @@
 
 package ru.tinkoff.eclair.validate.log.single;
 
-import org.springframework.validation.Errors;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.core.ErrorFilterFactory;
-import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
 import ru.tinkoff.eclair.definition.ErrorLog;
+import ru.tinkoff.eclair.exception.AnnotationUsageException;
+import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
 
+import java.lang.reflect.Method;
 import java.util.Set;
-
-import static java.lang.String.format;
 
 /**
  * @author Vyacheslav Klapatnyuk
  */
-public class LogErrorValidator extends LogAnnotationValidator {
+public class LogErrorValidator extends LogValidator<Log.error> {
 
     private final ErrorFilterFactory errorFilterFactory = ErrorFilterFactory.getInstance();
 
@@ -37,29 +36,21 @@ public class LogErrorValidator extends LogAnnotationValidator {
     }
 
     @Override
-    public boolean supports(Class<?> clazz) {
-        return clazz == Log.error.class;
-    }
+    public void validate(Method method, Log.error target) throws AnnotationUsageException {
+        super.validate(method, target);
 
-    @Override
-    public void validate(Object target, Errors errors) {
-        super.validate(target, errors);
-
-        Log.error logError = (Log.error) target;
-
-        Class<? extends Throwable>[] ofType = logError.ofType();
-        Class<? extends Throwable>[] exclude = logError.exclude();
+        Class<? extends Throwable>[] ofType = target.ofType();
+        Class<? extends Throwable>[] exclude = target.exclude();
         ErrorLog.Filter filter = errorFilterFactory.buildErrorFilter(ofType, exclude);
 
         Set<Class<? extends Throwable>> includes = filter.getIncludes();
         if (includes.isEmpty()) {
-            errors.reject("error.set.empty", "Empty error set defined by annotation: " + logError);
-        } else {
-            Set<Class<? extends Throwable>> excludes = filter.getExcludes();
-            if (ofType.length > includes.size() || exclude.length > excludes.size()) {
-                errors.reject("error.set.non.optimal",
-                        format("Error set defined by annotation should be optimized: ofType=%s, exclude=%s", includes, excludes));
-            }
+            throw new AnnotationUsageException("Empty error set", method, target);
+        }
+
+        Set<Class<? extends Throwable>> excludes = filter.getExcludes();
+        if (ofType.length > includes.size() || exclude.length > excludes.size()) {
+            throw new AnnotationUsageException("Error set should be optimized", method, target);
         }
     }
 }

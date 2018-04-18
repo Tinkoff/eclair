@@ -1,1 +1,2 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=ru.tinkoff.eclair.autoconfigure.EclairAutoConfiguration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration = ru.tinkoff.eclair.autoconfigure.EclairAutoConfiguration
+org.springframework.boot.diagnostics.FailureAnalyzer = ru.tinkoff.eclair.autoconfigure.EclairFailureAnalyzer

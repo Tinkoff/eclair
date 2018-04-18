@@ -16,13 +16,13 @@
 package ru.tinkoff.eclair.validate;
 
 import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.validation.Errors;
-import org.springframework.validation.Validator;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.annotation.Mdc;
 import ru.tinkoff.eclair.core.AnnotationExtractor;
-import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
+import ru.tinkoff.eclair.core.LoggerBeanNamesResolver;
+import ru.tinkoff.eclair.exception.AnnotationUsageException;
 import ru.tinkoff.eclair.logger.EclairLogger;
+import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
 import ru.tinkoff.eclair.validate.log.group.*;
 import ru.tinkoff.eclair.validate.mdc.MdcsValidator;
 import ru.tinkoff.eclair.validate.mdc.MergedMdcsValidator;
@@ -31,13 +31,14 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
 
-import static java.lang.String.format;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 
 /**
  * @author Vyacheslav Klapatnyuk
  */
-class BeanMethodValidator implements Validator {
+public class MethodValidator implements AnnotationUsageValidator<Method> {
 
     private final AnnotationExtractor annotationExtractor = AnnotationExtractor.getInstance();
 
@@ -50,19 +51,19 @@ class BeanMethodValidator implements Validator {
     private final MdcsValidator mdcsValidator = new MdcsValidator();
     private final MergedMdcsValidator mergedMdcsValidator = new MergedMdcsValidator();
 
-    BeanMethodValidator(GenericApplicationContext applicationContext,
-                        Map<String, EclairLogger> loggers,
-                        PrinterResolver printerResolver) {
-        this.logsValidator = new LogsValidator(applicationContext, loggers, printerResolver);
-        this.logInsValidator = new LogInsValidator(applicationContext, loggers, printerResolver);
-        this.logOutsValidator = new LogOutsValidator(applicationContext, loggers, printerResolver);
-        this.logErrorsValidator = new LogErrorsValidator(applicationContext, loggers, printerResolver);
-        this.parameterLogsValidator = new ParameterLogsValidator(applicationContext, loggers, printerResolver);
-    }
-
-    @Override
-    public boolean supports(Class<?> clazz) {
-        return clazz == Method.class;
+    public MethodValidator(GenericApplicationContext applicationContext,
+                           Map<String, EclairLogger> loggers,
+                           PrinterResolver printerResolver) {
+        Map<String, Set<String>> loggerNames = loggers.keySet().stream()
+                .collect(toMap(
+                        identity(),
+                        loggerName -> LoggerBeanNamesResolver.getInstance().resolve(applicationContext, loggerName)
+                ));
+        this.logsValidator = new LogsValidator(loggerNames, printerResolver);
+        this.logInsValidator = new LogInsValidator(loggerNames, printerResolver);
+        this.logOutsValidator = new LogOutsValidator(loggerNames, printerResolver);
+        this.logErrorsValidator = new LogErrorsValidator(loggerNames, printerResolver);
+        this.parameterLogsValidator = new ParameterLogsValidator(loggerNames, printerResolver);
     }
 
     /**
@@ -72,44 +73,42 @@ class BeanMethodValidator implements Validator {
      * TODO: Log.in + Log.out      ?-> Log
      */
     @Override
-    public void validate(Object target, Errors errors) {
-        Method method = (Method) target;
-
-        Set<Log> logs = annotationExtractor.getLogs(method);
+    public void validate(Method method, Method target) throws AnnotationUsageException {
+        Set<Log> logs = annotationExtractor.getLogs(target);
         boolean methodAnnotationFound = !logs.isEmpty();
 
-        Set<Log.in> logIns = annotationExtractor.getLogIns(method);
+        Set<Log.in> logIns = annotationExtractor.getLogIns(target);
         methodAnnotationFound |= !logIns.isEmpty();
 
-        Set<Log.out> logOuts = annotationExtractor.getLogOuts(method);
+        Set<Log.out> logOuts = annotationExtractor.getLogOuts(target);
         methodAnnotationFound |= !logOuts.isEmpty();
 
-        Set<Log.error> logErrors = annotationExtractor.getLogErrors(method);
+        Set<Log.error> logErrors = annotationExtractor.getLogErrors(target);
         methodAnnotationFound |= !logErrors.isEmpty();
 
-        Set<Mdc> mdcs = annotationExtractor.getMdcs(method);
+        Set<Mdc> mdcs = annotationExtractor.getMdcs(target);
         methodAnnotationFound |= !mdcs.isEmpty();
 
-        List<Set<Log>> parameterLogs = annotationExtractor.getParameterLogs(method);
+        List<Set<Log>> parameterLogs = annotationExtractor.getParameterLogs(target);
         boolean argAnnotationFound = !parameterLogs.stream().allMatch(Set::isEmpty);
 
-        List<Set<Mdc>> parameterMdcs = annotationExtractor.getParametersMdcs(method);
+        List<Set<Mdc>> parameterMdcs = annotationExtractor.getParametersMdcs(target);
         argAnnotationFound |= !parameterMdcs.stream().allMatch(Set::isEmpty);
 
-        if (Modifier.isPrivate(method.getModifiers())) {
+        if (Modifier.isPrivate(target.getModifiers())) {
             if (methodAnnotationFound) {
-                errors.reject("method.private", format("Annotated method could not be private: %s", method));
+                throw new AnnotationUsageException("Annotated method could not be private", target);
             }
             if (argAnnotationFound) {
-                errors.reject("method.args.private", format("Method with annotated parameters could not be private: %s", method));
+                throw new AnnotationUsageException("Method with annotated parameters could not be private", target);
             }
         }
-        if (Modifier.isStatic(method.getModifiers())) {
+        if (Modifier.isStatic(target.getModifiers())) {
             if (methodAnnotationFound) {
-                errors.reject("method.static", format("Annotated method could not be static: %s", method));
+                throw new AnnotationUsageException("Annotated method could not be static", target);
             }
             if (argAnnotationFound) {
-                errors.reject("method.args.static", format("Method with annotated parameters could not be static: %s", method));
+                throw new AnnotationUsageException("Method with annotated parameters could not be static", target);
             }
         }
 
@@ -117,16 +116,16 @@ class BeanMethodValidator implements Validator {
             return;
         }
 
-        logsValidator.validate(logs, errors);
-        logInsValidator.validate(logIns, errors);
-        logOutsValidator.validate(logOuts, errors);
-        logErrorsValidator.validate(logErrors, errors);
-        parameterLogs.forEach(log -> parameterLogsValidator.validate(log, errors));
+        logsValidator.validate(target, logs);
+        logInsValidator.validate(target, logIns);
+        logOutsValidator.validate(target, logOuts);
+        logErrorsValidator.validate(target, logErrors);
+        parameterLogs.forEach(log -> parameterLogsValidator.validate(target, log));
 
-        mdcsValidator.validate(mdcs, errors);
-        parameterMdcs.forEach(item -> mdcsValidator.validate(item, errors));
+        mdcsValidator.validate(target, mdcs);
+        parameterMdcs.forEach(item -> mdcsValidator.validate(target, item));
         Set<Mdc> mergedMdcs = new HashSet<>(mdcs);
         mergedMdcs.addAll(parameterMdcs.stream().flatMap(Collection::stream).collect(toSet()));
-        mergedMdcsValidator.validate(mergedMdcs, errors);
+        mergedMdcsValidator.validate(target, mergedMdcs);
     }
 }

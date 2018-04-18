@@ -13,22 +13,16 @@
  * limitations under the License.
  */
 
-package ru.tinkoff.eclair.validate.log.single;
+package ru.tinkoff.eclair.validate;
 
-import ru.tinkoff.eclair.annotation.Log;
-import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
+import ru.tinkoff.eclair.exception.AnnotationUsageException;
+
+import java.lang.reflect.Method;
 
 /**
  * @author Vyacheslav Klapatnyuk
  */
-public class LogOutValidator extends LogAnnotationValidator {
+public interface AnnotationUsageValidator<T> {
 
-    public LogOutValidator(PrinterResolver printerResolver) {
-        super(printerResolver);
-    }
-
-    @Override
-    public boolean supports(Class<?> clazz) {
-        return clazz == Log.out.class;
-    }
+    void validate(Method method, T target) throws AnnotationUsageException;
 }

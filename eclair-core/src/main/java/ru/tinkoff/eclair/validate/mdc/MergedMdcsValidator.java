@@ -15,10 +15,11 @@
 
 package ru.tinkoff.eclair.validate.mdc;
 
-import org.springframework.validation.Errors;
-import org.springframework.validation.Validator;
 import ru.tinkoff.eclair.annotation.Mdc;
+import ru.tinkoff.eclair.exception.AnnotationUsageException;
+import ru.tinkoff.eclair.validate.AnnotationUsageValidator;
 
+import java.lang.reflect.Method;
 import java.util.Collection;
 
 import static java.lang.String.format;
@@ -27,24 +28,20 @@ import static java.util.stream.Collectors.groupingBy;
 /**
  * @author Vyacheslav Klapatnyuk
  */
-public class MergedMdcsValidator implements Validator {
+public class MergedMdcsValidator implements AnnotationUsageValidator<Collection<Mdc>> {
 
     @Override
-    public boolean supports(Class<?> clazz) {
-        return Collection.class.isAssignableFrom(clazz);
-    }
-
-    @Override
-    public void validate(Object target, Errors errors) {
-        @SuppressWarnings("unchecked")
-        Collection<Mdc> mdcs = (Collection<Mdc>) target;
-
-        mdcs.stream().collect(groupingBy(Mdc::key))
+    public void validate(Method method, Collection<Mdc> target) throws AnnotationUsageException {
+        target.stream().collect(groupingBy(Mdc::key))
                 .entrySet().stream()
                 // validate uniqueness of not empty MDC keys
                 .filter(entry -> !entry.getKey().isEmpty())
                 .filter(entry -> entry.getValue().size() > 1)
-                .forEach(entry -> errors.reject("key.duplicate",
-                        format("Annotations duplicated for not empty key '%s': %s", entry.getKey(), entry.getValue())));
+                .findFirst()
+                .ifPresent(entry -> {
+                    throw new AnnotationUsageException(
+                            format("Annotations duplicated for not empty key '%s': %s", entry.getKey(), entry.getValue()),
+                            method);
+                });
     }
 }

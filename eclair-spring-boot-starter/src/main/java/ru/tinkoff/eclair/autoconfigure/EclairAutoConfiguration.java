@@ -55,9 +55,6 @@ import static java.util.Objects.isNull;
 @EnableConfigurationProperties(EclairProperties.class)
 public class EclairAutoConfiguration {
 
-    private static final String XML_AUTO_CONFIGURED_PRINTER_NAME = "jaxb2Printer";
-    private static final String JSON_AUTO_CONFIGURED_PRINTER_NAME = "jacksonPrinter";
-
     private final GenericApplicationContext applicationContext;
 
     public EclairAutoConfiguration(GenericApplicationContext applicationContext) {
@@ -95,6 +92,9 @@ public class EclairAutoConfiguration {
 
     @Configuration
     static class PrinterConfiguration {
+
+        private static final String XML_AUTO_CONFIGURED_PRINTER_NAME = "jaxb2Printer";
+        private static final String JSON_AUTO_CONFIGURED_PRINTER_NAME = "jacksonPrinter";
 
         @Bean
         @ConditionalOnMissingBean
