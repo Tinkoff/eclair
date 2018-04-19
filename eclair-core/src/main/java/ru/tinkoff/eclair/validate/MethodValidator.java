@@ -20,12 +20,11 @@ import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.annotation.Mdc;
 import ru.tinkoff.eclair.core.AnnotationExtractor;
 import ru.tinkoff.eclair.core.LoggerBeanNamesResolver;
-import ru.tinkoff.eclair.exception.AnnotationUsageException;
 import ru.tinkoff.eclair.logger.EclairLogger;
 import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
 import ru.tinkoff.eclair.validate.log.group.*;
-import ru.tinkoff.eclair.validate.mdc.MdcsValidator;
-import ru.tinkoff.eclair.validate.mdc.MergedMdcsValidator;
+import ru.tinkoff.eclair.validate.mdc.group.MdcsValidator;
+import ru.tinkoff.eclair.validate.mdc.group.MergedMdcsValidator;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -97,18 +96,26 @@ public class MethodValidator implements AnnotationUsageValidator<Method> {
 
         if (Modifier.isPrivate(target.getModifiers())) {
             if (methodAnnotationFound) {
-                throw new AnnotationUsageException("Annotated method could not be private", target);
+                throw new AnnotationUsageException(target,
+                        "Annotation on the 'private' method cannot be processed",
+                        "Change method access to 'default', 'protected' or 'public'");
             }
             if (argAnnotationFound) {
-                throw new AnnotationUsageException("Method with annotated parameters could not be private", target);
+                throw new AnnotationUsageException(target,
+                        "Annotation on the parameter of 'private' method cannot be processed",
+                        "Change method access to 'default', 'protected' or 'public'");
             }
         }
         if (Modifier.isStatic(target.getModifiers())) {
             if (methodAnnotationFound) {
-                throw new AnnotationUsageException("Annotated method could not be static", target);
+                throw new AnnotationUsageException(target,
+                        "Annotation on the 'static' method cannot be processed",
+                        "Remove 'static' modifier");
             }
             if (argAnnotationFound) {
-                throw new AnnotationUsageException("Method with annotated parameters could not be static", target);
+                throw new AnnotationUsageException(target,
+                        "Annotation on the parameter of 'static' method cannot be processed",
+                        "Remove 'static' modifier");
             }
         }
 

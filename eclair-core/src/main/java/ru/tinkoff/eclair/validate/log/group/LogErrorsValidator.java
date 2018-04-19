@@ -17,8 +17,7 @@ package ru.tinkoff.eclair.validate.log.group;
 
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.core.ErrorFilterFactory;
-import ru.tinkoff.eclair.definition.ErrorLog;
-import ru.tinkoff.eclair.exception.AnnotationUsageException;
+import ru.tinkoff.eclair.validate.AnnotationUsageException;
 import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
 import ru.tinkoff.eclair.validate.log.single.LogErrorValidator;
 
@@ -26,9 +25,9 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toSet;
 
 /**
  * @author Vyacheslav Klapatnyuk
@@ -50,14 +49,15 @@ public class LogErrorsValidator extends GroupLogValidator<Log.error> {
         groupAnnotationsByLogger(method, target).entrySet().stream()
                 .filter(entry -> entry.getValue().size() > 1)
                 .forEach(entry -> {
-                    List<Log.error> loggerLogErrors = entry.getValue();
-                    Set<ErrorLog.Filter> filters = loggerLogErrors.stream()
+                    List<Log.error> logErrors = entry.getValue();
+                    long filterCount = logErrors.stream()
                             .map(error -> errorFilterFactory.buildErrorFilter(error.ofType(), error.exclude()))
-                            .collect(Collectors.toSet());
-                    if (loggerLogErrors.size() > filters.size()) {
-                        throw new AnnotationUsageException(
-                                format("Error filters duplicated for logger '%s': %s", entry.getKey(), loggerLogErrors),
-                                method);
+                            .collect(toSet())
+                            .size();
+                    if (logErrors.size() > filterCount) {
+                        throw new AnnotationUsageException(method,
+                                format("Duplicated error filters with 'logger = %s' on the method", entry.getKey()),
+                                "Optimize error filters or specify a different logger names");
                     }
                 });
 

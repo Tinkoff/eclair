@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package ru.tinkoff.eclair.exception;
+package ru.tinkoff.eclair.validate;
 
 import lombok.Getter;
 
@@ -27,16 +27,18 @@ import java.lang.reflect.Method;
 public class AnnotationUsageException extends RuntimeException {
 
     private final Method method;
+    private final String action;
 
     private Annotation annotation;
 
-    public AnnotationUsageException(String message, Method method) {
-        this(message, method, null);
+    public AnnotationUsageException(Method method, String message, String action) {
+        this(method, message, action, null);
     }
 
-    public AnnotationUsageException(String message, Method method, Annotation annotation) {
+    public AnnotationUsageException(Method method, String message, String action, Annotation annotation) {
         super(message);
         this.method = method;
         this.annotation = annotation;
+        this.action = action;
     }
 }

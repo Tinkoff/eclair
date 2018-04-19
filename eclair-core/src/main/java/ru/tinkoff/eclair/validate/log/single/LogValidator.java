@@ -18,7 +18,7 @@ package ru.tinkoff.eclair.validate.log.single;
 import org.springframework.boot.logging.LogLevel;
 import org.springframework.util.StringUtils;
 import ru.tinkoff.eclair.core.AnnotationAttribute;
-import ru.tinkoff.eclair.exception.AnnotationUsageException;
+import ru.tinkoff.eclair.validate.AnnotationUsageException;
 import ru.tinkoff.eclair.printer.Printer;
 import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
 import ru.tinkoff.eclair.validate.AnnotationUsageValidator;
@@ -26,7 +26,7 @@ import ru.tinkoff.eclair.validate.AnnotationUsageValidator;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
-import static java.lang.String.*;
+import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static org.springframework.boot.logging.LogLevel.OFF;
 
@@ -49,14 +49,20 @@ public class LogValidator<T extends Annotation> implements AnnotationUsageValida
         LogLevel expectedLevel = AnnotationAttribute.LEVEL.extract(target);
         LogLevel ifEnabledLevel = AnnotationAttribute.IF_ENABLED.extract(target);
         if (ifEnabledLevel.ordinal() >= expectedLevel.ordinal() && ifEnabledLevel != OFF) {
-            throw new AnnotationUsageException("'If enabled' level is higher or equals to expected level", method, target);
+            throw new AnnotationUsageException(method,
+                    format("'ifEnabled = %s' should be more strict than 'level = %s'", ifEnabledLevel, expectedLevel),
+                    "Correct specified levels relation or replace 'ifEnabled' by default value 'OFF'",
+                    target);
         }
 
         String printerName = AnnotationAttribute.PRINTER.extract(target);
         if (StringUtils.hasText(printerName)) {
             Printer printer = printerResolver.resolve(printerName);
             if (isNull(printer)) {
-                throw new AnnotationUsageException(format("Unknown printer '%s'", printerName), method, target);
+                throw new AnnotationUsageException(method,
+                        format("Unknown printer '%s'", printerName),
+                        "Use correct bean name or alias to specify 'printer'",
+                        target);
             }
         }
     }

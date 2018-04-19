@@ -15,8 +15,6 @@
 
 package ru.tinkoff.eclair.validate;
 
-import ru.tinkoff.eclair.exception.AnnotationUsageException;
-
 import java.lang.reflect.Method;
 
 /**

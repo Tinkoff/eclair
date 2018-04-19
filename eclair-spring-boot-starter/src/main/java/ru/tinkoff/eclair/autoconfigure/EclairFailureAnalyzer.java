@@ -17,7 +17,7 @@ package ru.tinkoff.eclair.autoconfigure;
 
 import org.springframework.boot.diagnostics.AbstractFailureAnalyzer;
 import org.springframework.boot.diagnostics.FailureAnalysis;
-import ru.tinkoff.eclair.exception.AnnotationUsageException;
+import ru.tinkoff.eclair.validate.AnnotationUsageException;
 
 import java.lang.annotation.Annotation;
 
@@ -30,19 +30,15 @@ public class EclairFailureAnalyzer extends AbstractFailureAnalyzer<AnnotationUsa
 
     @Override
     protected FailureAnalysis analyze(Throwable rootFailure, AnnotationUsageException cause) {
-        return new FailureAnalysis(buildDescription(cause), buildAction(), cause);
+        return new FailureAnalysis(buildDescription(cause), cause.getAction(), cause);
     }
 
     private String buildDescription(AnnotationUsageException cause) {
-        StringBuilder builder = new StringBuilder(cause.getMessage() + " | " + cause.getMethod());
+        StringBuilder builder = new StringBuilder(cause.getMessage() + "\n    - method: " + cause.getMethod());
         Annotation annotation = cause.getAnnotation();
         if (nonNull(annotation)) {
-            builder.append(" | ").append(annotation);
+            builder.append("\n    - annotation: ").append(annotation);
         }
         return builder.toString();
-    }
-
-    private String buildAction() {
-        return "Please correct the annotation definition";
     }
 }

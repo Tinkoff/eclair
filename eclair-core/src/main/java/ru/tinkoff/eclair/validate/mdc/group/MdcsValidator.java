@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
-package ru.tinkoff.eclair.validate.mdc;
+package ru.tinkoff.eclair.validate.mdc.group;
 
 import ru.tinkoff.eclair.annotation.Mdc;
-import ru.tinkoff.eclair.exception.AnnotationUsageException;
+import ru.tinkoff.eclair.validate.AnnotationUsageException;
 import ru.tinkoff.eclair.validate.AnnotationUsageValidator;
 
 import java.lang.reflect.Method;
@@ -37,9 +37,9 @@ public class MdcsValidator implements AnnotationUsageValidator<Collection<Mdc>> 
                 .filter(entry -> entry.getValue().size() > 1)
                 .findFirst()
                 .ifPresent(entry -> {
-                    throw new AnnotationUsageException(
-                            format("Annotations duplicated for key '%s': %s", entry.getKey(), entry.getValue()),
-                            method);
+                    throw new AnnotationUsageException(method,
+                            format("%s annotations with 'key = %s' on the annotated element", entry.getValue().size(), entry.getKey()),
+                            "Use unique 'key' per annotated element");
                 });
     }
 }

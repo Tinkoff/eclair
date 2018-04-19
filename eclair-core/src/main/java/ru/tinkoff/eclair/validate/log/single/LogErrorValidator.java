@@ -18,7 +18,7 @@ package ru.tinkoff.eclair.validate.log.single;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.core.ErrorFilterFactory;
 import ru.tinkoff.eclair.definition.ErrorLog;
-import ru.tinkoff.eclair.exception.AnnotationUsageException;
+import ru.tinkoff.eclair.validate.AnnotationUsageException;
 import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
 
 import java.lang.reflect.Method;
@@ -45,12 +45,18 @@ public class LogErrorValidator extends LogValidator<Log.error> {
 
         Set<Class<? extends Throwable>> includes = filter.getIncludes();
         if (includes.isEmpty()) {
-            throw new AnnotationUsageException("Empty error set", method, target);
+            throw new AnnotationUsageException(method,
+                    "Empty error set specified for filter",
+                    "Correct error sets or remove unnecessary annotation",
+                    target);
         }
 
         Set<Class<? extends Throwable>> excludes = filter.getExcludes();
         if (ofType.length > includes.size() || exclude.length > excludes.size()) {
-            throw new AnnotationUsageException("Error set should be optimized", method, target);
+            throw new AnnotationUsageException(method,
+                    "Error set contains duplicates",
+                    "Remove duplicate error types",
+                    target);
         }
     }
 }

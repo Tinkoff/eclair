@@ -16,7 +16,7 @@
 package ru.tinkoff.eclair.validate.log.group;
 
 import ru.tinkoff.eclair.core.AnnotationAttribute;
-import ru.tinkoff.eclair.exception.AnnotationUsageException;
+import ru.tinkoff.eclair.validate.AnnotationUsageException;
 import ru.tinkoff.eclair.validate.AnnotationUsageValidator;
 
 import java.lang.annotation.Annotation;
@@ -48,9 +48,9 @@ abstract class GroupLogValidator<T extends Annotation> implements AnnotationUsag
                 .filter(entry -> entry.getValue().size() > 1)
                 .findFirst()
                 .ifPresent(entry -> {
-                    throw new AnnotationUsageException(
-                            format("Annotations duplicated for logger '%s': %s", entry.getKey(), entry.getValue()),
-                            method);
+                    throw new AnnotationUsageException(method,
+                            format("%s annotations with 'logger = %s' on the method", entry.getValue().size(), entry.getKey()),
+                            "Use one annotation per 'logger'");
                 });
     }
 
@@ -62,7 +62,18 @@ abstract class GroupLogValidator<T extends Annotation> implements AnnotationUsag
                             .filter(entry -> entry.getValue().contains(loggerName))
                             .findFirst()
                             .map(Map.Entry::getKey)
-                            .orElseThrow(() -> new AnnotationUsageException(format("Unknown logger '%s'", loggerName), method));
+                            .orElseThrow(() -> {
+                                if (loggerName.isEmpty()) {
+                                    return new AnnotationUsageException(method,
+                                            "Primary logger not found among candidates",
+                                            "Annotate the needed logger by '@Primary' or specify the logger name explicitly",
+                                            annotation);
+                                }
+                                return new AnnotationUsageException(method,
+                                        format("Unknown logger '%s'", loggerName),
+                                        "Use correct bean name or alias to specify 'logger'",
+                                        annotation);
+                            });
                 }));
     }
 }

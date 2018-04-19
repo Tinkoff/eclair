@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
-package ru.tinkoff.eclair.validate.mdc;
+package ru.tinkoff.eclair.validate.mdc.group;
 
 import ru.tinkoff.eclair.annotation.Mdc;
-import ru.tinkoff.eclair.exception.AnnotationUsageException;
+import ru.tinkoff.eclair.validate.AnnotationUsageException;
 import ru.tinkoff.eclair.validate.AnnotationUsageValidator;
 
 import java.lang.reflect.Method;
@@ -32,16 +32,16 @@ public class MergedMdcsValidator implements AnnotationUsageValidator<Collection<
 
     @Override
     public void validate(Method method, Collection<Mdc> target) throws AnnotationUsageException {
+        // validate uniqueness of not empty MDC keys
         target.stream().collect(groupingBy(Mdc::key))
                 .entrySet().stream()
-                // validate uniqueness of not empty MDC keys
                 .filter(entry -> !entry.getKey().isEmpty())
                 .filter(entry -> entry.getValue().size() > 1)
                 .findFirst()
                 .ifPresent(entry -> {
-                    throw new AnnotationUsageException(
-                            format("Annotations duplicated for not empty key '%s': %s", entry.getKey(), entry.getValue()),
-                            method);
+                    throw new AnnotationUsageException(method,
+                            format("%s annotations with 'key = %s' on the method", entry.getValue().size(), entry.getKey()),
+                            "Use unique 'key' per method");
                 });
     }
 }
