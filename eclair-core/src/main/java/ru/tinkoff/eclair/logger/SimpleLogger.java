@@ -15,17 +15,15 @@
 
 package ru.tinkoff.eclair.logger;
 
-import lombok.AccessLevel;
-import lombok.Getter;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.boot.logging.LogLevel;
 import org.springframework.boot.logging.LoggingSystem;
 import ru.tinkoff.eclair.core.LoggerNameBuilder;
-import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
 import ru.tinkoff.eclair.definition.*;
 import ru.tinkoff.eclair.logger.facade.LoggerFacadeFactory;
 import ru.tinkoff.eclair.logger.facade.Slf4JLoggerFacadeFactory;
 import ru.tinkoff.eclair.printer.Printer;
+import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
 
 import java.util.function.Supplier;
 
@@ -34,18 +32,35 @@ import static java.util.Objects.nonNull;
 import static org.springframework.boot.logging.LogLevel.OFF;
 
 /**
+ * Standard {@link EclairLogger} implementation for AOP and manual level-specific logging.
+ * Performs logging into target defined by {@link #loggerFacadeFactory}.
+ * Determines context-specific configuration using {@link #loggingSystem}.
+ *
  * @author Vyacheslav Klapatnyuk
+ * @see LoggerFacadeFactory
+ * @see LoggingSystem
  */
 public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
 
+    /**
+     * Token indicating 'in'-event (beginning of method execution) in the log.
+     */
     private static final String IN = ">";
+    /**
+     * Token indicating 'out'-event (ending of method execution) in the log.
+     */
     private static final String OUT = "<";
+    /**
+     * Token indicating 'error'-event (emergency ending of method execution) in the log.
+     */
     private static final String ERROR = "!";
+    /**
+     * Token indicating manual logging event.
+     */
     private static final String MANUAL = "-";
 
     private final LoggerNameBuilder loggerNameBuilder = LoggerNameBuilder.getInstance();
 
-    @Getter(AccessLevel.PACKAGE)
     private final LoggerFacadeFactory loggerFacadeFactory;
     private final LoggingSystem loggingSystem;
 
@@ -58,11 +73,26 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
         this.loggingSystem = loggingSystem;
     }
 
+    /**
+     * Determines if specified log level is enabled for logger by current invocation context.
+     * Note: Uses information about current {@link StackTraceElement}, so not recommended if high execution speed is important.
+     *
+     * @param level checkable level
+     * @return {@code true} if enabled, {@code false} otherwise
+     */
     @Override
     public boolean isLogEnabled(LogLevel level) {
         return level != OFF && isLogEnabled(loggerNameBuilder.buildByInvoker(), level);
     }
 
+    /**
+     * Manual logging method.
+     *
+     * @param level          expected log level
+     * @param ifEnabledLevel lowest enabled level that allows logging
+     * @param format         format string with Slf4J syntax
+     * @param arguments      arguments for substituting into the format string
+     */
     @Override
     public void log(LogLevel level, LogLevel ifEnabledLevel, String format, Object... arguments) {
         String loggerName = loggerNameBuilder.buildByInvoker();
@@ -73,6 +103,12 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
         }
     }
 
+    /**
+     * Unwraps Java 8 {@link Supplier}s if necessary.
+     *
+     * @param arguments raw argument array (may contain {@link Supplier}s)
+     * @return unwrapped argument array ready for logging
+     */
     private Object[] unwrapArguments(Object[] arguments) {
         int length = arguments.length;
         Object[] result = new Object[length];
@@ -87,11 +123,24 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
         return result;
     }
 
+    /**
+     * Prepares logger name according to method invocation.
+     *
+     * @param invocation current loggable method invocation
+     * @return logger name
+     */
     @Override
     protected String getLoggerName(MethodInvocation invocation) {
         return loggerNameBuilder.build(invocation);
     }
 
+    /**
+     * Determines if log level is enabled for logger specified by name.
+     *
+     * @param loggerName checkable logger name
+     * @param level      checkable level
+     * @return {@code true} if enabled, {@code false} otherwise
+     */
     @Override
     protected boolean isLogEnabled(String loggerName, LogLevel level) {
         return level != OFF &&
@@ -99,15 +148,23 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
     }
 
     /**
-     * Lazy check
+     * Always returns {@code true} for lazy optimal check within {@link #logIn(MethodInvocation, MethodLog)}.
      *
-     * @see SimpleLogger#logIn(org.aopalliance.intercept.MethodInvocation, MethodLog)
+     * @param invocation current loggable method invocation
+     * @param methodLog  definition of invoked method logging
+     * @return always {@code true}
      */
     @Override
     protected boolean isLogInNecessary(MethodInvocation invocation, MethodLog methodLog) {
         return true;
     }
 
+    /**
+     * Performs the logging of 'in'-event (beginning of method execution).
+     *
+     * @param invocation current loggable method invocation
+     * @param methodLog  definition of invoked method logging
+     */
     @Override
     protected void logIn(MethodInvocation invocation, MethodLog methodLog) {
         String loggerName = getLoggerName(invocation);
@@ -187,16 +244,24 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
     }
 
     /**
-     * Lazy check
+     * Always returns {@code true} for lazy optimal check within {@link #logOut(MethodInvocation, MethodLog, Object)}.
      *
-     * @see SimpleLogger#logOut(org.aopalliance.intercept.MethodInvocation, MethodLog, java.lang.Object)
-     * @see SimpleLogger#logError(org.aopalliance.intercept.MethodInvocation, MethodLog, java.lang.Throwable)
+     * @param invocation current loggable method invocation
+     * @param methodLog  definition of invoked method logging
+     * @return always {@code true}
      */
     @Override
     protected boolean isLogOutNecessary(MethodInvocation invocation, MethodLog methodLog) {
         return true;
     }
 
+    /**
+     * Performs the logging of 'out'-event (ending of method execution).
+     *
+     * @param invocation current loggable method invocation
+     * @param methodLog  definition of invoked method logging
+     * @param result     result of the loggable method invocation
+     */
     @Override
     protected void logOut(MethodInvocation invocation, MethodLog methodLog, Object result) {
         OutLog outLog = methodLog.getOutLog();
@@ -225,15 +290,25 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
     }
 
     /**
-     * Lazy check
+     * Always returns {@code true} for lazy optimal check within {@link #logError(MethodInvocation, MethodLog, Throwable)}.
      *
-     * @see SimpleLogger#logError(org.aopalliance.intercept.MethodInvocation, MethodLog, java.lang.Throwable)
+     * @param invocation current loggable method invocation
+     * @param methodLog  definition of invoked method logging
+     * @param throwable  thrown during the loggable method execution
+     * @return always {@code true}
      */
     @Override
     protected boolean isLogErrorNecessary(MethodInvocation invocation, MethodLog methodLog, Throwable throwable) {
         return true;
     }
 
+    /**
+     * Performs the logging of 'error'-event (emergency ending of method execution).
+     *
+     * @param invocation current loggable method invocation
+     * @param methodLog  definition of invoked method logging
+     * @param throwable  thrown during the loggable method execution
+     */
     @Override
     public void logError(MethodInvocation invocation, MethodLog methodLog, Throwable throwable) {
         ErrorLog errorLog = methodLog.findErrorLog(throwable.getClass());
@@ -267,5 +342,9 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
         } catch (Exception e) {
             return PrinterResolver.defaultPrinter.print(argument);
         }
+    }
+
+    LoggerFacadeFactory getLoggerFacadeFactory() {
+        return loggerFacadeFactory;
     }
 }

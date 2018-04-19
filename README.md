@@ -35,7 +35,7 @@ logging.pattern.console: '%-5level [%X] %logger{35} %msg%n'
 ```
 All available log levels in order from the most common `TRACE` to the rarest `OFF`:
  * `OFF` deactivates logging completely
- * `ERROR` and `FATAL` are identical (`ERROR` is used in examples)
+ * `ERROR` and `FATAL` are identical (`ERROR` is used everywhere)
 ```
 TRACE > DEBUG > INFO > WARN > ERROR = FATAL > OFF
 ```

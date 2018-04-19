@@ -43,6 +43,11 @@ public final class LoggerNameBuilder {
         return build(method.getDeclaringClass().getName(), method.getName());
     }
 
+    /**
+     * Note: Uses information about current {@link StackTraceElement}, so not recommended if high execution speed is important.
+     *
+     * @return dynamically built logger name
+     */
     public String buildByInvoker() {
         StackTraceElement invoker = resolveLoggerInvoker();
         return build(invoker.getClassName(), invoker.getMethodName());

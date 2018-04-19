@@ -19,6 +19,7 @@ import java.lang.annotation.*;
 
 /**
  * Container for annotate method/parameter by multiple repeatable {@link Log} annotations.
+ * Usually not intended to be used explicitly.
  *
  * @author Vyacheslav Klapatnyuk
  * @see Repeatable
