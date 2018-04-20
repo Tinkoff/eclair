@@ -36,12 +36,12 @@ import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import ru.tinkoff.eclair.aop.EclairProxyCreator;
 import ru.tinkoff.eclair.core.AnnotationDefinitionFactory;
 import ru.tinkoff.eclair.core.ExpressionEvaluator;
-import ru.tinkoff.eclair.printer.resolver.BeanFactoryPrinterResolver;
-import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
 import ru.tinkoff.eclair.logger.EclairLogger;
 import ru.tinkoff.eclair.logger.SimpleLogger;
 import ru.tinkoff.eclair.printer.*;
 import ru.tinkoff.eclair.printer.processor.JaxbElementWrapper;
+import ru.tinkoff.eclair.printer.resolver.BeanFactoryPrinterResolver;
+import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
 
 import java.util.List;
 
@@ -93,9 +93,6 @@ public class EclairAutoConfiguration {
     @Configuration
     static class PrinterConfiguration {
 
-        private static final String XML_AUTO_CONFIGURED_PRINTER_NAME = "jaxb2Printer";
-        private static final String JSON_AUTO_CONFIGURED_PRINTER_NAME = "jacksonPrinter";
-
         @Bean
         @ConditionalOnMissingBean
         @Order(0)
@@ -103,7 +100,7 @@ public class EclairAutoConfiguration {
             return new OverriddenToStringPrinter();
         }
 
-        @Bean(XML_AUTO_CONFIGURED_PRINTER_NAME)
+        @Bean
         @ConditionalOnClass(Jaxb2Marshaller.class)
         @ConditionalOnSingleCandidate(Jaxb2Marshaller.class)
         @ConditionalOnMissingBean(Jaxb2Printer.class)
@@ -114,7 +111,7 @@ public class EclairAutoConfiguration {
                     .addPreProcessor(new JaxbElementWrapper(marshaller));
         }
 
-        @Bean(JSON_AUTO_CONFIGURED_PRINTER_NAME)
+        @Bean
         @ConditionalOnClass(ObjectMapper.class)
         @ConditionalOnSingleCandidate(ObjectMapper.class)
         @ConditionalOnMissingBean
@@ -133,15 +130,10 @@ public class EclairAutoConfiguration {
         @Bean
         @ConditionalOnMissingBean
         public PrinterResolver printerResolver(GenericApplicationContext applicationContext,
-                                               ObjectProvider<List<Printer>> orderedPrinters) {
-            List<Printer> resolvedOrderedPrinters = orderedPrinters.getIfAvailable();
-            if (isNull(resolvedOrderedPrinters)) {
-                return new BeanFactoryPrinterResolver(applicationContext, singletonList(PrinterResolver.defaultPrinter));
-            }
-            BeanFactoryPrinterResolver printerResolver = new BeanFactoryPrinterResolver(applicationContext, resolvedOrderedPrinters);
-            printerResolver.putAlias("xml", XML_AUTO_CONFIGURED_PRINTER_NAME);
-            printerResolver.putAlias("json", JSON_AUTO_CONFIGURED_PRINTER_NAME);
-            return printerResolver;
+                                               ObjectProvider<List<Printer>> printersObjectProvider) {
+            List<Printer> orderedPrinters = printersObjectProvider.getIfAvailable();
+            List<Printer> printers = isNull(orderedPrinters) ? singletonList(PrinterResolver.defaultPrinter) : orderedPrinters;
+            return new BeanFactoryPrinterResolver(applicationContext, printers);
         }
     }
 }

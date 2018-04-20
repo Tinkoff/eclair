@@ -44,8 +44,6 @@ import static java.util.Objects.nonNull;
 import static org.springframework.util.StringUtils.hasText;
 
 /**
- * TODO: add tests
- *
  * @author Vyacheslav Klapatnyuk
  */
 public class JaxbElementWrapper implements PrinterPreProcessor {

@@ -100,10 +100,4 @@ public class BeanFactoryPrinterResolver implements PrinterResolver {
                 .findFirst()
                 .orElse(null);
     }
-
-    public void putAlias(String alias, String original) {
-        if (printers.containsKey(original)) {
-            aliases.put(alias, original);
-        }
-    }
 }
