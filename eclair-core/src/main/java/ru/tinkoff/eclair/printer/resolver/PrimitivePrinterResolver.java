@@ -22,8 +22,6 @@ import java.util.List;
 import static java.util.Collections.nCopies;
 
 /**
- * TODO: add tests
- *
  * @author Vyacheslav Klapatnyuk
  */
 public class PrimitivePrinterResolver implements PrinterResolver {

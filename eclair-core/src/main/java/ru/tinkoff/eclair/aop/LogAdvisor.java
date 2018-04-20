@@ -79,4 +79,12 @@ final class LogAdvisor extends StaticMethodMatcherPointcutAdvisor implements Met
         eclairLogger.logOutIfNecessary(invocation, methodLog, result);
         return result;
     }
+
+    EclairLogger getEclairLogger() {
+        return eclairLogger;
+    }
+
+    Map<Method, MethodLog> getMethodLogs() {
+        return methodLogs;
+    }
 }
