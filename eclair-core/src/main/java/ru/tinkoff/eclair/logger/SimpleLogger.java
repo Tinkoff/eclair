@@ -20,6 +20,7 @@ import org.springframework.boot.logging.LogLevel;
 import org.springframework.boot.logging.LoggingSystem;
 import ru.tinkoff.eclair.core.LoggerNameBuilder;
 import ru.tinkoff.eclair.definition.*;
+import ru.tinkoff.eclair.definition.method.MethodLog;
 import ru.tinkoff.eclair.logger.facade.LoggerFacadeFactory;
 import ru.tinkoff.eclair.logger.facade.Slf4JLoggerFacadeFactory;
 import ru.tinkoff.eclair.printer.Printer;

@@ -18,6 +18,7 @@ package ru.tinkoff.eclair.logger;
 import org.aopalliance.intercept.MethodInvocation;
 import org.junit.Test;
 import ru.tinkoff.eclair.definition.*;
+import ru.tinkoff.eclair.definition.method.MethodLog;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;

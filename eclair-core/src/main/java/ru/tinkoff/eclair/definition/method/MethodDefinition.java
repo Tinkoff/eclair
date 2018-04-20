@@ -13,36 +13,14 @@
  * limitations under the License.
  */
 
-package ru.tinkoff.eclair.definition;
-
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Singular;
+package ru.tinkoff.eclair.definition.method;
 
 import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Set;
 
 /**
  * @author Vyacheslav Klapatnyuk
  */
-@Getter
-@Builder
-public class MethodMdc {
+public interface MethodDefinition {
 
-    @NonNull
-    private Method method;
-
-    @NonNull
-    @Singular
-    private List<String> parameterNames;
-
-    @NonNull
-    @Singular
-    private Set<ParameterMdc> methodDefinitions;
-
-    @NonNull
-    @Singular
-    private List<Set<ParameterMdc>> parameterDefinitions;
+    Method getMethod();
 }

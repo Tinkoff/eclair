@@ -13,9 +13,10 @@
  * limitations under the License.
  */
 
-package ru.tinkoff.eclair.definition.factory;
+package ru.tinkoff.eclair.definition.method.factory;
 
 import ru.tinkoff.eclair.definition.*;
+import ru.tinkoff.eclair.definition.method.MethodLog;
 
 import java.lang.reflect.Method;
 import java.util.List;

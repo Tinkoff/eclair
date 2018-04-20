@@ -16,7 +16,7 @@
 package ru.tinkoff.eclair.logger;
 
 import org.aopalliance.intercept.MethodInvocation;
-import ru.tinkoff.eclair.definition.MethodLog;
+import ru.tinkoff.eclair.definition.method.MethodLog;
 
 import java.util.Objects;
 

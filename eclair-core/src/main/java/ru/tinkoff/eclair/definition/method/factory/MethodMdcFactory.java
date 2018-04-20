@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-package ru.tinkoff.eclair.definition.factory;
+package ru.tinkoff.eclair.definition.method.factory;
 
-import ru.tinkoff.eclair.definition.MethodMdc;
+import ru.tinkoff.eclair.definition.method.MethodMdc;
 import ru.tinkoff.eclair.definition.ParameterMdc;
 
 import java.lang.reflect.Method;

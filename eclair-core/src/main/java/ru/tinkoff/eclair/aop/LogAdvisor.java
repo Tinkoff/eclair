@@ -15,59 +15,32 @@
 
 package ru.tinkoff.eclair.aop;
 
-import org.aopalliance.aop.Advice;
-import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-import org.springframework.aop.support.StaticMethodMatcherPointcutAdvisor;
-import org.springframework.core.BridgeMethodResolver;
-import ru.tinkoff.eclair.definition.MethodLog;
+import ru.tinkoff.eclair.definition.method.MethodLog;
 import ru.tinkoff.eclair.logger.EclairLogger;
 
-import java.lang.reflect.Method;
 import java.util.List;
-import java.util.Map;
-
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
 
 /**
  * @author Vyacheslav Klapatnyuk
  */
-final class LogAdvisor extends StaticMethodMatcherPointcutAdvisor implements MethodInterceptor {
+final class LogAdvisor extends AbstractAdvisor<MethodLog> {
 
     private final EclairLogger eclairLogger;
-    private final Map<Method, MethodLog> methodLogs;
 
-    private LogAdvisor(EclairLogger eclairLogger, List<MethodLog> methodLogs) {
+    private LogAdvisor(List<MethodLog> methodLogs,
+                       EclairLogger eclairLogger) {
+        super(methodLogs);
         this.eclairLogger = eclairLogger;
-        this.methodLogs = methodLogs.stream().collect(toMap(MethodLog::getMethod, identity()));
     }
 
     static LogAdvisor newInstance(EclairLogger eclairLogger, List<MethodLog> methodLogs) {
-        return methodLogs.isEmpty() ? null : new LogAdvisor(eclairLogger, methodLogs);
-    }
-
-    @Override
-    public Advice getAdvice() {
-        return this;
-    }
-
-    @Override
-    public boolean matches(Method method, Class<?> targetClass) {
-        return methodLogs.containsKey(method) || methodLogs.containsKey(BridgeMethodResolver.findBridgedMethod(method));
-    }
-
-    /**
-     * Despite the fact that this method is not being used.
-     */
-    @Override
-    public boolean isPerInstance() {
-        return false;
+        return methodLogs.isEmpty() ? null : new LogAdvisor(methodLogs, eclairLogger);
     }
 
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
-        MethodLog methodLog = methodLogs.get(invocation.getMethod());
+        MethodLog methodLog = methodDefinitions.get(invocation.getMethod());
         eclairLogger.logInIfNecessary(invocation, methodLog);
         Object result;
         try {
@@ -82,9 +55,5 @@ final class LogAdvisor extends StaticMethodMatcherPointcutAdvisor implements Met
 
     EclairLogger getEclairLogger() {
         return eclairLogger;
-    }
-
-    Map<Method, MethodLog> getMethodLogs() {
-        return methodLogs;
     }
 }

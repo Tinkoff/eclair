@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package ru.tinkoff.eclair.definition;
+package ru.tinkoff.eclair.definition.method;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -21,6 +21,10 @@ import lombok.NonNull;
 import lombok.Singular;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.core.ErrorLogResolver;
+import ru.tinkoff.eclair.definition.ErrorLog;
+import ru.tinkoff.eclair.definition.InLog;
+import ru.tinkoff.eclair.definition.OutLog;
+import ru.tinkoff.eclair.definition.ParameterLog;
 import ru.tinkoff.eclair.definition.factory.ErrorLogFactory;
 
 import java.lang.reflect.Method;
@@ -37,7 +41,7 @@ import static org.springframework.core.annotation.AnnotationUtils.synthesizeAnno
  * @author Vyacheslav Klapatnyuk
  */
 @Builder
-public class MethodLog {
+public class MethodLog implements MethodDefinition {
 
     private static final ErrorLog EMPTY = ErrorLogFactory.newInstance(synthesizeAnnotation(Log.error.class));
 

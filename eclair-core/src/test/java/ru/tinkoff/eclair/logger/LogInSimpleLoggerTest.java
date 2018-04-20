@@ -27,7 +27,7 @@ import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
 import ru.tinkoff.eclair.definition.InLog;
-import ru.tinkoff.eclair.definition.MethodLog;
+import ru.tinkoff.eclair.definition.method.MethodLog;
 import ru.tinkoff.eclair.definition.ParameterLog;
 import ru.tinkoff.eclair.logger.facade.LoggerFacadeFactory;
 import ru.tinkoff.eclair.printer.JacksonPrinter;

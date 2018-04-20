@@ -33,7 +33,7 @@ public class EclairFailureAnalyzer extends AbstractFailureAnalyzer<AnnotationUsa
         return new FailureAnalysis(buildDescription(cause), cause.getAction(), cause);
     }
 
-    private String buildDescription(AnnotationUsageException cause) {
+    String buildDescription(AnnotationUsageException cause) {
         StringBuilder builder = new StringBuilder(cause.getMessage() + "\n    - method: " + cause.getMethod());
         Annotation annotation = cause.getAnnotation();
         if (nonNull(annotation)) {

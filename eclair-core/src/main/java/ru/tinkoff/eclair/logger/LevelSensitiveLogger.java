@@ -20,7 +20,7 @@ import org.springframework.boot.logging.LogLevel;
 import ru.tinkoff.eclair.core.ExpectedLevelResolver;
 import ru.tinkoff.eclair.definition.ErrorLog;
 import ru.tinkoff.eclair.definition.LogDefinition;
-import ru.tinkoff.eclair.definition.MethodLog;
+import ru.tinkoff.eclair.definition.method.MethodLog;
 
 import java.util.function.Function;
 

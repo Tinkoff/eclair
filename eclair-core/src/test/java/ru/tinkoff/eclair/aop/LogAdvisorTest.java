@@ -18,7 +18,7 @@ package ru.tinkoff.eclair.aop;
 import org.aopalliance.intercept.MethodInvocation;
 import org.junit.Before;
 import org.junit.Test;
-import ru.tinkoff.eclair.definition.MethodLog;
+import ru.tinkoff.eclair.definition.method.MethodLog;
 import ru.tinkoff.eclair.logger.EclairLogger;
 
 import java.lang.reflect.Method;
@@ -42,29 +42,13 @@ public class LogAdvisorTest {
     private final RuntimeException throwable = new RuntimeException();
 
     private Method method;
-    private Method bridgeMethod;
     private MethodLog methodLog;
 
     @Before
     public void init() throws NoSuchMethodException {
-        method = Child.class.getMethod("method", String.class);
-        bridgeMethod = Child.class.getMethod("method", Object.class);
+        method = LogAdvisorTest.class.getMethod("init");
         methodLog = mock(MethodLog.class);
         when(methodLog.getMethod()).thenReturn(method);
-    }
-
-    @Test
-    public void matches() {
-        // given
-        EclairLogger eclairLogger = mock(EclairLogger.class);
-        LogAdvisor logAdvisor = LogAdvisor.newInstance(eclairLogger, singletonList(methodLog));
-        // when
-        assertNotNull(logAdvisor);
-        boolean matches = logAdvisor.matches(method, null);
-        boolean bridgeMatches = logAdvisor.matches(bridgeMethod, null);
-        // then
-        assertTrue(matches);
-        assertTrue(bridgeMatches);
     }
 
     @Test
@@ -88,7 +72,7 @@ public class LogAdvisorTest {
         assertNotNull(logAdvisor);
         assertThat(logAdvisor.getEclairLogger(), is(eclairLogger));
 
-        Set<Map.Entry<Method, MethodLog>> entries = logAdvisor.getMethodLogs().entrySet();
+        Set<Map.Entry<Method, MethodLog>> entries = logAdvisor.getMethodDefinitions().entrySet();
         assertThat(entries, hasSize(1));
 
         Map.Entry<Method, MethodLog> entry = entries.iterator().next();
@@ -132,18 +116,6 @@ public class LogAdvisorTest {
             verify(eclairLogger).logInIfNecessary(invocation, methodLog);
             verify(eclairLogger).logErrorIfNecessary(invocation, methodLog, throwable);
             assertThat(e, is(throwable));
-        }
-    }
-
-    interface Parent<T> {
-
-        void method(T input);
-    }
-
-    private static class Child implements Parent<String> {
-
-        @Override
-        public void method(String input) {
         }
     }
 }

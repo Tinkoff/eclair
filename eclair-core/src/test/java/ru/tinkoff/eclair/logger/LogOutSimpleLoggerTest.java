@@ -21,7 +21,7 @@ import org.junit.Test;
 import org.springframework.boot.logging.LogLevel;
 import org.springframework.boot.logging.LoggerConfiguration;
 import org.springframework.boot.logging.LoggingSystem;
-import ru.tinkoff.eclair.definition.MethodLog;
+import ru.tinkoff.eclair.definition.method.MethodLog;
 import ru.tinkoff.eclair.definition.OutLog;
 import ru.tinkoff.eclair.logger.facade.LoggerFacadeFactory;
 import ru.tinkoff.eclair.printer.Printer;

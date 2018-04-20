@@ -15,68 +15,41 @@
 
 package ru.tinkoff.eclair.aop;
 
-import org.aopalliance.aop.Advice;
-import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.slf4j.MDC;
-import org.springframework.aop.support.StaticMethodMatcherPointcutAdvisor;
-import org.springframework.core.BridgeMethodResolver;
 import ru.tinkoff.eclair.core.ExpressionEvaluator;
-import ru.tinkoff.eclair.definition.MethodMdc;
+import ru.tinkoff.eclair.definition.method.MethodMdc;
 import ru.tinkoff.eclair.definition.ParameterMdc;
 
-import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static java.util.Objects.isNull;
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
 
 /**
  * @author Vyacheslav Klapatnyuk
  */
-final class MdcAdvisor extends StaticMethodMatcherPointcutAdvisor implements MethodInterceptor {
+final class MdcAdvisor extends AbstractAdvisor<MethodMdc> {
 
     private final ExpressionEvaluator expressionEvaluator;
-    private final Map<Method, MethodMdc> methodMdcs;
 
-    private MdcAdvisor(ExpressionEvaluator expressionEvaluator,
-                       List<MethodMdc> methodMdcs) {
+    private MdcAdvisor(List<MethodMdc> methodMdcs,
+                       ExpressionEvaluator expressionEvaluator) {
+        super(methodMdcs);
         this.expressionEvaluator = expressionEvaluator;
-        this.methodMdcs = methodMdcs.stream().collect(toMap(MethodMdc::getMethod, identity()));
     }
 
     static MdcAdvisor newInstance(ExpressionEvaluator expressionEvaluator,
                                   List<MethodMdc> methodMdcs) {
-        return methodMdcs.isEmpty() ? null : new MdcAdvisor(expressionEvaluator, methodMdcs);
-    }
-
-    @Override
-    public Advice getAdvice() {
-        return this;
-    }
-
-    @Override
-    public boolean matches(Method method, Class<?> targetClass) {
-        return methodMdcs.containsKey(method) || methodMdcs.containsKey(BridgeMethodResolver.findBridgedMethod(method));
-    }
-
-    /**
-     * Despite the fact that this method is not being used.
-     */
-    @Override
-    public boolean isPerInstance() {
-        return false;
+        return methodMdcs.isEmpty() ? null : new MdcAdvisor(methodMdcs, expressionEvaluator);
     }
 
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
         Set<String> localKeys = new HashSet<>();
         try (LocalKeysHolder ignored = new LocalKeysHolder(localKeys)) {
-            MethodMdc methodMdc = methodMdcs.get(invocation.getMethod());
+            MethodMdc methodMdc = methodDefinitions.get(invocation.getMethod());
             processMethodDefinitions(invocation, methodMdc, localKeys);
             processParameterDefinitions(invocation, methodMdc, localKeys);
             return invocation.proceed();
