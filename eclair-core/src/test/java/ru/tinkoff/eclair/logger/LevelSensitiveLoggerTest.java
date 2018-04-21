@@ -17,7 +17,9 @@ package ru.tinkoff.eclair.logger;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.junit.Test;
+import ru.tinkoff.eclair.definition.ErrorLog;
 import ru.tinkoff.eclair.definition.InLog;
+import ru.tinkoff.eclair.definition.OutLog;
 import ru.tinkoff.eclair.definition.ParameterLog;
 import ru.tinkoff.eclair.definition.method.MethodLog;
 
@@ -36,7 +38,7 @@ public class LevelSensitiveLoggerTest {
     public void isLogInNecessaryByMethodEnabledAndParameterNull() {
         // given
         MethodInvocation invocation = mock(MethodInvocation.class);
-        MethodLog methodLog = givenMethodLog(givenInLog(), null);
+        MethodLog methodLog = givenMethodLog(givenInLog(), null, null, null);
 
         LevelSensitiveLogger levelSensitiveLogger = spy(LevelSensitiveLogger.class);
         when(levelSensitiveLogger.isLogEnabled(any(), any())).thenReturn(true);
@@ -52,7 +54,7 @@ public class LevelSensitiveLoggerTest {
     public void isLogInNecessaryByMethodDisabledAndByParameterNull() {
         // given
         MethodInvocation invocation = mock(MethodInvocation.class);
-        MethodLog methodLog = givenMethodLog(givenInLog(), null);
+        MethodLog methodLog = givenMethodLog(givenInLog(), null, null, null);
 
         LevelSensitiveLogger levelSensitiveLogger = spy(LevelSensitiveLogger.class);
         when(levelSensitiveLogger.isLogEnabled(any(), any())).thenReturn(false);
@@ -68,7 +70,7 @@ public class LevelSensitiveLoggerTest {
     public void isLogInNecessaryByMethodDisabledAndByParameterEnabled() {
         // given
         MethodInvocation invocation = mock(MethodInvocation.class);
-        MethodLog methodLog = givenMethodLog(givenInLog(), givenParameterLog());
+        MethodLog methodLog = givenMethodLog(givenInLog(), givenParameterLog(), null, null);
 
         LevelSensitiveLogger levelSensitiveLogger = spy(LevelSensitiveLogger.class);
         when(levelSensitiveLogger.isLogEnabled(any(), any())).thenReturn(false, true);
@@ -84,7 +86,7 @@ public class LevelSensitiveLoggerTest {
     public void isLogInNecessaryByMethodDisabledAndByParameterDisabled() {
         // given
         MethodInvocation invocation = mock(MethodInvocation.class);
-        MethodLog methodLog = givenMethodLog(givenInLog(), givenParameterLog());
+        MethodLog methodLog = givenMethodLog(givenInLog(), givenParameterLog(), null, null);
 
         LevelSensitiveLogger levelSensitiveLogger = spy(LevelSensitiveLogger.class);
         when(levelSensitiveLogger.isLogEnabled(any(), any())).thenReturn(false, false);
@@ -100,7 +102,7 @@ public class LevelSensitiveLoggerTest {
     public void isLogInNecessaryByMethodNullAndByParameterEnabled() {
         // given
         MethodInvocation invocation = mock(MethodInvocation.class);
-        MethodLog methodLog = givenMethodLog(null, givenParameterLog());
+        MethodLog methodLog = givenMethodLog(null, givenParameterLog(), null, null);
 
         LevelSensitiveLogger levelSensitiveLogger = spy(LevelSensitiveLogger.class);
         when(levelSensitiveLogger.isLogEnabled(any(), any())).thenReturn(true);
@@ -112,10 +114,127 @@ public class LevelSensitiveLoggerTest {
         assertTrue(necessary);
     }
 
-    private MethodLog givenMethodLog(InLog inLog, ParameterLog parameterLog) {
+    @Test
+    public void isLogInNecessaryByMethodNullAndByParameterNull() {
+        // given
+        MethodInvocation invocation = mock(MethodInvocation.class);
+        MethodLog methodLog = givenMethodLog(null, null, null, null);
+
+        LevelSensitiveLogger levelSensitiveLogger = spy(LevelSensitiveLogger.class);
+        // when
+        boolean necessary = levelSensitiveLogger.isLogInNecessary(invocation, methodLog);
+        // then
+        verify(levelSensitiveLogger).getLoggerName(invocation);
+        verify(levelSensitiveLogger, never()).isLogEnabled(any(), any());
+        assertFalse(necessary);
+    }
+
+    @Test
+    public void isLogOutNecessaryNotNullEnabled() {
+        // given
+        MethodInvocation invocation = mock(MethodInvocation.class);
+        MethodLog methodLog = givenMethodLog(null, null, givenOutLog(), null);
+
+        LevelSensitiveLogger levelSensitiveLogger = spy(LevelSensitiveLogger.class);
+        when(levelSensitiveLogger.isLogEnabled(any(), any())).thenReturn(true);
+        // when
+        boolean necessary = levelSensitiveLogger.isLogOutNecessary(invocation, methodLog);
+        // then
+        verify(levelSensitiveLogger).getLoggerName(invocation);
+        verify(levelSensitiveLogger).isLogEnabled(any(), any());
+        assertTrue(necessary);
+    }
+
+    @Test
+    public void isLogOutNecessaryNotNullDisabled() {
+        // given
+        MethodInvocation invocation = mock(MethodInvocation.class);
+        MethodLog methodLog = givenMethodLog(null, null, givenOutLog(), null);
+
+        LevelSensitiveLogger levelSensitiveLogger = spy(LevelSensitiveLogger.class);
+        when(levelSensitiveLogger.isLogEnabled(any(), any())).thenReturn(false);
+        // when
+        boolean necessary = levelSensitiveLogger.isLogOutNecessary(invocation, methodLog);
+        // then
+        verify(levelSensitiveLogger).getLoggerName(invocation);
+        verify(levelSensitiveLogger).isLogEnabled(any(), any());
+        assertFalse(necessary);
+    }
+
+    @Test
+    public void isLogOutNecessaryNull() {
+        // given
+        MethodInvocation invocation = mock(MethodInvocation.class);
+        MethodLog methodLog = givenMethodLog(null, null, null, null);
+
+        LevelSensitiveLogger levelSensitiveLogger = spy(LevelSensitiveLogger.class);
+        // when
+        boolean necessary = levelSensitiveLogger.isLogOutNecessary(invocation, methodLog);
+        // then
+        verify(levelSensitiveLogger, never()).getLoggerName(invocation);
+        verify(levelSensitiveLogger, never()).isLogEnabled(any(), any());
+        assertFalse(necessary);
+    }
+
+    @Test
+    public void isLogErrorNecessaryNotNullEnabled() {
+        // given
+        MethodInvocation invocation = mock(MethodInvocation.class);
+        MethodLog methodLog = givenMethodLog(null, null, null, givenErrorLog());
+
+        LevelSensitiveLogger levelSensitiveLogger = spy(LevelSensitiveLogger.class);
+        when(levelSensitiveLogger.isLogEnabled(any(), any())).thenReturn(true);
+
+        Throwable throwable = mock(Throwable.class);
+        // when
+        boolean necessary = levelSensitiveLogger.isLogErrorNecessary(invocation, methodLog, throwable);
+        // then
+        verify(levelSensitiveLogger).getLoggerName(invocation);
+        verify(levelSensitiveLogger).isLogEnabled(any(), any());
+        assertTrue(necessary);
+    }
+
+    @Test
+    public void isLogErrorNecessaryNotNullDisabled() {
+        // given
+        MethodInvocation invocation = mock(MethodInvocation.class);
+        MethodLog methodLog = givenMethodLog(null, null, null, givenErrorLog());
+
+        LevelSensitiveLogger levelSensitiveLogger = spy(LevelSensitiveLogger.class);
+        when(levelSensitiveLogger.isLogEnabled(any(), any())).thenReturn(false);
+
+        Throwable throwable = mock(Throwable.class);
+        // when
+        boolean necessary = levelSensitiveLogger.isLogErrorNecessary(invocation, methodLog, throwable);
+        // then
+        verify(levelSensitiveLogger).getLoggerName(invocation);
+        verify(levelSensitiveLogger).isLogEnabled(any(), any());
+        assertFalse(necessary);
+    }
+
+    @Test
+    public void isLogErrorNecessaryNull() {
+        // given
+        MethodInvocation invocation = mock(MethodInvocation.class);
+        MethodLog methodLog = givenMethodLog(null, null, null, null);
+
+        LevelSensitiveLogger levelSensitiveLogger = spy(LevelSensitiveLogger.class);
+
+        Throwable throwable = mock(Throwable.class);
+        // when
+        boolean necessary = levelSensitiveLogger.isLogErrorNecessary(invocation, methodLog, throwable);
+        // then
+        verify(levelSensitiveLogger, never()).getLoggerName(invocation);
+        verify(levelSensitiveLogger, never()).isLogEnabled(any(), any());
+        assertFalse(necessary);
+    }
+
+    private MethodLog givenMethodLog(InLog inLog, ParameterLog parameterLog, OutLog outLog, ErrorLog errorLog) {
         MethodLog methodLog = mock(MethodLog.class);
         when(methodLog.getInLog()).thenReturn(inLog);
         when(methodLog.getParameterLogs()).thenReturn(singletonList(parameterLog));
+        when(methodLog.getOutLog()).thenReturn(outLog);
+        when(methodLog.findErrorLog(any())).thenReturn(errorLog);
         return methodLog;
     }
 
@@ -133,17 +252,17 @@ public class LevelSensitiveLoggerTest {
         return parameterLog;
     }
 
-    @Test
-    public void isLogOutNecessary() {
-        // given
-        // when
-        // then
+    private OutLog givenOutLog() {
+        OutLog outLog = mock(OutLog.class);
+        when(outLog.getLevel()).thenReturn(DEBUG);
+        when(outLog.getIfEnabledLevel()).thenReturn(DEBUG);
+        return outLog;
     }
 
-    @Test
-    public void isLogErrorNecessary() {
-        // given
-        // when
-        // then
+    private ErrorLog givenErrorLog() {
+        ErrorLog errorLog = mock(ErrorLog.class);
+        when(errorLog.getLevel()).thenReturn(DEBUG);
+        when(errorLog.getIfEnabledLevel()).thenReturn(DEBUG);
+        return errorLog;
     }
 }

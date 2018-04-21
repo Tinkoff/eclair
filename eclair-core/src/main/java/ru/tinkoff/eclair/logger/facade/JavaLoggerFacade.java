@@ -49,13 +49,9 @@ public class JavaLoggerFacade implements LoggerFacade {
 
     @Override
     public void log(LogLevel level, String format, Object... arguments) {
-        if (LEVELS.containsKey(level)) {
-            FormattingTuple formattingTuple = MessageFormatter.arrayFormat(format, arguments);
-            String message = formattingTuple.getMessage();
-            Throwable throwable = formattingTuple.getThrowable();
-            logger.log(LEVELS.get(level), message, throwable);
-            return;
-        }
-        throw new IllegalArgumentException("Unexpected logging level: " + level);
+        FormattingTuple formattingTuple = MessageFormatter.arrayFormat(format, arguments);
+        String message = formattingTuple.getMessage();
+        Throwable throwable = formattingTuple.getThrowable();
+        logger.log(LEVELS.get(level), message, throwable);
     }
 }
