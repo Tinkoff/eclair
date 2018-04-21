@@ -59,16 +59,16 @@ public class LogInSimpleLoggerTest {
 
     @Before
     public void init() throws NoSuchMethodException {
-        method = LogInSimpleLoggerTest.class.getMethod("method");
-        methodWithParameters = LogInSimpleLoggerTest.class.getMethod("methodWithParameters", String.class, Integer.class, Dto.class);
+        method = LogInSimpleLoggerTest.class.getDeclaredMethod("method");
+        methodWithParameters = LogInSimpleLoggerTest.class.getDeclaredMethod("methodWithParameters", String.class, Integer.class, Dto.class);
     }
 
     @SuppressWarnings("unused")
-    public void method() {
+    private void method() {
     }
 
     @SuppressWarnings("unused")
-    public void methodWithParameters(String s, Integer i, Dto dto) {
+    private void methodWithParameters(String s, Integer i, Dto dto) {
     }
 
     @Test

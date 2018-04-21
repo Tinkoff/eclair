@@ -58,7 +58,7 @@ public class AnnotationExtractorTest {
     public void getCandidateMethodsWithInheritanceAndGeneric() throws NoSuchMethodException {
         // given
         Method childMethod = Child.class.getMethod("method", NullPointerException.class);
-        Method parentMethod = Parent.class.getMethod("parentMethod");
+        Method parentMethod = Parent.class.getDeclaredMethod("parentMethod");
         Method interfaceMethod = Interface.class.getMethod("interfaceMethod");
         // when
         Set<Method> methods = annotationExtractor.getCandidateMethods(Child.class);
@@ -80,7 +80,7 @@ public class AnnotationExtractorTest {
     @SuppressWarnings("unused")
     private static class Parent<T extends RuntimeException> implements Interface<T> {
 
-        public void parentMethod() {
+        void parentMethod() {
         }
 
         @Override
@@ -98,7 +98,7 @@ public class AnnotationExtractorTest {
     @Test
     public void hasAnyAnnotationDetectsLogs() throws NoSuchMethodException {
         // given
-        Method method = ClassWithAnnotatedMethods.class.getMethod("logs");
+        Method method = ClassWithAnnotatedMethods.class.getDeclaredMethod("logs");
         // when
         boolean has = annotationExtractor.hasAnyAnnotation(method);
         // then
@@ -108,7 +108,7 @@ public class AnnotationExtractorTest {
     @Test
     public void hasAnyAnnotationDetectsLog() throws NoSuchMethodException {
         // given
-        Method method = ClassWithAnnotatedMethods.class.getMethod("log", String.class);
+        Method method = ClassWithAnnotatedMethods.class.getDeclaredMethod("log", String.class);
         // when
         boolean has = annotationExtractor.hasAnyAnnotation(method);
         // then
@@ -118,7 +118,7 @@ public class AnnotationExtractorTest {
     @Test
     public void hasAnyAnnotationDetectsLogIns() throws NoSuchMethodException {
         // given
-        Method method = ClassWithAnnotatedMethods.class.getMethod("logIns");
+        Method method = ClassWithAnnotatedMethods.class.getDeclaredMethod("logIns");
         // when
         boolean has = annotationExtractor.hasAnyAnnotation(method);
         // then
@@ -128,7 +128,7 @@ public class AnnotationExtractorTest {
     @Test
     public void hasAnyAnnotationDetectsLogIn() throws NoSuchMethodException {
         // given
-        Method method = ClassWithAnnotatedMethods.class.getMethod("logIn");
+        Method method = ClassWithAnnotatedMethods.class.getDeclaredMethod("logIn");
         // when
         boolean has = annotationExtractor.hasAnyAnnotation(method);
         // then
@@ -138,7 +138,7 @@ public class AnnotationExtractorTest {
     @Test
     public void hasAnyAnnotationDetectsLogOuts() throws NoSuchMethodException {
         // given
-        Method method = ClassWithAnnotatedMethods.class.getMethod("logOuts");
+        Method method = ClassWithAnnotatedMethods.class.getDeclaredMethod("logOuts");
         // when
         boolean has = annotationExtractor.hasAnyAnnotation(method);
         // then
@@ -148,7 +148,7 @@ public class AnnotationExtractorTest {
     @Test
     public void hasAnyAnnotationDetectsLogOut() throws NoSuchMethodException {
         // given
-        Method method = ClassWithAnnotatedMethods.class.getMethod("logOut");
+        Method method = ClassWithAnnotatedMethods.class.getDeclaredMethod("logOut");
         // when
         boolean has = annotationExtractor.hasAnyAnnotation(method);
         // then
@@ -158,7 +158,7 @@ public class AnnotationExtractorTest {
     @Test
     public void hasAnyAnnotationDetectsLogErrors() throws NoSuchMethodException {
         // given
-        Method method = ClassWithAnnotatedMethods.class.getMethod("logErrors");
+        Method method = ClassWithAnnotatedMethods.class.getDeclaredMethod("logErrors");
         // when
         boolean has = annotationExtractor.hasAnyAnnotation(method);
         // then
@@ -168,7 +168,7 @@ public class AnnotationExtractorTest {
     @Test
     public void hasAnyAnnotationDetectsLogError() throws NoSuchMethodException {
         // given
-        Method method = ClassWithAnnotatedMethods.class.getMethod("logError");
+        Method method = ClassWithAnnotatedMethods.class.getDeclaredMethod("logError");
         // when
         boolean has = annotationExtractor.hasAnyAnnotation(method);
         // then
@@ -178,7 +178,7 @@ public class AnnotationExtractorTest {
     @Test
     public void hasAnyAnnotationDetectsMdcs() throws NoSuchMethodException {
         // given
-        Method method = ClassWithAnnotatedMethods.class.getMethod("mdcs");
+        Method method = ClassWithAnnotatedMethods.class.getDeclaredMethod("mdcs");
         // when
         boolean has = annotationExtractor.hasAnyAnnotation(method);
         // then
@@ -188,7 +188,7 @@ public class AnnotationExtractorTest {
     @Test
     public void hasAnyAnnotationDetectsMdc() throws NoSuchMethodException {
         // given
-        Method method = ClassWithAnnotatedMethods.class.getMethod("mdc");
+        Method method = ClassWithAnnotatedMethods.class.getDeclaredMethod("mdc");
         // when
         boolean has = annotationExtractor.hasAnyAnnotation(method);
         // then
@@ -198,7 +198,7 @@ public class AnnotationExtractorTest {
     @Test
     public void hasAnyAnnotationDetectsParameterLogs() throws NoSuchMethodException {
         // given
-        Method method = ClassWithAnnotatedMethods.class.getMethod("parameterLogs", String.class);
+        Method method = ClassWithAnnotatedMethods.class.getDeclaredMethod("parameterLogs", String.class);
         Parameter parameter = method.getParameters()[0];
         // when
         boolean has = annotationExtractor.hasAnyAnnotation(parameter);
@@ -209,7 +209,7 @@ public class AnnotationExtractorTest {
     @Test
     public void hasAnyAnnotationDetectsParameterLog() throws NoSuchMethodException {
         // given
-        Method method = ClassWithAnnotatedMethods.class.getMethod("parameterLog", String.class);
+        Method method = ClassWithAnnotatedMethods.class.getDeclaredMethod("parameterLog", String.class);
         Parameter parameter = method.getParameters()[0];
         // when
         boolean has = annotationExtractor.hasAnyAnnotation(parameter);
@@ -220,7 +220,7 @@ public class AnnotationExtractorTest {
     @Test
     public void hasAnyAnnotationDetectsParameterMdcs() throws NoSuchMethodException {
         // given
-        Method method = ClassWithAnnotatedMethods.class.getMethod("parameterMdcs", String.class);
+        Method method = ClassWithAnnotatedMethods.class.getDeclaredMethod("parameterMdcs", String.class);
         Parameter parameter = method.getParameters()[0];
         // when
         boolean has = annotationExtractor.hasAnyAnnotation(parameter);
@@ -231,7 +231,7 @@ public class AnnotationExtractorTest {
     @Test
     public void hasAnyAnnotationDetectsParameterMdc() throws NoSuchMethodException {
         // given
-        Method method = ClassWithAnnotatedMethods.class.getMethod("parameterMdc", String.class);
+        Method method = ClassWithAnnotatedMethods.class.getDeclaredMethod("parameterMdc", String.class);
         Parameter parameter = method.getParameters()[0];
         // when
         boolean has = annotationExtractor.hasAnyAnnotation(parameter);
@@ -242,7 +242,7 @@ public class AnnotationExtractorTest {
     @Test
     public void hasAnyAnnotationNotDetectsLogOverParameter() throws NoSuchMethodException {
         // given
-        Method method = ClassWithAnnotatedMethods.class.getMethod("log", String.class);
+        Method method = ClassWithAnnotatedMethods.class.getDeclaredMethod("log", String.class);
         Parameter parameter = method.getParameters()[0];
         // when
         boolean parameterHas = annotationExtractor.hasAnyAnnotation(parameter);
@@ -253,7 +253,7 @@ public class AnnotationExtractorTest {
     @Test
     public void hasAnyAnnotationNotDetectsParameterLogOverMethod() throws NoSuchMethodException {
         // given
-        Method method = ClassWithAnnotatedMethods.class.getMethod("parameterLog", String.class);
+        Method method = ClassWithAnnotatedMethods.class.getDeclaredMethod("parameterLog", String.class);
         // when
         boolean has = annotationExtractor.hasAnyAnnotation(method);
         // then
@@ -263,7 +263,7 @@ public class AnnotationExtractorTest {
     @Test
     public void hasAnyAnnotationDetectsNothing() throws NoSuchMethodException {
         // given
-        Method method = ClassWithAnnotatedMethods.class.getMethod("none", String.class);
+        Method method = ClassWithAnnotatedMethods.class.getDeclaredMethod("none", String.class);
         Parameter parameter = method.getParameters()[0];
         // when
         boolean methodHas = annotationExtractor.hasAnyAnnotation(method);
@@ -277,58 +277,58 @@ public class AnnotationExtractorTest {
     private static class ClassWithAnnotatedMethods {
 
         @Logs(@Log)
-        public void logs() {
+        void logs() {
         }
 
         @Log
-        public void log(String input) {
+        void log(String input) {
         }
 
         @Log.ins(@Log.in)
-        public void logIns() {
+        void logIns() {
         }
 
         @Log.in
-        public void logIn() {
+        void logIn() {
         }
 
         @Log.outs(@Log.out)
-        public void logOuts() {
+        void logOuts() {
         }
 
         @Log.out
-        public void logOut() {
+        void logOut() {
         }
 
         @Log.errors(@Log.error)
-        public void logErrors() {
+        void logErrors() {
         }
 
         @Log.error
-        public void logError() {
+        void logError() {
         }
 
         @Mdcs(@Mdc)
-        public void mdcs() {
+        void mdcs() {
         }
 
         @Mdc
-        public void mdc() {
+        void mdc() {
         }
 
-        public void parameterLogs(@Logs(@Log) String input) {
+        void parameterLogs(@Logs(@Log) String input) {
         }
 
-        public void parameterLog(@Log String input) {
+        void parameterLog(@Log String input) {
         }
 
-        public void parameterMdcs(@Mdcs(@Mdc) String input) {
+        void parameterMdcs(@Mdcs(@Mdc) String input) {
         }
 
-        public void parameterMdc(@Mdc String input) {
+        void parameterMdc(@Mdc String input) {
         }
 
-        public void none(String input) {
+        void none(String input) {
         }
     }
 
@@ -419,7 +419,7 @@ public class AnnotationExtractorTest {
     @Test
     public void getLogErrorsOrder() throws NoSuchMethodException {
         // given
-        Method loggedOverriddenMethod = AnnotatedChild.class.getMethod("errorsOrder");
+        Method loggedOverriddenMethod = AnnotatedChild.class.getDeclaredMethod("errorsOrder");
         // when
         Set<Log.error> logErrors = annotationExtractor.getLogErrors(loggedOverriddenMethod);
         // then
@@ -560,15 +560,15 @@ public class AnnotationExtractorTest {
         @Log.error(INFO)
         @Log.error(WARN)
         @Log.error(ERROR)
-        public void errorsOrder() {
+        void errorsOrder() {
         }
     }
 
     @Test
     public void findLog() throws NoSuchMethodException {
         // given
-        Method method = MultiLogger.class.getMethod("log");
-        Method loggerMethod = MultiLogger.class.getMethod("loggerLog");
+        Method method = MultiLogger.class.getDeclaredMethod("log");
+        Method loggerMethod = MultiLogger.class.getDeclaredMethod("loggerLog");
         Set<String> loggerNames = new HashSet<>(asList("", "logger"));
         Set<String> unknownLoggerNames = singleton("b");
         // when
@@ -584,8 +584,8 @@ public class AnnotationExtractorTest {
     @Test
     public void findLogIn() throws NoSuchMethodException {
         // given
-        Method method = MultiLogger.class.getMethod("logIn");
-        Method loggerMethod = MultiLogger.class.getMethod("loggerLogIn");
+        Method method = MultiLogger.class.getDeclaredMethod("logIn");
+        Method loggerMethod = MultiLogger.class.getDeclaredMethod("loggerLogIn");
         Set<String> loggerNames = new HashSet<>(asList("", "logger"));
         Set<String> unknownLoggerNames = singleton("b");
         // when
@@ -601,8 +601,8 @@ public class AnnotationExtractorTest {
     @Test
     public void findLogOut() throws NoSuchMethodException {
         // given
-        Method method = MultiLogger.class.getMethod("logOut");
-        Method loggerMethod = MultiLogger.class.getMethod("loggerLogOut");
+        Method method = MultiLogger.class.getDeclaredMethod("logOut");
+        Method loggerMethod = MultiLogger.class.getDeclaredMethod("loggerLogOut");
         Set<String> loggerNames = new HashSet<>(asList("", "logger"));
         Set<String> unknownLoggerNames = singleton("b");
         // when
@@ -618,8 +618,8 @@ public class AnnotationExtractorTest {
     @Test
     public void findLogErrors() throws NoSuchMethodException {
         // given
-        Method method = MultiLogger.class.getMethod("logErrors");
-        Method loggerMethod = MultiLogger.class.getMethod("loggerLogErrors");
+        Method method = MultiLogger.class.getDeclaredMethod("logErrors");
+        Method loggerMethod = MultiLogger.class.getDeclaredMethod("loggerLogErrors");
         Set<String> loggerNames = new HashSet<>(asList("", "logger"));
         Set<String> unknownLoggerNames = singleton("b");
         // when
@@ -637,8 +637,8 @@ public class AnnotationExtractorTest {
     @Test
     public void findParameterLogs() throws NoSuchMethodException {
         // given
-        Method method = MultiLogger.class.getMethod("parameterLogs", String.class);
-        Method loggerMethod = MultiLogger.class.getMethod("loggerParameterLogs", String.class);
+        Method method = MultiLogger.class.getDeclaredMethod("parameterLogs", String.class);
+        Method loggerMethod = MultiLogger.class.getDeclaredMethod("loggerParameterLogs", String.class);
         Set<String> loggerNames = new HashSet<>(asList("", "logger"));
         Set<String> unknownLoggerNames = singleton("b");
         // when
@@ -658,41 +658,41 @@ public class AnnotationExtractorTest {
     private static class MultiLogger {
 
         @Log
-        public void log() {
+        void log() {
         }
 
         @Log.in
-        public void logIn() {
+        void logIn() {
         }
 
         @Log.out
-        public void logOut() {
+        void logOut() {
         }
 
         @Log.error
-        public void logErrors() {
+        void logErrors() {
         }
 
-        public void parameterLogs(@Log String input) {
+        void parameterLogs(@Log String input) {
         }
 
         @Log(logger = "logger")
-        public void loggerLog() {
+        void loggerLog() {
         }
 
         @Log.in(logger = "logger")
-        public void loggerLogIn() {
+        void loggerLogIn() {
         }
 
         @Log.out(logger = "logger")
-        public void loggerLogOut() {
+        void loggerLogOut() {
         }
 
         @Log.error(logger = "logger")
-        public void loggerLogErrors() {
+        void loggerLogErrors() {
         }
 
-        public void loggerParameterLogs(@Log(logger = "logger") String input) {
+        void loggerParameterLogs(@Log(logger = "logger") String input) {
         }
     }
 

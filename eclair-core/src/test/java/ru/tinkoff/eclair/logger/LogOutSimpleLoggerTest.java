@@ -45,22 +45,22 @@ public class LogOutSimpleLoggerTest {
 
     @Before
     public void init() throws NoSuchMethodException {
-        voidMethod = LogOutSimpleLoggerTest.class.getMethod("voidMethod");
-        voidObjectMethod = LogOutSimpleLoggerTest.class.getMethod("voidObjectMethod");
-        method = LogOutSimpleLoggerTest.class.getMethod("method");
+        voidMethod = LogOutSimpleLoggerTest.class.getDeclaredMethod("voidMethod");
+        voidObjectMethod = LogOutSimpleLoggerTest.class.getDeclaredMethod("voidObjectMethod");
+        method = LogOutSimpleLoggerTest.class.getDeclaredMethod("method");
     }
 
     @SuppressWarnings("unused")
-    public void voidMethod() {
+    private void voidMethod() {
     }
 
     @SuppressWarnings("unused")
-    public Void voidObjectMethod() {
+    private Void voidObjectMethod() {
         return null;
     }
 
     @SuppressWarnings("unused")
-    public BigDecimal method() {
+    private BigDecimal method() {
         return null;
     }
 

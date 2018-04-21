@@ -65,7 +65,7 @@ public class AnnotationDefinitionFactoryTest {
     public void buildInLogByLogIn() throws NoSuchMethodException {
         // given
         Set<String> loggerNames = singleton("");
-        Method method = LogInLoggableClass.class.getMethod("logIn", String.class, String.class);
+        Method method = LogInLoggableClass.class.getDeclaredMethod("logIn", String.class, String.class);
         // when
         InLog inLog = annotationDefinitionFactory.buildInLog(loggerNames, method);
         // then
@@ -77,7 +77,7 @@ public class AnnotationDefinitionFactoryTest {
     public void buildInLogByLog() throws NoSuchMethodException {
         // given
         Set<String> loggerNames = singleton("");
-        Method method = LogInLoggableClass.class.getMethod("log", String.class, String.class);
+        Method method = LogInLoggableClass.class.getDeclaredMethod("log", String.class, String.class);
         // when
         InLog inLog = annotationDefinitionFactory.buildInLog(loggerNames, method);
         // then
@@ -89,7 +89,7 @@ public class AnnotationDefinitionFactoryTest {
     public void buildInLogByLogWithAlias() throws NoSuchMethodException {
         // given
         Set<String> loggerNames = singleton("");
-        Method method = LogInLoggableClass.class.getMethod("logWithAlias", String.class, String.class);
+        Method method = LogInLoggableClass.class.getDeclaredMethod("logWithAlias", String.class, String.class);
         // when
         InLog inLog = annotationDefinitionFactory.buildInLog(loggerNames, method);
         // then
@@ -101,7 +101,7 @@ public class AnnotationDefinitionFactoryTest {
     public void buildInLogEmpty() throws NoSuchMethodException {
         // given
         Set<String> loggerNames = singleton("");
-        Method method = LogInLoggableClass.class.getMethod("empty", String.class, String.class);
+        Method method = LogInLoggableClass.class.getDeclaredMethod("empty", String.class, String.class);
         // when
         InLog inLog = annotationDefinitionFactory.buildInLog(loggerNames, method);
         // then
@@ -112,7 +112,7 @@ public class AnnotationDefinitionFactoryTest {
     public void buildParameterLogs() throws NoSuchMethodException {
         // given
         Set<String> loggerNames = singleton("");
-        Method method = LogInLoggableClass.class.getMethod("parameterLog", String.class, String.class);
+        Method method = LogInLoggableClass.class.getDeclaredMethod("parameterLog", String.class, String.class);
         // when
         List<ParameterLog> parameterLogs = annotationDefinitionFactory.buildParameterLogs(loggerNames, method);
         // then
@@ -125,7 +125,7 @@ public class AnnotationDefinitionFactoryTest {
     public void buildInLogByLogIns() throws NoSuchMethodException {
         // given
         Set<String> loggerNames = singleton("");
-        Method method = LogInLoggableClass.class.getMethod("logIns");
+        Method method = LogInLoggableClass.class.getDeclaredMethod("logIns");
         // when
         InLog inLog = annotationDefinitionFactory.buildInLog(loggerNames, method);
         // then
@@ -137,7 +137,7 @@ public class AnnotationDefinitionFactoryTest {
     public void buildInLogByLogs() throws NoSuchMethodException {
         // given
         Set<String> loggerNames = singleton("");
-        Method method = LogInLoggableClass.class.getMethod("logs");
+        Method method = LogInLoggableClass.class.getDeclaredMethod("logs");
         // when
         InLog inLog = annotationDefinitionFactory.buildInLog(loggerNames, method);
         // then
@@ -150,29 +150,29 @@ public class AnnotationDefinitionFactoryTest {
 
         @Log.in(INFO)
         @Log(WARN)
-        public void logIn(String a, String b) {
+        void logIn(String a, String b) {
         }
 
         @Log(level = WARN)
-        public void log(String a, String b) {
+        void log(String a, String b) {
         }
 
         @Log(WARN)
-        public void logWithAlias(String a, String b) {
+        void logWithAlias(String a, String b) {
         }
 
-        public void empty(String a, String b) {
+        void empty(String a, String b) {
         }
 
-        public void parameterLog(@Log(ifEnabled = WARN) String a, String b) {
+        void parameterLog(@Log(ifEnabled = WARN) String a, String b) {
         }
 
         @Log.ins(@Log.in(ERROR))
-        public void logIns() {
+        void logIns() {
         }
 
         @Logs(@Log(ERROR))
-        public void logs() {
+        void logs() {
         }
     }
 
@@ -180,7 +180,7 @@ public class AnnotationDefinitionFactoryTest {
     public void buildOutLog() throws NoSuchMethodException {
         // given
         Set<String> loggerNames = singleton("");
-        Method method = LogOutLoggableClass.class.getMethod("logOut");
+        Method method = LogOutLoggableClass.class.getDeclaredMethod("logOut");
         // when
         OutLog outLog = annotationDefinitionFactory.buildOutLog(loggerNames, method);
         // then
@@ -192,7 +192,7 @@ public class AnnotationDefinitionFactoryTest {
     public void buildOutLogByLog() throws NoSuchMethodException {
         // given
         Set<String> loggerNames = singleton("");
-        Method method = LogOutLoggableClass.class.getMethod("log");
+        Method method = LogOutLoggableClass.class.getDeclaredMethod("log");
         // when
         OutLog outLog = annotationDefinitionFactory.buildOutLog(loggerNames, method);
         // then
@@ -207,7 +207,7 @@ public class AnnotationDefinitionFactoryTest {
     public void buildOutLogByLogWithAlias() throws NoSuchMethodException {
         // given
         Set<String> loggerNames = singleton("");
-        Method method = LogOutLoggableClass.class.getMethod("logWithAlias");
+        Method method = LogOutLoggableClass.class.getDeclaredMethod("logWithAlias");
         // when
         OutLog outLog = annotationDefinitionFactory.buildOutLog(loggerNames, method);
         // then
@@ -219,7 +219,7 @@ public class AnnotationDefinitionFactoryTest {
     public void buildOutLogEmpty() throws NoSuchMethodException {
         // given
         Set<String> loggerNames = singleton("");
-        Method method = LogOutLoggableClass.class.getMethod("empty");
+        Method method = LogOutLoggableClass.class.getDeclaredMethod("empty");
         // when
         OutLog outLog = annotationDefinitionFactory.buildOutLog(loggerNames, method);
         // then
@@ -230,7 +230,7 @@ public class AnnotationDefinitionFactoryTest {
     public void buildOutLogByLogOuts() throws NoSuchMethodException {
         // given
         Set<String> loggerNames = singleton("");
-        Method method = LogOutLoggableClass.class.getMethod("logOuts");
+        Method method = LogOutLoggableClass.class.getDeclaredMethod("logOuts");
         // when
         OutLog outLog = annotationDefinitionFactory.buildOutLog(loggerNames, method);
         // then
@@ -242,7 +242,7 @@ public class AnnotationDefinitionFactoryTest {
     public void buildOutLogByLogs() throws NoSuchMethodException {
         // given
         Set<String> loggerNames = singleton("");
-        Method method = LogOutLoggableClass.class.getMethod("logs");
+        Method method = LogOutLoggableClass.class.getDeclaredMethod("logs");
         // when
         OutLog outLog = annotationDefinitionFactory.buildOutLog(loggerNames, method);
         // then
@@ -255,26 +255,26 @@ public class AnnotationDefinitionFactoryTest {
 
         @Log.out(INFO)
         @Log(WARN)
-        public void logOut() {
+        void logOut() {
         }
 
         @Log(level = WARN, ifEnabled = ERROR, verbose = TRACE, printer = "json")
-        public void log() {
+        void log() {
         }
 
         @Log(value = WARN)
-        public void logWithAlias() {
+        void logWithAlias() {
         }
 
-        public void empty() {
+        void empty() {
         }
 
         @Log.outs(@Log.out(ERROR))
-        public void logOuts() {
+        void logOuts() {
         }
 
         @Logs(@Log(ERROR))
-        public void logs() {
+        void logs() {
         }
     }
 
@@ -282,7 +282,7 @@ public class AnnotationDefinitionFactoryTest {
     public void buildErrorLogs() throws NoSuchMethodException {
         // given
         Set<String> loggerNames = singleton("");
-        Method method = LogErrorLoggableClass.class.getMethod("logError");
+        Method method = LogErrorLoggableClass.class.getDeclaredMethod("logError");
         // when
         Set<ErrorLog> errorLogs = annotationDefinitionFactory.buildErrorLogs(loggerNames, method);
         // then
@@ -296,7 +296,7 @@ public class AnnotationDefinitionFactoryTest {
     public void buildErrorLogsEmpty() throws NoSuchMethodException {
         // given
         Set<String> loggerNames = singleton("");
-        Method method = LogErrorLoggableClass.class.getMethod("empty");
+        Method method = LogErrorLoggableClass.class.getDeclaredMethod("empty");
         // when
         Set<ErrorLog> errorLogs = annotationDefinitionFactory.buildErrorLogs(loggerNames, method);
         // then
@@ -308,17 +308,17 @@ public class AnnotationDefinitionFactoryTest {
 
         @Log.error(WARN)
         @Log.error(INFO)
-        public void logError() {
+        void logError() {
         }
 
-        public void empty() {
+        void empty() {
         }
     }
 
     @Test
     public void buildMethodParameterMdcs() throws NoSuchMethodException {
         // given
-        Method method = MdcLoggableClass.class.getMethod("mdc", String.class, String.class);
+        Method method = MdcLoggableClass.class.getDeclaredMethod("mdc", String.class, String.class);
         // when
         Set<ParameterMdc> parameterMdcs = annotationDefinitionFactory.buildMethodParameterMdcs(method);
         // then
@@ -329,7 +329,7 @@ public class AnnotationDefinitionFactoryTest {
     @Test
     public void buildMethodParameterMdcsEmpty() throws NoSuchMethodException {
         // given
-        Method method = MdcLoggableClass.class.getMethod("empty");
+        Method method = MdcLoggableClass.class.getDeclaredMethod("empty");
         // when
         Set<ParameterMdc> parameterMdcs = annotationDefinitionFactory.buildMethodParameterMdcs(method);
         // then
@@ -339,7 +339,7 @@ public class AnnotationDefinitionFactoryTest {
     @Test
     public void buildParameterMdcs() throws NoSuchMethodException {
         // given
-        Method method = MdcLoggableClass.class.getMethod("mdc", String.class, String.class);
+        Method method = MdcLoggableClass.class.getDeclaredMethod("mdc", String.class, String.class);
         // when
         List<Set<ParameterMdc>> parameterMdcs = annotationDefinitionFactory.buildParameterMdcs(method);
         // then
@@ -352,7 +352,7 @@ public class AnnotationDefinitionFactoryTest {
     @Test
     public void buildParameterMdcsEmpty() throws NoSuchMethodException {
         // given
-        Method method = MdcLoggableClass.class.getMethod("empty");
+        Method method = MdcLoggableClass.class.getDeclaredMethod("empty");
         // when
         List<Set<ParameterMdc>> parameterMdcs = annotationDefinitionFactory.buildParameterMdcs(method);
         // then
@@ -363,10 +363,10 @@ public class AnnotationDefinitionFactoryTest {
     private static class MdcLoggableClass {
 
         @Mdc(key = "method")
-        public void mdc(@Mdc(key = "a") String a, String b) {
+        void mdc(@Mdc(key = "a") String a, String b) {
         }
 
-        public void empty() {
+        void empty() {
         }
     }
 }

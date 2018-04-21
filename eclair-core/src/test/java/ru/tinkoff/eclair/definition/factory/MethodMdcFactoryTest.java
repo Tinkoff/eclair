@@ -54,11 +54,11 @@ public class MethodMdcFactoryTest {
     }
 
     private Method givenMethod() throws NoSuchMethodException {
-        return MethodMdcFactoryTest.class.getMethod("annotatedMethod", String.class, String.class);
+        return MethodMdcFactoryTest.class.getDeclaredMethod("annotatedMethod", String.class, String.class);
     }
 
     @SuppressWarnings("unused")
-    public void annotatedMethod(String a, String b) {
+    private void annotatedMethod(String a, String b) {
     }
 
     private Set<ParameterMdc> givenMethodMdcs() {

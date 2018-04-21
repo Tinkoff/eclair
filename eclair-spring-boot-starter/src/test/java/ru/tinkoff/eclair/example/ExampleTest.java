@@ -106,7 +106,7 @@ public class ExampleTest {
         String expected = ExampleTableBuilder.TABLE_HEADER +
                 " `TRACE` `DEBUG`    | `DEBUG [] r.t.eclair.example.Example.simple >`<br>`DEBUG [] r.t.eclair.example.Example.simple <`\n" +
                 " `INFO` .. `OFF`    | -";
-        String loggerName = loggerNameBuilder.build(Example.class.getMethod("simple"));
+        String loggerName = loggerNameBuilder.build(Example.class.getDeclaredMethod("simple"));
         String actual = exampleTableBuilder.buildTable(groupLevels(loggerName));
         System.out.println(actual);
         assertEquals(expected, actual);
@@ -120,7 +120,7 @@ public class ExampleTest {
         String expected = ExampleTableBuilder.TABLE_HEADER +
                 " `TRACE` `DEBUG`    | `DEBUG [] r.t.e.example.Example.simpleError >`<br>`DEBUG [] r.t.e.example.Example.simpleError !`\n" +
                 " `INFO` .. `OFF`    | -";
-        String loggerName = loggerNameBuilder.build(Example.class.getMethod("simpleError"));
+        String loggerName = loggerNameBuilder.build(Example.class.getDeclaredMethod("simpleError"));
         String actual = exampleTableBuilder.buildTable(groupLevels(loggerName));
         System.out.println(actual);
         assertEquals(expected, actual);
@@ -134,7 +134,7 @@ public class ExampleTest {
         String expected = ExampleTableBuilder.TABLE_HEADER +
                 " `TRACE` .. `INFO`  | `INFO  [] r.t.eclair.example.Example.level >`<br>`INFO  [] r.t.eclair.example.Example.level <`\n" +
                 " `WARN` .. `OFF`    | -";
-        String loggerName = loggerNameBuilder.build(Example.class.getMethod("level"));
+        String loggerName = loggerNameBuilder.build(Example.class.getDeclaredMethod("level"));
         String actual = exampleTableBuilder.buildTable(groupLevels(loggerName));
         System.out.println(actual);
         assertEquals(expected, actual);
@@ -148,7 +148,7 @@ public class ExampleTest {
         String expected = ExampleTableBuilder.TABLE_HEADER +
                 " `TRACE` `DEBUG`    | `INFO  [] r.t.e.example.Example.ifEnabled >`<br>`INFO  [] r.t.e.example.Example.ifEnabled <`\n" +
                 " `INFO` .. `OFF`    | -";
-        String loggerName = loggerNameBuilder.build(Example.class.getMethod("ifEnabled"));
+        String loggerName = loggerNameBuilder.build(Example.class.getDeclaredMethod("ifEnabled"));
         String actual = exampleTableBuilder.buildTable(groupLevels(loggerName));
         System.out.println(actual);
         assertEquals(expected, actual);
@@ -167,7 +167,7 @@ public class ExampleTest {
                 " `TRACE` `DEBUG`    | `INFO  [] r.t.eclair.example.Example.verbose > s=\"s\", i=4, d=5.6`<br>`INFO  [] r.t.eclair.example.Example.verbose < false`\n" +
                 " `INFO`             | `INFO  [] r.t.eclair.example.Example.verbose >`<br>`INFO  [] r.t.eclair.example.Example.verbose <`\n" +
                 " `WARN` .. `OFF`    | -";
-        String loggerName = loggerNameBuilder.build(Example.class.getMethod("verbose", String.class, Integer.class, Double.class));
+        String loggerName = loggerNameBuilder.build(Example.class.getDeclaredMethod("verbose", String.class, Integer.class, Double.class));
         String actual = exampleTableBuilder.buildTable(groupLevels(loggerName));
         System.out.println(actual);
         assertEquals(expected, actual);
@@ -185,7 +185,7 @@ public class ExampleTest {
         String expected = ExampleTableBuilder.TABLE_HEADER +
                 " `TRACE` `DEBUG`    | `DEBUG [] r.t.e.e.Example.verboseDisabled >`<br>`DEBUG [] r.t.e.e.Example.verboseDisabled <`\n" +
                 " `INFO` .. `OFF`    | -";
-        String loggerName = loggerNameBuilder.build(Example.class.getMethod("verboseDisabled", String.class, Integer.class, Double.class));
+        String loggerName = loggerNameBuilder.build(Example.class.getDeclaredMethod("verboseDisabled", String.class, Integer.class, Double.class));
         String actual = exampleTableBuilder.buildTable(groupLevels(loggerName));
         System.out.println(actual);
         assertEquals(expected, actual);
@@ -202,7 +202,7 @@ public class ExampleTest {
         String expected = ExampleTableBuilder.TABLE_HEADER +
                 " `TRACE` `DEBUG`    | `DEBUG [] r.t.eclair.example.Example.json > dto={\"i\":2,\"s\":\"r\"}, i=8`<br>`DEBUG [] r.t.eclair.example.Example.json <`\n" +
                 " `INFO` .. `OFF`    | -";
-        String loggerName = loggerNameBuilder.build(Example.class.getMethod("json", Dto.class, Integer.class));
+        String loggerName = loggerNameBuilder.build(Example.class.getDeclaredMethod("json", Dto.class, Integer.class));
         String actual = exampleTableBuilder.buildTable(groupLevels(loggerName));
         System.out.println(actual);
         assertEquals(expected, actual);
@@ -219,7 +219,7 @@ public class ExampleTest {
         String expected = ExampleTableBuilder.TABLE_HEADER +
                 " `TRACE` `DEBUG`    | `DEBUG [] r.t.eclair.example.Example.xml > dto=<dto><i>4</i><s>k</s></dto>, i=7`<br>`DEBUG [] r.t.eclair.example.Example.xml <`\n" +
                 " `INFO` .. `OFF`    | -";
-        String loggerName = loggerNameBuilder.build(Example.class.getMethod("xml", Dto.class, Integer.class));
+        String loggerName = loggerNameBuilder.build(Example.class.getDeclaredMethod("xml", Dto.class, Integer.class));
         String actual = exampleTableBuilder.buildTable(groupLevels(loggerName));
         System.out.println(actual);
         assertEquals(expected, actual);
@@ -239,7 +239,7 @@ public class ExampleTest {
                 " `DEBUG`            | `INFO  [] r.t.eclair.example.Example.inOut > dto=Dto{i=3, s='m'}, s=\"s\", i=3`\n" +
                 " `INFO`             | `INFO  [] r.t.eclair.example.Example.inOut >`\n" +
                 " `WARN` .. `OFF`    | -";
-        String loggerName = loggerNameBuilder.build(Example.class.getMethod("inOut", Dto.class, String.class, Integer.class));
+        String loggerName = loggerNameBuilder.build(Example.class.getDeclaredMethod("inOut", Dto.class, String.class, Integer.class));
         String actual = exampleTableBuilder.buildTable(groupLevels(loggerName));
         System.out.println(actual);
         assertEquals(expected, actual);
@@ -253,7 +253,7 @@ public class ExampleTest {
         String expected = ExampleTableBuilder.TABLE_HEADER +
                 " `TRACE` .. `FATAL` | `ERROR [] r.t.eclair.example.Example.error ! java.lang.RuntimeException: Something strange happened`<br>`java.lang.RuntimeException: Something strange happened`<br>`\tat ru.tinkoff.eclair.example.Example.error(Example.java:0)`<br>..\n" +
                 " `OFF`              | -";
-        String loggerName = loggerNameBuilder.build(Example.class.getMethod("error"));
+        String loggerName = loggerNameBuilder.build(Example.class.getDeclaredMethod("error"));
         String actual = exampleTableBuilder.buildTable(groupLevels(loggerName));
         System.out.println(actual);
         assertEquals(expected, actual);
@@ -267,7 +267,7 @@ public class ExampleTest {
         String expected = ExampleTableBuilder.TABLE_HEADER +
                 " `TRACE` `DEBUG`    | `WARN  [] r.t.e.e.Example.warningOnDebug ! java.lang.RuntimeException: Something strange happened, but it doesn't matter`<br>`java.lang.RuntimeException: Something strange happened, but it doesn't matter`<br>`\tat ru.tinkoff.eclair.example.Example.warningOnDebug(Example.java:0)`<br>..\n" +
                 " `INFO` .. `OFF`    | -";
-        String loggerName = loggerNameBuilder.build(Example.class.getMethod("warningOnDebug"));
+        String loggerName = loggerNameBuilder.build(Example.class.getDeclaredMethod("warningOnDebug"));
         String actual = exampleTableBuilder.buildTable(groupLevels(loggerName));
         System.out.println(actual);
         assertEquals(expected, actual);
@@ -288,7 +288,7 @@ public class ExampleTest {
                 " `TRACE` .. `WARN`  | `WARN  [] r.t.e.example.Example.filterErrors ! java.lang.NullPointerException`<br>`java.lang.NullPointerException: null`<br>`\tat ru.tinkoff.eclair.example.ExampleTest.filterErrors(ExampleTest.java:0)`<br>..<br>`ERROR [] r.t.e.example.Example.filterErrors ! java.lang.Exception`<br>`java.lang.Exception: null`<br>`\tat ru.tinkoff.eclair.example.ExampleTest.filterErrors(ExampleTest.java:0)`<br>..\n" +
                 " `ERROR` `FATAL`    | `ERROR [] r.t.e.example.Example.filterErrors ! java.lang.Exception`<br>`java.lang.Exception: null`<br>`\tat ru.tinkoff.eclair.example.ExampleTest.filterErrors(ExampleTest.java:0)`<br>..\n" +
                 " `OFF`              | -";
-        String loggerName = loggerNameBuilder.build(Example.class.getMethod("filterErrors", Throwable.class));
+        String loggerName = loggerNameBuilder.build(Example.class.getDeclaredMethod("filterErrors", Throwable.class));
         String actual = exampleTableBuilder.buildTable(groupLevels(loggerName));
         System.out.println(actual);
         assertEquals(expected, actual);
@@ -302,7 +302,7 @@ public class ExampleTest {
         String expected = ExampleTableBuilder.TABLE_HEADER +
                 " `TRACE` .. `WARN`  | `WARN  [] r.t.e.example.Example.mostSpecific ! java.lang.IllegalArgumentException`<br>`java.lang.IllegalArgumentException: null`<br>`\tat ru.tinkoff.eclair.example.Example.mostSpecific(Example.java:0)`<br>..\n" +
                 " `ERROR` .. `OFF`   | -";
-        String loggerName = loggerNameBuilder.build(Example.class.getMethod("mostSpecific"));
+        String loggerName = loggerNameBuilder.build(Example.class.getDeclaredMethod("mostSpecific"));
         String actual = exampleTableBuilder.buildTable(groupLevels(loggerName));
         System.out.println(actual);
         assertEquals(expected, actual);
@@ -321,7 +321,7 @@ public class ExampleTest {
                 " `TRACE` `DEBUG`    | `INFO  [] r.t.e.example.Example.parameter > dto=Dto{i=0, s='u'}`\n" +
                 " `INFO`             | `INFO  [] r.t.e.example.Example.parameter > Dto{i=0, s='u'}`\n" +
                 " `WARN` .. `OFF`    | -";
-        String loggerName = loggerNameBuilder.build(Example.class.getMethod("parameter", Dto.class, String.class, Integer.class));
+        String loggerName = loggerNameBuilder.build(Example.class.getDeclaredMethod("parameter", Dto.class, String.class, Integer.class));
         String actual = exampleTableBuilder.buildTable(groupLevels(loggerName));
         System.out.println(actual);
         assertEquals(expected, actual);
@@ -338,7 +338,7 @@ public class ExampleTest {
         String expected = ExampleTableBuilder.TABLE_HEADER +
                 " `TRACE` `DEBUG`    | `DEBUG [] r.t.eclair.example.Example.printers > xml=<dto><i>5</i><s>********</s></dto>, json={\"i\":5,\"s\":\"password\"}`<br>`DEBUG [] r.t.eclair.example.Example.printers < <dto><i>5</i><s>********</s></dto>`\n" +
                 " `INFO` .. `OFF`    | -";
-        String loggerName = loggerNameBuilder.build(Example.class.getMethod("printers", Dto.class, Dto.class, Integer.class));
+        String loggerName = loggerNameBuilder.build(Example.class.getDeclaredMethod("printers", Dto.class, Dto.class, Integer.class));
         String actual = exampleTableBuilder.buildTable(groupLevels(loggerName));
         System.out.println(actual);
         assertEquals(expected, actual);
@@ -358,7 +358,7 @@ public class ExampleTest {
                 " `DEBUG`            | `INFO  [] r.t.e.e.Example.parameterLevels > d=9.4, s=\"v\"`\n" +
                 " `INFO`             | `INFO  [] r.t.e.e.Example.parameterLevels > 9.4`\n" +
                 " `WARN` .. `OFF`    | -";
-        String loggerName = loggerNameBuilder.build(Example.class.getMethod("parameterLevels", Double.class, String.class, Integer.class));
+        String loggerName = loggerNameBuilder.build(Example.class.getDeclaredMethod("parameterLevels", Double.class, String.class, Integer.class));
         String actual = exampleTableBuilder.buildTable(groupLevels(loggerName));
         System.out.println(actual);
         assertEquals(expected, actual);
@@ -379,7 +379,7 @@ public class ExampleTest {
                 " `INFO`             | `INFO  [] r.t.eclair.example.Example.mix >`<br>`WARN  [] r.t.eclair.example.Example.mix ! java.lang.IllegalArgumentException: Something strange happened`<br>`java.lang.IllegalArgumentException: Something strange happened`<br>`\tat ru.tinkoff.eclair.example.Example.mix(Example.java:0)`<br>..\n" +
                 " `WARN`             | `WARN  [] r.t.eclair.example.Example.mix ! java.lang.IllegalArgumentException: Something strange happened`<br>`java.lang.IllegalArgumentException: Something strange happened`<br>`\tat ru.tinkoff.eclair.example.Example.mix(Example.java:0)`<br>..\n" +
                 " `ERROR` .. `OFF`   | -";
-        String loggerName = loggerNameBuilder.build(Example.class.getMethod("mix", Dto.class, Dto.class, Integer.class));
+        String loggerName = loggerNameBuilder.build(Example.class.getDeclaredMethod("mix", Dto.class, Dto.class, Integer.class));
         String actual = exampleTableBuilder.buildTable(groupLevels(loggerName));
         System.out.println(actual);
         assertEquals(expected, actual);
@@ -468,7 +468,7 @@ public class ExampleTest {
                 " `TRACE` `DEBUG`    | `DEBUG [] r.t.eclair.example.Example.manual >`<br>`INFO  [] r.t.eclair.example.Example.manual - Eager logging: 3.141592653589793`<br>`DEBUG [] r.t.eclair.example.Example.manual - Lazy logging: 3.141592653589793`<br>`DEBUG [] r.t.eclair.example.Example.manual <`\n" +
                 " `INFO`             | `INFO  [] r.t.eclair.example.Example.manual - Eager logging: 3.141592653589793`\n" +
                 " `WARN` .. `OFF`    | -";
-        String loggerName = loggerNameBuilder.build(Example.class.getMethod("manual"));
+        String loggerName = loggerNameBuilder.build(Example.class.getDeclaredMethod("manual"));
         String actual = exampleTableBuilder.buildTable(groupLevels(loggerName));
         System.out.println(actual);
         assertEquals(expected, actual);
@@ -486,7 +486,7 @@ public class ExampleTest {
                 " `WARN`             | `ERROR [] r.t.e.example.Example.manualLevel - ERROR`<br>`ERROR [] r.t.e.example.Example.manualLevel - ERROR if WARN enabled`<br>`WARN  [] r.t.e.example.Example.manualLevel - WARN`\n" +
                 " `ERROR` `FATAL`    | `ERROR [] r.t.e.example.Example.manualLevel - ERROR`\n" +
                 " `OFF`              | -";
-        String loggerName = loggerNameBuilder.build(Example.class.getMethod("manualLevel"));
+        String loggerName = loggerNameBuilder.build(Example.class.getDeclaredMethod("manualLevel"));
         String actual = exampleTableBuilder.buildTable(groupLevels(loggerName));
         System.out.println(actual);
         assertEquals(expected, actual);

@@ -36,79 +36,79 @@ import static org.springframework.boot.logging.LogLevel.*;
 class Example {
 
     @Log
-    public void simple() {
+    void simple() {
     }
 
     @Log
-    public void simpleError() {
+    void simpleError() {
         throw new RuntimeException();
     }
 
     @Log(INFO)
-    public void level() {
+    void level() {
     }
 
     @Log(level = INFO, ifEnabled = DEBUG)
-    public void ifEnabled() {
+    void ifEnabled() {
     }
 
     @Log(INFO)
-    public boolean verbose(String s, Integer i, Double d) {
+    boolean verbose(String s, Integer i, Double d) {
         return false;
     }
 
     @Log(verbose = OFF)
-    public boolean verboseDisabled(String s, Integer i, Double d) {
+    boolean verboseDisabled(String s, Integer i, Double d) {
         return false;
     }
 
     @Log(printer = "jacksonPrinter")
-    public void json(Dto dto, Integer i) {
+    void json(Dto dto, Integer i) {
     }
 
     @Log(printer = "jaxb2Printer")
-    public void xml(Dto dto, Integer i) {
+    void xml(Dto dto, Integer i) {
     }
 
     @Log.in(INFO)
     @Log.out(TRACE)
-    public void inOut(Dto dto, String s, Integer i) {
+    void inOut(Dto dto, String s, Integer i) {
     }
 
     @Log.error
-    public void error() {
+    void error() {
         throw new RuntimeException("Something strange happened");
     }
 
     @Log.error(level = WARN, ifEnabled = DEBUG)
-    public void warningOnDebug() {
+    void warningOnDebug() {
         throw new RuntimeException("Something strange happened, but it doesn't matter");
     }
 
     @Log.error(level = WARN, ofType = {NullPointerException.class, IndexOutOfBoundsException.class})
     @Log.error(exclude = Error.class)
-    public void filterErrors(Throwable throwable) throws Throwable {
+    void filterErrors(Throwable throwable) throws Throwable {
         throw throwable;
     }
 
     @Log.error(level = ERROR, ofType = Exception.class)
     @Log.error(level = WARN, ofType = RuntimeException.class)
-    public void mostSpecific() {
+    void mostSpecific() {
         throw new IllegalArgumentException();
     }
 
-    public void parameter(@Log(INFO) Dto dto, String s, Integer i) {
+    void parameter(@Log(INFO) Dto dto, String s, Integer i) {
     }
 
     @Log.out(printer = "maskJaxb2Printer")
-    public Dto printers(@Log(printer = "maskJaxb2Printer") Dto xml,
+    Dto printers(@Log(printer = "maskJaxb2Printer") Dto xml,
                         @Log(printer = "jacksonPrinter") Dto json,
                         Integer i) {
         return xml;
     }
 
     @Log.in(INFO)
-    public void parameterLevels(@Log(INFO) Double d,
+    void parameterLevels(@Log(INFO) Double d,
                                 @Log(DEBUG) String s,
                                 @Log(TRACE) Integer i) {
     }
@@ -117,7 +117,7 @@ class Example {
     @Log.out(level = TRACE, verbose = TRACE)
     @Log.error(level = WARN, ofType = RuntimeException.class, exclude = NullPointerException.class)
     @Log.error(level = ERROR, ofType = {Error.class, Exception.class})
-    public Dto mix(@Log(printer = "jaxb2Printer") Dto xml,
+    Dto mix(@Log(printer = "jaxb2Printer") Dto xml,
                    @Log(ifEnabled = TRACE, printer = "jacksonPrinter") Dto json,
                    Integer i) {
         throw new IllegalArgumentException("Something strange happened");
@@ -131,7 +131,7 @@ class Example {
     }
 
     @Log
-    public void outer() {
+    void outer() {
         self.mdc();
     }
 
@@ -199,13 +199,13 @@ class Example {
     private ManualLogger logger;
 
     @Log
-    public void manual() {
+    void manual() {
         logger.info("Eager logging: {}", Math.PI);
         logger.debug("Lazy logging: {}", (Supplier) () -> Math.PI);
     }
 
     @Log
-    public void manualLevel() {
+    void manualLevel() {
         // log ERROR
         logger.error("ERROR");
         logger.errorIfWarnEnabled("ERROR if WARN enabled");
