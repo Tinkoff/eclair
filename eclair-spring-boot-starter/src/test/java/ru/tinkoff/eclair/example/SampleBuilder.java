@@ -21,7 +21,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * @author Viacheslav Klapatnyuk
+ * @author Vyacheslav Klapatnyuk
  */
 abstract class SampleBuilder {
 
