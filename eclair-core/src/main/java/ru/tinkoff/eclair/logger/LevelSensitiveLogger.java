@@ -27,7 +27,6 @@ import java.util.function.Function;
 import static java.util.Objects.nonNull;
 
 /**
- * TODO: add tests
  * Level-sensitive abstract child of base logger.
  * Considers current log level configuration among other rules when deciding whether to log or not.
  *

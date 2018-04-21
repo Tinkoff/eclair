@@ -32,8 +32,6 @@ public final class ExpressionEvaluator {
 
     private static final Logger logger = LoggerFactory.getLogger(ExpressionEvaluator.class);
 
-    // TODO: implement if necessary
-    // private static final ParserContext parserContext = ParserContext.TEMPLATE_EXPRESSION;
     private static final ParserContext parserContext = null;
 
     private final ExpressionParser expressionParser;
