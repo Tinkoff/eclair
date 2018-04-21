@@ -19,6 +19,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -27,12 +28,14 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.core.AnnotationDefinitionFactory;
+import ru.tinkoff.eclair.core.BeanFactoryHelper;
 import ru.tinkoff.eclair.core.ExpressionEvaluator;
-import ru.tinkoff.eclair.printer.resolver.BeanFactoryPrinterResolver;
 import ru.tinkoff.eclair.logger.SimpleLogger;
 import ru.tinkoff.eclair.printer.Printer;
 import ru.tinkoff.eclair.printer.ToStringPrinter;
+import ru.tinkoff.eclair.printer.resolver.AliasedPrinterResolver;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
@@ -47,7 +50,7 @@ import static org.junit.Assert.assertTrue;
         SpelExpressionParser.class,
         StandardEvaluationContext.class,
         AnnotationDefinitionFactory.class,
-        BeanFactoryPrinterResolver.class,
+        BeanFactoryHelper.class,
 
         EclairProxyCreatorTest.InfrastructureTestConfiguration.class,
         EclairProxyCreatorTest.TestConfiguration.class
@@ -68,6 +71,14 @@ public class EclairProxyCreatorTest {
         @Bean
         public SimpleLogger simpleLogger() {
             return new SimpleLogger();
+        }
+
+        @Bean
+        public AliasedPrinterResolver aliasedPrinterResolver(ApplicationContext applicationContext,
+                                                             List<Printer> printers) {
+            return new AliasedPrinterResolver(
+                    BeanFactoryHelper.getInstance().collectToOrderedMap(applicationContext, Printer.class, printers),
+                    BeanFactoryHelper.getInstance().getAliases(applicationContext, Printer.class));
         }
     }
 

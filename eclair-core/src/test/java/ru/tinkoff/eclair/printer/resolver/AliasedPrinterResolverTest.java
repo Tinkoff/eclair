@@ -18,15 +18,19 @@ package ru.tinkoff.eclair.printer.resolver;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
+import ru.tinkoff.eclair.core.BeanFactoryHelper;
 import ru.tinkoff.eclair.core.BeanFactoryHelperTest;
 import ru.tinkoff.eclair.printer.Printer;
 
 import java.util.List;
 
+import static java.util.Collections.singletonList;
+import static java.util.Objects.isNull;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNull;
@@ -37,18 +41,23 @@ import static org.junit.Assert.assertThat;
  */
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = BeanFactoryHelperTest.TestConfiguration.class)
-public class BeanFactoryPrinterResolverTest {
+public class AliasedPrinterResolverTest {
 
     @Autowired
-    private List<Printer> printers;
+    private ObjectProvider<List<Printer>> printersObjectProvider;
     @Autowired
     private ApplicationContext applicationContext;
 
-    private BeanFactoryPrinterResolver printerResolver;
+    private AliasedPrinterResolver printerResolver;
 
     @Before
     public void init() {
-        printerResolver = new BeanFactoryPrinterResolver(applicationContext, printers);
+        List<Printer> orderedPrinters = printersObjectProvider.getIfAvailable();
+        List<Printer> printers = isNull(orderedPrinters) ? singletonList(PrinterResolver.defaultPrinter) : orderedPrinters;
+        BeanFactoryHelper beanFactoryHelper = BeanFactoryHelper.getInstance();
+        printerResolver = new AliasedPrinterResolver(
+                beanFactoryHelper.collectToOrderedMap(applicationContext, Printer.class, printers),
+                beanFactoryHelper.getAliases(applicationContext, Printer.class));
     }
 
     @Test

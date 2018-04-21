@@ -18,22 +18,21 @@ package ru.tinkoff.eclair.core;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.annotation.Logs;
 import ru.tinkoff.eclair.annotation.Mdc;
-import ru.tinkoff.eclair.printer.resolver.BeanFactoryPrinterResolver;
-import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
 import ru.tinkoff.eclair.definition.*;
 import ru.tinkoff.eclair.printer.JacksonPrinter;
 import ru.tinkoff.eclair.printer.Jaxb2Printer;
 import ru.tinkoff.eclair.printer.Printer;
+import ru.tinkoff.eclair.printer.resolver.AliasedPrinterResolver;
+import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
 
 import java.lang.reflect.Method;
 import java.util.*;
 
-import static java.util.Arrays.asList;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.singleton;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.empty;
@@ -55,10 +54,10 @@ public class AnnotationDefinitionFactoryTest {
 
     @Before
     public void init() {
-        Map<String, Object> printers = new LinkedHashMap<>();
+        Map<String, Printer> printers = new LinkedHashMap<>();
         printers.put("xml", xmlPrinter);
         printers.put("json", jsonPrinter);
-        PrinterResolver printerResolver = new BeanFactoryPrinterResolver(new StaticListableBeanFactory(printers), asList(xmlPrinter, jsonPrinter));
+        PrinterResolver printerResolver = new AliasedPrinterResolver(printers, emptyMap());
         annotationDefinitionFactory = new AnnotationDefinitionFactory(printerResolver);
     }
 

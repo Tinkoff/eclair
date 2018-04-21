@@ -16,8 +16,8 @@
 package ru.tinkoff.eclair.validate.log.group;
 
 import ru.tinkoff.eclair.annotation.Log;
-import ru.tinkoff.eclair.validate.AnnotationUsageException;
 import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
+import ru.tinkoff.eclair.validate.AnnotationUsageException;
 import ru.tinkoff.eclair.validate.log.single.LogValidator;
 
 import java.lang.reflect.Method;

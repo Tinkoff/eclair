@@ -25,8 +25,6 @@ import static java.lang.String.format;
 import static java.util.Arrays.asList;
 
 /**
- * TODO: merge with {@link BeanFactoryHelper}
- *
  * @author Vyacheslav Klapatnyuk
  */
 public final class LoggerBeanNamesResolver {
@@ -40,6 +38,16 @@ public final class LoggerBeanNamesResolver {
         return instance;
     }
 
+    /**
+     * Resolve all possible aliases in application context for usage in annotation to specify given bean.
+     * Note: primary bean has also '' (empty string) alias.
+     * For example:
+     * 'jaxb2Printer': {'jaxb2Printer', '', 'jaxb', 'xml'} // primary bean
+     * 'jacksonPrinter': {'jacksonPrinter'} // bean without any aliases
+     *
+     * @param beanName resolvable bean name
+     * @return resolved names and aliases, including bean name given by parameter
+     */
     public Set<String> resolve(GenericApplicationContext applicationContext, String beanName) {
         String[] beanNamesForType = applicationContext.getBeanNamesForType(EclairLogger.class);
         if (!asList(beanNamesForType).contains(beanName)) {

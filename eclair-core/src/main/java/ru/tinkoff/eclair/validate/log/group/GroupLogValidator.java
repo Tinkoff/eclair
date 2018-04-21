@@ -16,6 +16,7 @@
 package ru.tinkoff.eclair.validate.log.group;
 
 import ru.tinkoff.eclair.core.AnnotationAttribute;
+import ru.tinkoff.eclair.core.LoggerBeanNamesResolver;
 import ru.tinkoff.eclair.validate.AnnotationUsageException;
 import ru.tinkoff.eclair.validate.AnnotationUsageValidator;
 
@@ -35,13 +36,14 @@ abstract class GroupLogValidator<T extends Annotation> implements AnnotationUsag
 
     private final Map<String, Set<String>> loggerNames;
 
+    /**
+     * @param loggerNames logger aliases grouped by its bean name
+     * @see LoggerBeanNamesResolver#resolve(org.springframework.context.support.GenericApplicationContext, java.lang.String)
+     */
     GroupLogValidator(Map<String, Set<String>> loggerNames) {
         this.loggerNames = loggerNames;
     }
 
-    /**
-     * TODO: add validation of several aliases usage within one method
-     */
     @Override
     public void validate(Method method, Set<T> target) throws AnnotationUsageException {
         groupAnnotationsByLogger(method, target).entrySet().stream()

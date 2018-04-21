@@ -60,6 +60,9 @@ public final class BeanFactoryHelper {
         throw new IllegalArgumentException(format("Bean names not equals: %s, %s", bean, bean2));
     }
 
+    /**
+     * @return key: 'alias', value: 'name'
+     */
     public <T> Map<String, String> getAliases(ListableBeanFactory beanFactory, Class<T> clazz) {
         return beanFactory.getBeansOfType(clazz).keySet().stream()
                 .map(name -> getAliasEntrySet(beanFactory, name))

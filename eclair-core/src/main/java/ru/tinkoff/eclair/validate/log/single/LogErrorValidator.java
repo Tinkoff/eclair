@@ -18,8 +18,8 @@ package ru.tinkoff.eclair.validate.log.single;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.core.ErrorFilterFactory;
 import ru.tinkoff.eclair.definition.ErrorLog;
-import ru.tinkoff.eclair.validate.AnnotationUsageException;
 import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
+import ru.tinkoff.eclair.validate.AnnotationUsageException;
 
 import java.lang.reflect.Method;
 import java.util.Set;

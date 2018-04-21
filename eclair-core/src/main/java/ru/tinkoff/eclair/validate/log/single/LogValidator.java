@@ -18,9 +18,9 @@ package ru.tinkoff.eclair.validate.log.single;
 import org.springframework.boot.logging.LogLevel;
 import org.springframework.util.StringUtils;
 import ru.tinkoff.eclair.core.AnnotationAttribute;
-import ru.tinkoff.eclair.validate.AnnotationUsageException;
 import ru.tinkoff.eclair.printer.Printer;
 import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
+import ru.tinkoff.eclair.validate.AnnotationUsageException;
 import ru.tinkoff.eclair.validate.AnnotationUsageValidator;
 
 import java.lang.annotation.Annotation;

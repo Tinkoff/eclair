@@ -15,9 +15,7 @@
 
 package ru.tinkoff.eclair.printer.resolver;
 
-import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.util.StringUtils;
-import ru.tinkoff.eclair.core.BeanFactoryHelper;
 import ru.tinkoff.eclair.printer.Printer;
 
 import java.util.List;
@@ -30,20 +28,15 @@ import static java.util.stream.Collectors.toList;
 /**
  * @author Vyacheslav Klapatnyuk
  */
-public class BeanFactoryPrinterResolver implements PrinterResolver {
-
-    private static final BeanFactoryHelper beanFactoryHelper = BeanFactoryHelper.getInstance();
+public class AliasedPrinterResolver implements PrinterResolver {
 
     private final Map<String, Printer> printers;
     private final Map<String, String> aliases;
 
-    /**
-     * @param orderedPrinters Printers in priority order.
-     *                        This order is used when determining a suitable printer that is not explicitly specified.
-     */
-    public BeanFactoryPrinterResolver(ListableBeanFactory beanFactory, List<Printer> orderedPrinters) {
-        this.printers = beanFactoryHelper.collectToOrderedMap(beanFactory, Printer.class, orderedPrinters);
-        this.aliases = beanFactoryHelper.getAliases(beanFactory, Printer.class);
+    public AliasedPrinterResolver(Map<String, Printer> printers,
+                                  Map<String, String> aliases) {
+        this.printers = printers;
+        this.aliases = aliases;
     }
 
     /**

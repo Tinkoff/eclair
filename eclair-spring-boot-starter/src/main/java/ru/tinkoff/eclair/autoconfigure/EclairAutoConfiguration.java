@@ -35,12 +35,13 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import ru.tinkoff.eclair.aop.EclairProxyCreator;
 import ru.tinkoff.eclair.core.AnnotationDefinitionFactory;
+import ru.tinkoff.eclair.core.BeanFactoryHelper;
 import ru.tinkoff.eclair.core.ExpressionEvaluator;
 import ru.tinkoff.eclair.logger.EclairLogger;
 import ru.tinkoff.eclair.logger.SimpleLogger;
 import ru.tinkoff.eclair.printer.*;
 import ru.tinkoff.eclair.printer.processor.JaxbElementWrapper;
-import ru.tinkoff.eclair.printer.resolver.BeanFactoryPrinterResolver;
+import ru.tinkoff.eclair.printer.resolver.AliasedPrinterResolver;
 import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
 
 import java.util.List;
@@ -133,7 +134,10 @@ public class EclairAutoConfiguration {
                                                ObjectProvider<List<Printer>> printersObjectProvider) {
             List<Printer> orderedPrinters = printersObjectProvider.getIfAvailable();
             List<Printer> printers = isNull(orderedPrinters) ? singletonList(PrinterResolver.defaultPrinter) : orderedPrinters;
-            return new BeanFactoryPrinterResolver(applicationContext, printers);
+            BeanFactoryHelper beanFactoryHelper = BeanFactoryHelper.getInstance();
+            return new AliasedPrinterResolver(
+                    beanFactoryHelper.collectToOrderedMap(applicationContext, Printer.class, printers),
+                    beanFactoryHelper.getAliases(applicationContext, Printer.class));
         }
     }
 }
