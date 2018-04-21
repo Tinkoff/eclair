@@ -16,7 +16,6 @@
 package ru.tinkoff.eclair.validate.log.group;
 
 import ru.tinkoff.eclair.annotation.Log;
-import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
 import ru.tinkoff.eclair.validate.AnnotationUsageException;
 import ru.tinkoff.eclair.validate.log.single.LogValidator;
 
@@ -32,9 +31,9 @@ public class LogsValidator extends GroupLogValidator<Log> {
     private final LogValidator<Log> logValidator;
 
     public LogsValidator(Map<String, Set<String>> loggerNames,
-                         PrinterResolver printerResolver) {
+                         LogValidator<Log> logValidator) {
         super(loggerNames);
-        logValidator = new LogValidator<>(printerResolver);
+        this.logValidator = logValidator;
     }
 
     @Override

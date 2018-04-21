@@ -18,8 +18,8 @@ package ru.tinkoff.eclair.aop;
 import org.aopalliance.intercept.MethodInvocation;
 import org.slf4j.MDC;
 import ru.tinkoff.eclair.core.ExpressionEvaluator;
-import ru.tinkoff.eclair.definition.method.MethodMdc;
 import ru.tinkoff.eclair.definition.ParameterMdc;
+import ru.tinkoff.eclair.definition.method.MethodMdc;
 
 import java.util.HashSet;
 import java.util.List;

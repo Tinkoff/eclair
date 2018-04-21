@@ -15,28 +15,27 @@
 
 package ru.tinkoff.eclair.validate;
 
-import org.springframework.context.support.GenericApplicationContext;
+import lombok.RequiredArgsConstructor;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.annotation.Mdc;
 import ru.tinkoff.eclair.core.AnnotationExtractor;
-import ru.tinkoff.eclair.core.LoggerBeanNamesResolver;
-import ru.tinkoff.eclair.logger.EclairLogger;
-import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
 import ru.tinkoff.eclair.validate.log.group.*;
 import ru.tinkoff.eclair.validate.mdc.group.MdcsValidator;
 import ru.tinkoff.eclair.validate.mdc.group.MergedMdcsValidator;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 
 /**
  * @author Vyacheslav Klapatnyuk
  */
+@RequiredArgsConstructor
 public class MethodValidator implements AnnotationUsageValidator<Method> {
 
     private final AnnotationExtractor annotationExtractor;
@@ -47,24 +46,8 @@ public class MethodValidator implements AnnotationUsageValidator<Method> {
     private final LogErrorsValidator logErrorsValidator;
     private final ParameterLogsValidator parameterLogsValidator;
 
-    private final MdcsValidator mdcsValidator = new MdcsValidator();
-    private final MergedMdcsValidator mergedMdcsValidator = new MergedMdcsValidator();
-
-    public MethodValidator(AnnotationExtractor annotationExtractor,
-                           GenericApplicationContext applicationContext,
-                           Map<String, EclairLogger> loggers,
-                           PrinterResolver printerResolver) {
-        this.annotationExtractor = annotationExtractor;
-        LoggerBeanNamesResolver loggerBeanNamesResolver = LoggerBeanNamesResolver.getInstance();
-        Map<String, Set<String>> loggerNames = loggers.keySet().stream().collect(toMap(
-                identity(),
-                loggerName -> loggerBeanNamesResolver.resolve(applicationContext, loggerName)));
-        this.logsValidator = new LogsValidator(loggerNames, printerResolver);
-        this.logInsValidator = new LogInsValidator(loggerNames, printerResolver);
-        this.logOutsValidator = new LogOutsValidator(loggerNames, printerResolver);
-        this.logErrorsValidator = new LogErrorsValidator(loggerNames, printerResolver);
-        this.parameterLogsValidator = new ParameterLogsValidator(loggerNames, printerResolver);
-    }
+    private final MdcsValidator mdcsValidator;
+    private final MergedMdcsValidator mergedMdcsValidator;
 
     public void validate(Method method) throws AnnotationUsageException {
         validate(method, method);
@@ -136,8 +119,12 @@ public class MethodValidator implements AnnotationUsageValidator<Method> {
 
         mdcsValidator.validate(target, mdcs);
         parameterMdcs.forEach(item -> mdcsValidator.validate(target, item));
+        mergedMdcsValidator.validate(target, mergeMdcs(mdcs, parameterMdcs));
+    }
+
+    private Set<Mdc> mergeMdcs(Set<Mdc> mdcs, List<Set<Mdc>> parameterMdcs) {
         Set<Mdc> mergedMdcs = new HashSet<>(mdcs);
         mergedMdcs.addAll(parameterMdcs.stream().flatMap(Collection::stream).collect(toSet()));
-        mergedMdcsValidator.validate(target, mergedMdcs);
+        return mergedMdcs;
     }
 }

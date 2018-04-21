@@ -32,6 +32,11 @@ import ru.tinkoff.eclair.definition.method.factory.MethodMdcFactory;
 import ru.tinkoff.eclair.logger.EclairLogger;
 import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
 import ru.tinkoff.eclair.validate.MethodValidator;
+import ru.tinkoff.eclair.validate.log.group.*;
+import ru.tinkoff.eclair.validate.log.single.LogErrorValidator;
+import ru.tinkoff.eclair.validate.log.single.LogValidator;
+import ru.tinkoff.eclair.validate.mdc.group.MdcsValidator;
+import ru.tinkoff.eclair.validate.mdc.group.MergedMdcsValidator;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -41,7 +46,9 @@ import java.util.stream.Stream;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * @author Vyacheslav Klapatnyuk
@@ -77,7 +84,25 @@ public class EclairProxyCreator extends AbstractAutoProxyCreator {
         this.annotationDefinitionFactory = annotationDefinitionFactory;
         this.loggers = BeanFactoryHelper.getInstance().collectToOrderedMap(applicationContext, EclairLogger.class, orderedLoggers);
         this.expressionEvaluator = expressionEvaluator;
-        this.methodValidator = new MethodValidator(AnnotationExtractor.getInstance(), applicationContext, loggers, printerResolver);
+        this.methodValidator = initMethodValidator(printerResolver);
+    }
+
+    private MethodValidator initMethodValidator(PrinterResolver printerResolver) {
+        LoggerBeanNamesResolver loggerBeanNamesResolver = LoggerBeanNamesResolver.getInstance();
+        Map<String, Set<String>> loggerNames = loggers.keySet().stream()
+                .collect(toMap(
+                        identity(),
+                        loggerName -> loggerBeanNamesResolver.resolve(applicationContext, loggerName))
+                );
+        return new MethodValidator(AnnotationExtractor.getInstance(),
+                new LogsValidator(loggerNames, new LogValidator<>(printerResolver)),
+                new LogInsValidator(loggerNames, new LogValidator<>(printerResolver)),
+                new LogOutsValidator(loggerNames, new LogValidator<>(printerResolver)),
+                new LogErrorsValidator(loggerNames, new LogErrorValidator(printerResolver)),
+                new ParameterLogsValidator(loggerNames, new LogValidator<>(printerResolver)),
+                new MdcsValidator(),
+                new MergedMdcsValidator()
+        );
     }
 
     @Override

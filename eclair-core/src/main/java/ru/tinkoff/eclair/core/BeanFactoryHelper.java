@@ -25,8 +25,6 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
 /**
- * TODO: refactor
- *
  * @author Vyacheslav Klapatnyuk
  */
 public final class BeanFactoryHelper {
