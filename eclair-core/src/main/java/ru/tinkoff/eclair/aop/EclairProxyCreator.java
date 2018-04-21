@@ -77,7 +77,7 @@ public class EclairProxyCreator extends AbstractAutoProxyCreator {
         this.annotationDefinitionFactory = annotationDefinitionFactory;
         this.loggers = BeanFactoryHelper.getInstance().collectToOrderedMap(applicationContext, EclairLogger.class, orderedLoggers);
         this.expressionEvaluator = expressionEvaluator;
-        this.methodValidator = new MethodValidator(applicationContext, loggers, printerResolver);
+        this.methodValidator = new MethodValidator(AnnotationExtractor.getInstance(), applicationContext, loggers, printerResolver);
     }
 
     @Override
@@ -99,7 +99,7 @@ public class EclairProxyCreator extends AbstractAutoProxyCreator {
             return AbstractAutoProxyCreator.DO_NOT_PROXY;
         }
         if (validate) {
-            annotationExtractor.getCandidateMethods(targetClass).forEach(method -> methodValidator.validate(method, method));
+            annotationExtractor.getCandidateMethods(targetClass).forEach(methodValidator::validate);
         }
         MdcAdvisor mdcAdvisor = getMdcAdvisor(targetClass);
         List<LogAdvisor> logAdvisors = getLoggingAdvisors(targetClass);

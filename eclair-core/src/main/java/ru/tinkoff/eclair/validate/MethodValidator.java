@@ -39,7 +39,7 @@ import static java.util.stream.Collectors.toSet;
  */
 public class MethodValidator implements AnnotationUsageValidator<Method> {
 
-    private final AnnotationExtractor annotationExtractor = AnnotationExtractor.getInstance();
+    private final AnnotationExtractor annotationExtractor;
 
     private final LogsValidator logsValidator;
     private final LogInsValidator logInsValidator;
@@ -50,19 +50,24 @@ public class MethodValidator implements AnnotationUsageValidator<Method> {
     private final MdcsValidator mdcsValidator = new MdcsValidator();
     private final MergedMdcsValidator mergedMdcsValidator = new MergedMdcsValidator();
 
-    public MethodValidator(GenericApplicationContext applicationContext,
+    public MethodValidator(AnnotationExtractor annotationExtractor,
+                           GenericApplicationContext applicationContext,
                            Map<String, EclairLogger> loggers,
                            PrinterResolver printerResolver) {
-        Map<String, Set<String>> loggerNames = loggers.keySet().stream()
-                .collect(toMap(
-                        identity(),
-                        loggerName -> LoggerBeanNamesResolver.getInstance().resolve(applicationContext, loggerName)
-                ));
+        this.annotationExtractor = annotationExtractor;
+        LoggerBeanNamesResolver loggerBeanNamesResolver = LoggerBeanNamesResolver.getInstance();
+        Map<String, Set<String>> loggerNames = loggers.keySet().stream().collect(toMap(
+                identity(),
+                loggerName -> loggerBeanNamesResolver.resolve(applicationContext, loggerName)));
         this.logsValidator = new LogsValidator(loggerNames, printerResolver);
         this.logInsValidator = new LogInsValidator(loggerNames, printerResolver);
         this.logOutsValidator = new LogOutsValidator(loggerNames, printerResolver);
         this.logErrorsValidator = new LogErrorsValidator(loggerNames, printerResolver);
         this.parameterLogsValidator = new ParameterLogsValidator(loggerNames, printerResolver);
+    }
+
+    public void validate(Method method) throws AnnotationUsageException {
+        validate(method, method);
     }
 
     /**

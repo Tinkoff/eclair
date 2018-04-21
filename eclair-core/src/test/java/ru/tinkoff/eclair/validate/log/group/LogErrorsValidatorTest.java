@@ -41,7 +41,7 @@ public class LogErrorsValidatorTest {
 
     @Before
     public void init() throws NoSuchMethodException {
-        method = GroupLogValidatorTest.class.getMethod("init");
+        method = LogErrorsValidatorTest.class.getMethod("init");
     }
 
     @Test(expected = AnnotationUsageException.class)

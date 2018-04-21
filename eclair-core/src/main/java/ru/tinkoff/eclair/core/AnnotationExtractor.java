@@ -40,7 +40,7 @@ import static ru.tinkoff.eclair.core.AnnotationAttribute.LOGGER;
 /**
  * @author Vyacheslav Klapatnyuk
  */
-public final class AnnotationExtractor {
+public class AnnotationExtractor {
 
     /**
      * In order of supposed popularity
