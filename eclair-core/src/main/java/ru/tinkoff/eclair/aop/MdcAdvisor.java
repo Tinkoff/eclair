@@ -30,7 +30,7 @@ import static java.util.Objects.isNull;
 /**
  * @author Vyacheslav Klapatnyuk
  */
-final class MdcAdvisor extends AbstractAdvisor<MethodMdc> {
+class MdcAdvisor extends AbstractAdvisor<MethodMdc> {
 
     private final ExpressionEvaluator expressionEvaluator;
 
@@ -40,8 +40,8 @@ final class MdcAdvisor extends AbstractAdvisor<MethodMdc> {
         this.expressionEvaluator = expressionEvaluator;
     }
 
-    static MdcAdvisor newInstance(ExpressionEvaluator expressionEvaluator,
-                                  List<MethodMdc> methodMdcs) {
+    static MdcAdvisor newInstance(List<MethodMdc> methodMdcs,
+                                  ExpressionEvaluator expressionEvaluator) {
         return methodMdcs.isEmpty() ? null : new MdcAdvisor(methodMdcs, expressionEvaluator);
     }
 
@@ -56,7 +56,7 @@ final class MdcAdvisor extends AbstractAdvisor<MethodMdc> {
         }
     }
 
-    private void processMethodDefinitions(MethodInvocation invocation, MethodMdc methodMdc, Set<String> localKeys) {
+    void processMethodDefinitions(MethodInvocation invocation, MethodMdc methodMdc, Set<String> localKeys) {
         for (ParameterMdc definition : methodMdc.getMethodDefinitions()) {
             String key = definition.getKey();
             if (key.isEmpty()) {
@@ -68,8 +68,13 @@ final class MdcAdvisor extends AbstractAdvisor<MethodMdc> {
                 List<String> parameterNames = methodMdc.getParameterNames();
                 for (int a = 0; a < arguments.length; a++) {
                     String parameterName = parameterNames.get(a);
-                    String subKey = isNull(parameterName) ? synthesizeKey(key, a) : parameterName;
-                    putMdc(subKey, arguments[a], definition, localKeys);
+                    if (isNull(parameterName)) {
+                        putMdc(synthesizeKey(key, a), arguments[a], definition, localKeys);
+                    } else if (definition.getKey().isEmpty()) {
+                        putMdc(parameterName, arguments[a], definition, localKeys);
+                    } else {
+                        putMdc(synthesizeKey(key, parameterName), arguments[a], definition, localKeys);
+                    }
                 }
             } else {
                 Object value = expressionEvaluator.evaluate(expressionString);
@@ -78,7 +83,7 @@ final class MdcAdvisor extends AbstractAdvisor<MethodMdc> {
         }
     }
 
-    private void processParameterDefinitions(MethodInvocation invocation, MethodMdc methodMdc, Set<String> localKeys) {
+    void processParameterDefinitions(MethodInvocation invocation, MethodMdc methodMdc, Set<String> localKeys) {
         Object[] arguments = invocation.getArguments();
         for (int a = 0; a < arguments.length; a++) {
             for (ParameterMdc definition : methodMdc.getParameterDefinitions().get(a)) {
@@ -96,11 +101,15 @@ final class MdcAdvisor extends AbstractAdvisor<MethodMdc> {
         }
     }
 
-    private String synthesizeKey(String prefix, int index) {
-        return prefix + "[" + index + "]";
+    String synthesizeKey(String prefix, int index) {
+        return synthesizeKey(prefix, String.valueOf(index));
     }
 
-    private void putMdc(String key, Object value, ParameterMdc definition, Set<String> localKeys) {
+    String synthesizeKey(String prefix, String name) {
+        return prefix + "[" + name + "]";
+    }
+
+    void putMdc(String key, Object value, ParameterMdc definition, Set<String> localKeys) {
         if (!definition.isGlobal()) {
             localKeys.add(key);
         }

@@ -26,6 +26,10 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.groupingBy;
 
 /**
+ * TODO: validate uniqueness of empty 'key' attribute on method
+ * TODO: validate uniqueness of empty 'value' attribute on method
+ * TODO: validate empty expression string on method without parameters
+ *
  * @author Vyacheslav Klapatnyuk
  */
 public class MdcsValidator implements AnnotationUsageValidator<Collection<Mdc>> {

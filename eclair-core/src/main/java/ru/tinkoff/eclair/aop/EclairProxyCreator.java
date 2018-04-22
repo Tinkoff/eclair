@@ -149,7 +149,7 @@ public class EclairProxyCreator extends AbstractAutoProxyCreator {
                 .map(this::getMethodMdc)
                 .filter(Objects::nonNull)
                 .collect(toList());
-        return MdcAdvisor.newInstance(expressionEvaluator, methodMdcs);
+        return MdcAdvisor.newInstance(methodMdcs, expressionEvaluator);
     }
 
     private MethodMdc getMethodMdc(Method method) {

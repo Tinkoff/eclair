@@ -28,7 +28,7 @@ import static java.util.Objects.isNull;
 /**
  * @author Vyacheslav Klapatnyuk
  */
-public final class ExpressionEvaluator {
+public class ExpressionEvaluator {
 
     private static final Logger logger = LoggerFactory.getLogger(ExpressionEvaluator.class);
 
