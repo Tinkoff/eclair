@@ -27,6 +27,7 @@ import ru.tinkoff.eclair.core.AnnotationExtractor;
 import ru.tinkoff.eclair.validate.log.group.*;
 import ru.tinkoff.eclair.validate.mdc.group.MdcsValidator;
 import ru.tinkoff.eclair.validate.mdc.group.MergedMdcsValidator;
+import ru.tinkoff.eclair.validate.mdc.group.MethodMdcsValidator;
 
 import java.lang.reflect.Method;
 import java.util.Iterator;
@@ -126,6 +127,7 @@ public class MethodValidatorTest {
                 mock(LogOutsValidator.class),
                 mock(LogErrorsValidator.class),
                 mock(ParameterLogsValidator.class),
+                mock(MethodMdcsValidator.class),
                 mock(MdcsValidator.class),
                 mock(MergedMdcsValidator.class));
     }
@@ -158,6 +160,7 @@ public class MethodValidatorTest {
         LogOutsValidator logOutsValidator = mock(LogOutsValidator.class);
         LogErrorsValidator logErrorsValidator = mock(LogErrorsValidator.class);
         ParameterLogsValidator parameterLogsValidator = mock(ParameterLogsValidator.class);
+        MethodMdcsValidator methodMdcsValidator = mock(MethodMdcsValidator.class);
         MdcsValidator mdcsValidator = mock(MdcsValidator.class);
         MergedMdcsValidator mergedMdcsValidator = mock(MergedMdcsValidator.class);
 
@@ -167,6 +170,7 @@ public class MethodValidatorTest {
                 logOutsValidator,
                 logErrorsValidator,
                 parameterLogsValidator,
+                methodMdcsValidator,
                 mdcsValidator,
                 mergedMdcsValidator);
 
@@ -179,7 +183,8 @@ public class MethodValidatorTest {
         verify(logOutsValidator).validate(method, logOuts);
         verify(logErrorsValidator).validate(method, logErrors);
         verifyParameterLogs(parameterLogsValidator, parameterLogs, parameterLogs1);
-        verifyMdcs(mdcsValidator, mdcs, parameterMdcs, parameterMdcs1);
+        verify(methodMdcsValidator).validate(method, mdcs);
+        verifyMdcs(mdcsValidator, parameterMdcs, parameterMdcs1);
         verify(mergedMdcsValidator).validate(eq(method), any());
     }
 
@@ -190,10 +195,9 @@ public class MethodValidatorTest {
         assertThat(parameterLogsIterator.next(), is(parameterLogs1));
     }
 
-    private void verifyMdcs(MdcsValidator mdcsValidator, Set<Mdc> mdcs, Set<Mdc> parameterMdcs, Set<Mdc> parameterMdcs1) {
-        verify(mdcsValidator, times(3)).validate(eq(method), parameterMdcsCaptor.capture());
+    private void verifyMdcs(MdcsValidator mdcsValidator, Set<Mdc> parameterMdcs, Set<Mdc> parameterMdcs1) {
+        verify(mdcsValidator, times(2)).validate(eq(method), parameterMdcsCaptor.capture());
         Iterator<Set<Mdc>> parameterMdcsIterator = parameterMdcsCaptor.getAllValues().iterator();
-        assertThat(parameterMdcsIterator.next(), is(mdcs));
         assertThat(parameterMdcsIterator.next(), is(parameterMdcs));
         assertThat(parameterMdcsIterator.next(), is(parameterMdcs1));
     }

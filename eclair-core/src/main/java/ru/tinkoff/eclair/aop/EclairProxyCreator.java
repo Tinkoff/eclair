@@ -37,6 +37,7 @@ import ru.tinkoff.eclair.validate.log.single.LogErrorValidator;
 import ru.tinkoff.eclair.validate.log.single.LogValidator;
 import ru.tinkoff.eclair.validate.mdc.group.MdcsValidator;
 import ru.tinkoff.eclair.validate.mdc.group.MergedMdcsValidator;
+import ru.tinkoff.eclair.validate.mdc.group.MethodMdcsValidator;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -100,6 +101,7 @@ public class EclairProxyCreator extends AbstractAutoProxyCreator {
                 new LogOutsValidator(loggerNames, new LogValidator<>(printerResolver)),
                 new LogErrorsValidator(loggerNames, new LogErrorValidator(printerResolver)),
                 new ParameterLogsValidator(loggerNames, new LogValidator<>(printerResolver)),
+                new MethodMdcsValidator(),
                 new MdcsValidator(),
                 new MergedMdcsValidator()
         );

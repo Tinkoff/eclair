@@ -296,7 +296,7 @@ public class MdcAdvisorTest {
     }
 
     @Test
-    public void synthesizeKey() {
+    public void synthesizeKeyByName() {
         // given
         MdcAdvisor mdcAdvisor = MdcAdvisor.newInstance(singletonList(mock(MethodMdc.class)), mock(ExpressionEvaluator.class));
         String prefix = "prefix";
@@ -306,5 +306,18 @@ public class MdcAdvisorTest {
         String synthesizedKey = mdcAdvisor.synthesizeKey(prefix, name);
         // then
         assertThat(synthesizedKey, is("prefix[name]"));
+    }
+
+    @Test
+    public void synthesizeKeyByInt() {
+        // given
+        MdcAdvisor mdcAdvisor = MdcAdvisor.newInstance(singletonList(mock(MethodMdc.class)), mock(ExpressionEvaluator.class));
+        String prefix = "prefix";
+        int index = 1;
+        // when
+        assertNotNull(mdcAdvisor);
+        String synthesizedKey = mdcAdvisor.synthesizeKey(prefix, index);
+        // then
+        assertThat(synthesizedKey, is("prefix[1]"));
     }
 }

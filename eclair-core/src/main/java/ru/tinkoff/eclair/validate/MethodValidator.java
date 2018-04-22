@@ -22,6 +22,7 @@ import ru.tinkoff.eclair.core.AnnotationExtractor;
 import ru.tinkoff.eclair.validate.log.group.*;
 import ru.tinkoff.eclair.validate.mdc.group.MdcsValidator;
 import ru.tinkoff.eclair.validate.mdc.group.MergedMdcsValidator;
+import ru.tinkoff.eclair.validate.mdc.group.MethodMdcsValidator;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -46,6 +47,7 @@ public class MethodValidator implements AnnotationUsageValidator<Method> {
     private final LogErrorsValidator logErrorsValidator;
     private final ParameterLogsValidator parameterLogsValidator;
 
+    private final MethodMdcsValidator methodMdcsValidator;
     private final MdcsValidator mdcsValidator;
     private final MergedMdcsValidator mergedMdcsValidator;
 
@@ -117,7 +119,7 @@ public class MethodValidator implements AnnotationUsageValidator<Method> {
         logErrorsValidator.validate(target, logErrors);
         parameterLogs.forEach(log -> parameterLogsValidator.validate(target, log));
 
-        mdcsValidator.validate(target, mdcs);
+        methodMdcsValidator.validate(target, mdcs);
         parameterMdcs.forEach(item -> mdcsValidator.validate(target, item));
         mergedMdcsValidator.validate(target, mergeMdcs(mdcs, parameterMdcs));
     }

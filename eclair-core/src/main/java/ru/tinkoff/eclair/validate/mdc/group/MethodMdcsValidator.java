@@ -17,29 +17,29 @@ package ru.tinkoff.eclair.validate.mdc.group;
 
 import ru.tinkoff.eclair.annotation.Mdc;
 import ru.tinkoff.eclair.validate.AnnotationUsageException;
-import ru.tinkoff.eclair.validate.AnnotationUsageValidator;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
 
-import static java.lang.String.format;
-import static java.util.stream.Collectors.groupingBy;
-
 /**
  * @author Vyacheslav Klapatnyuk
  */
-public class MdcsValidator implements AnnotationUsageValidator<Collection<Mdc>> {
+public class MethodMdcsValidator extends MdcsValidator {
 
     @Override
     public void validate(Method method, Collection<Mdc> target) throws AnnotationUsageException {
-        target.stream().collect(groupingBy(Mdc::key))
-                .entrySet().stream()
-                .filter(entry -> entry.getValue().size() > 1)
+        super.validate(method, target);
+
+        target.stream()
+                .filter(mdc -> mdc.value().isEmpty())
                 .findFirst()
-                .ifPresent(entry -> {
-                    throw new AnnotationUsageException(method,
-                            format("%s annotations with 'key = %s' on the annotated element", entry.getValue().size(), entry.getKey()),
-                            "Use unique 'key' per annotated element");
+                .ifPresent(mdc -> {
+                    if (method.getParameterCount() == 0) {
+                        throw new AnnotationUsageException(method,
+                                "Method not contains any parameters",
+                                "Do not use empty @Mdc annotation on method without parameters",
+                                mdc);
+                    }
                 });
     }
 }
