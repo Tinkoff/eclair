@@ -456,7 +456,7 @@ void manualLevel() {
 
 ## Release History
 
-04.2018 - 1.0.0 Basic features
+24.04.2018 - 0.8.0 Basic features
 
 ## License
 
