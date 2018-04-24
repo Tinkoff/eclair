@@ -24,7 +24,7 @@ Add this to your POM.
 <dependency>
     <groupId>ru.tinkoff</groupId>
     <artifactId>eclair-spring-boot-starter</artifactId>
-    <version>1.0.0</version>
+    <version>0.8.0</version>
 </dependency>
 ```
 
@@ -56,40 +56,6 @@ void simple() {
  `TRACE` `DEBUG`    | `DEBUG [] r.t.eclair.example.Example.simple >`<br>`DEBUG [] r.t.eclair.example.Example.simple <`
  `INFO` .. `OFF`    | -
 
-#### With thrown exception
-```java
-@Log
-void simpleError() {
-    throw new RuntimeException();
-}
-```
- Enabled level      | Log sample
---------------------|------------
- `TRACE` `DEBUG`    | `DEBUG [] r.t.e.example.Example.simpleError >`<br>`DEBUG [] r.t.e.example.Example.simpleError !`
- `INFO` .. `OFF`    | -
-
-#### Explicit `INFO` level
-```java
-@Log(INFO)
-void level() {
-}
-```
- Enabled level      | Log sample
---------------------|------------
- `TRACE` .. `INFO`  | `INFO  [] r.t.eclair.example.Example.level >`<br>`INFO  [] r.t.eclair.example.Example.level <`
- `WARN` .. `OFF`    | -
-
-#### Log as `INFO` if enabled `DEBUG` level
-```java
-@Log(level = INFO, ifEnabled = DEBUG)
-void ifEnabled() {
-}
-```
- Enabled level      | Log sample
---------------------|------------
- `TRACE` `DEBUG`    | `INFO  [] r.t.e.example.Example.ifEnabled >`<br>`INFO  [] r.t.e.example.Example.ifEnabled <`
- `INFO` .. `OFF`    | -
-
 #### Influence of configured level to verbosity
 ```java
 @Log(INFO)
@@ -103,31 +69,6 @@ boolean verbose(String s, Integer i, Double d) {
  `INFO`             | `INFO  [] r.t.eclair.example.Example.verbose >`<br>`INFO  [] r.t.eclair.example.Example.verbose <`
  `WARN` .. `OFF`    | -
 
-#### Verbosity disabled
-Arguments and return value are not printed for any level.
-```java
-@Log(verbose = OFF)
-boolean verboseDisabled(String s, Integer i, Double d) {
-    return false;
-}
-```
- Enabled level      | Log sample
---------------------|------------
- `TRACE` `DEBUG`    | `DEBUG [] r.t.e.e.Example.verboseDisabled >`<br>`DEBUG [] r.t.e.e.Example.verboseDisabled <`
- `INFO` .. `OFF`    | -
-
-#### Try to print arguments by `JacksonPrinter` as `JSON`
-You can specify printer's bean name or alias. Arguments and return values will be serialized with `#toString()` invocation by default. 
-```java
-@Log(printer = "jacksonPrinter")
-void json(Dto dto, Integer i) {
-}
-```
- Enabled level      | Log sample
---------------------|------------
- `TRACE` `DEBUG`    | `DEBUG [] r.t.eclair.example.Example.json > dto={"i":2,"s":"r"}, i=8`<br>`DEBUG [] r.t.eclair.example.Example.json <`
- `INFO` .. `OFF`    | -
-
 #### Try to print arguments by `Jaxb2Printer` as `XML`
 You can specify printer's bean name or alias.
 ```java
@@ -138,47 +79,6 @@ void verboseXml(Dto dto, Integer i) {
  Enabled level      | Log sample
 --------------------|------------
  `TRACE` `DEBUG`    | `DEBUG [] r.t.eclair.example.Example.xml > dto=<dto><i>4</i><s>k</s></dto>, i=7`<br>`DEBUG [] r.t.eclair.example.Example.xml <`
- `INFO` .. `OFF`    | -
-
-#### Separate `in` and `out` events 
-Logging of `in` and `out` events can be declared separately with own settings.
-```java
-@Log.in(INFO)
-@Log.out(TRACE)
-void inOut(Dto dto, String s, Integer i) {
-}
-```
- Enabled level      | Log sample
---------------------|------------
- `TRACE`            | `INFO  [] r.t.eclair.example.Example.inOut > dto=Dto{i=3, s='m'}, s="s", i=3`<br>`TRACE [] r.t.eclair.example.Example.inOut <`
- `DEBUG`            | `INFO  [] r.t.eclair.example.Example.inOut > dto=Dto{i=3, s='m'}, s="s", i=3`
- `INFO`             | `INFO  [] r.t.eclair.example.Example.inOut >`
- `WARN` .. `OFF`    | -
-
-#### Error
-Errors logged on `ERROR` level by default. So it is visible for all levels except `OFF`. 
-```java
-@Log.error
-void error() {
-    throw new RuntimeException("Something strange happened");
-}
-```
- Enabled level      | Log sample
---------------------|------------
- `TRACE` .. `FATAL` | `ERROR [] r.t.eclair.example.Example.error ! java.lang.RuntimeException: Something strange happened`<br>`java.lang.RuntimeException: Something strange happened`<br>`	at ru.tinkoff.eclair.example.Example.error(Example.java:0)`<br>..
- `OFF`              | -
-
-#### Warning on `DEBUG`
-You may want to log minor error, if `DEBUG` level enabled. 
-```java
-@Log.error(level = WARN, ifEnabled = DEBUG)
-void warningOnDebug() {
-    throw new RuntimeException("Something strange happened, but it doesn't matter");
-}
-```
- Enabled level      | Log sample
---------------------|------------
- `TRACE` `DEBUG`    | `WARN  [] r.t.e.e.Example.warningOnDebug ! java.lang.RuntimeException: Something strange happened, but it doesn't matter`<br>`java.lang.RuntimeException: Something strange happened, but it doesn't matter`<br>`	at ru.tinkoff.eclair.example.Example.warningOnDebug(Example.java:0)`<br>..
  `INFO` .. `OFF`    | -
 
 #### Filter errors by type
@@ -206,21 +106,6 @@ filterErrors(new Error());
  `ERROR` `FATAL`    | `ERROR [] r.t.e.example.Example.filterErrors ! java.lang.Exception`<br>`java.lang.Exception: null`<br>`	at ru.tinkoff.eclair.example.ExampleTest.filterErrors(ExampleTest.java:0)`<br>..
  `OFF`              | -
 
-#### The most specific error type
-If thrown exception matches to several filters, the most specific parent type will be used.<br>
-`IllegalArgumentException` is child of `Exception` and `RuntimeException` too, but `RuntimeException` is more specific, so `IllegalArgumentException` logged with `WARN` level. 
-```java
-@Log.error(level = ERROR, ofType = Exception.class)
-@Log.error(level = WARN, ofType = RuntimeException.class)
-void mostSpecific() {
-    throw new IllegalArgumentException();
-}
-```
- Enabled level      | Log sample
---------------------|------------
- `TRACE` .. `WARN`  | `WARN  [] r.t.e.example.Example.mostSpecific ! java.lang.IllegalArgumentException`<br>`java.lang.IllegalArgumentException: null`<br>`	at ru.tinkoff.eclair.example.Example.mostSpecific(Example.java:0)`<br>..
- `ERROR` .. `OFF`   | -
-
 #### Log annotated argument only
 > Note: If method is not annotated, log string will have the highest level among annotated parameters.<br>
 > Note: Parameter name printed for `TRACE` and `DEBUG` levels by default.
@@ -233,79 +118,6 @@ void parameter(@Log(INFO) Dto dto, String s, Integer i) {
  `TRACE` `DEBUG`    | `INFO  [] r.t.e.example.Example.parameter > dto=Dto{i=0, s='u'}`
  `INFO`             | `INFO  [] r.t.e.example.Example.parameter > Dto{i=0, s='u'}`
  `WARN` .. `OFF`    | -
-
-#### Specific printer for each argument
-Printer can has pre- and post-processors for manipulating with data before / after serialization.<br>
-For example `maskJaxb2Printer` is configured with `XPathMasker` post-processor, so all elements matched `//s` expression masked by `********`.
-```java
-@Log.out(printer = "maskJaxb2Printer")
-Dto printers(@Log(printer = "maskJaxb2Printer") Dto xml,
-             @Log(printer = "jacksonPrinter") Dto json,
-             Integer i) {
-    return xml;
-}
-```
- Enabled level      | Log sample
---------------------|------------
- `TRACE` `DEBUG`    | `DEBUG [] r.t.eclair.example.Example.printers > xml=<dto><i>5</i><s>********</s></dto>, json={"i":5,"s":"password"}`<br>`DEBUG [] r.t.eclair.example.Example.printers < <dto><i>5</i><s>********</s></dto>`
- `INFO` .. `OFF`    | -
-
-#### Configured parameter levels
-```java
-@Log.in(INFO)
-void parameterLevels(@Log(INFO) Double d,
-                     @Log(DEBUG) String s,
-                     @Log(TRACE) Integer i) {
-}
-```
- Enabled level      | Log sample
---------------------|------------
- `TRACE`            | `INFO  [] r.t.e.e.Example.parameterLevels > d=9.4, s="v", i=7`
- `DEBUG`            | `INFO  [] r.t.e.e.Example.parameterLevels > d=9.4, s="v"`
- `INFO`             | `INFO  [] r.t.e.e.Example.parameterLevels > 9.4`
- `WARN` .. `OFF`    | -
-
-#### Mix
-```java
-@Log.in(INFO)
-@Log.out(level = TRACE, verbose = TRACE)
-@Log.error(level = WARN, ofType = RuntimeException.class, exclude = NullPointerException.class)
-@Log.error(level = ERROR, ofType = {Error.class, Exception.class})
-Dto mix(@Log(printer = "jaxb2Printer") Dto xml,
-        @Log(ifEnabled = TRACE, printer = "jacksonPrinter") Dto json,
-        Integer i) {
-    throw new IllegalArgumentException("Something strange happened");
-}
-```
- Enabled level      | Log sample
---------------------|------------
- `TRACE`            | `INFO  [] r.t.eclair.example.Example.mix > xml=<dto><i>5</i><s>a</s></dto>, json={"i":7,"s":"b"}, i=1`<br>`WARN  [] r.t.eclair.example.Example.mix ! java.lang.IllegalArgumentException: Something strange happened`<br>`java.lang.IllegalArgumentException: Something strange happened`<br>`	at ru.tinkoff.eclair.example.Example.mix(Example.java:0)`<br>..
- `DEBUG`            | `INFO  [] r.t.eclair.example.Example.mix > xml=<dto><i>5</i><s>a</s></dto>, i=1`<br>`WARN  [] r.t.eclair.example.Example.mix ! java.lang.IllegalArgumentException: Something strange happened`<br>`java.lang.IllegalArgumentException: Something strange happened`<br>`	at ru.tinkoff.eclair.example.Example.mix(Example.java:0)`<br>..
- `INFO`             | `INFO  [] r.t.eclair.example.Example.mix >`<br>`WARN  [] r.t.eclair.example.Example.mix ! java.lang.IllegalArgumentException: Something strange happened`<br>`java.lang.IllegalArgumentException: Something strange happened`<br>`	at ru.tinkoff.eclair.example.Example.mix(Example.java:0)`<br>..
- `WARN`             | `WARN  [] r.t.eclair.example.Example.mix ! java.lang.IllegalArgumentException: Something strange happened`<br>`java.lang.IllegalArgumentException: Something strange happened`<br>`	at ru.tinkoff.eclair.example.Example.mix(Example.java:0)`<br>..
- `ERROR` .. `OFF`   | -
-
-#### Meta-annotation possibilities
-You can define your own custom annotation to combine several Eclair annotations to one.
-```java
-@Target({ElementType.METHOD, ElementType.PARAMETER})
-@Retention(RetentionPolicy.RUNTIME)
-@Log(level = INFO, printer = "jaxb2Printer")
-@Log.error(ofType = RuntimeException.class)
-@interface Audit {
-}
-```
-So, if annotation above defined the following examples work absolutely identical.
-```java
-@Log(level = INFO, printer = "jaxb2Printer")
-@Log.error(ofType = RuntimeException.class)
-void listing() {
-}
-
-@Audit
-void meta() {
-}
-```
 
 #### Multiple loggers in application
 You can have several `EclairLogger` implementations in your application context.<br>
@@ -371,28 +183,6 @@ void mdcByArgument(@Mdc(key = "dto", value = "#this")
 DEBUG [length=8, dto=Dto{i=12, s='password'}] r.t.e.example.Example.mdcByArgument > dto=Dto{i=12, s='password'}
 ```
 
-#### MDC defined by default
-If `key` or `value` of `@Mdc` annotation is empty, it will be synthesized by code meta-data:<br>
-* if `@Mdc` defined above the method with empty `value`, each method's parameter will be saved as MDC entry
-* if `@Mdc` defined above the parameter:
-    * empty `key` will be replaced by annotated parameter name
-    * empty `value` will be replaced by annotated parameter value
-```java
-@Mdc
-@Log.in
-void mdcByDefault(String first, Double second) {
-}
-```
-##### Log sample
-```
-DEBUG [first=content, second=3.141592653589793] r.t.e.example.Example.mdcByDefault > first="content", second=3.141592653589793
-```
-> It is not always possible to obtain information about parameter names at runtime.<br>
-In that case, MDC keys will contain method name and parameter index.
-```
-DEBUG [mdcByDefault[0]=content, mdcByDefault[1]=3.141592653589793] r.t.e.example.Example.mdcByDefault > first="content", second=3.141592653589793
-```
-
 ### Manual logging
 Inject `ManualLogger` implementation for manual logging.<br>
 > If execution time is important to you, manual logging with `ManualLogger` is not recommended.
@@ -414,45 +204,6 @@ void manual() {
  `TRACE` `DEBUG`    | `DEBUG [] r.t.eclair.example.Example.manual >`<br>`INFO  [] r.t.eclair.example.Example.manual - Eager logging: 3.141592653589793`<br>`DEBUG [] r.t.eclair.example.Example.manual - Lazy logging: 3.141592653589793`<br>`DEBUG [] r.t.eclair.example.Example.manual <`
  `INFO`             | `INFO  [] r.t.eclair.example.Example.manual - Eager logging: 3.141592653589793`
  `WARN` .. `OFF`    | -
-
-#### Manual level control
-Complete example of manual logging with different level settings.
-```java
-@Autowired
-private ManualLogger logger;
-
-@Log
-void manualLevel() {
-    // log ERROR
-    logger.error("ERROR");
-    logger.errorIfWarnEnabled("ERROR if WARN enabled");
-    logger.errorIfInfoEnabled("ERROR if INFO enabled");
-    logger.errorIfDebugEnabled("ERROR if DEBUG enabled");
-    logger.errorIfTraceEnabled("ERROR if TRACE enabled");
-    // log WARN
-    logger.warn("WARN");
-    logger.warnIfInfoEnabled("WARN if INFO enabled");
-    logger.warnIfDebugEnabled("WARN if DEBUG enabled");
-    logger.warnIfTraceEnabled("WARN if TRACE enabled");
-    // log INFO
-    logger.info("INFO");
-    logger.infoIfDebugEnabled("INFO if DEBUG enabled");
-    logger.infoIfTraceEnabled("INFO if TRACE enabled");
-    // log DEBUG
-    logger.debug("DEBUG");
-    logger.debugIfTraceEnabled("DEBUG if TRACE enabled");
-    // log TRACE
-    logger.trace("TRACE");
-}
-```
- Enabled level      | Log sample
---------------------|------------
- `TRACE`            | `DEBUG [] r.t.e.example.Example.manualLevel >`<br>`ERROR [] r.t.e.example.Example.manualLevel - ERROR`<br>`ERROR [] r.t.e.example.Example.manualLevel - ERROR if WARN enabled`<br>`ERROR [] r.t.e.example.Example.manualLevel - ERROR if INFO enabled`<br>`ERROR [] r.t.e.example.Example.manualLevel - ERROR if DEBUG enabled`<br>`ERROR [] r.t.e.example.Example.manualLevel - ERROR if TRACE enabled`<br>`WARN  [] r.t.e.example.Example.manualLevel - WARN`<br>`WARN  [] r.t.e.example.Example.manualLevel - WARN if INFO enabled`<br>`WARN  [] r.t.e.example.Example.manualLevel - WARN if DEBUG enabled`<br>`WARN  [] r.t.e.example.Example.manualLevel - WARN if TRACE enabled`<br>`INFO  [] r.t.e.example.Example.manualLevel - INFO`<br>`INFO  [] r.t.e.example.Example.manualLevel - INFO if DEBUG enabled`<br>`INFO  [] r.t.e.example.Example.manualLevel - INFO if TRACE enabled`<br>`DEBUG [] r.t.e.example.Example.manualLevel - DEBUG`<br>`DEBUG [] r.t.e.example.Example.manualLevel - DEBUG if TRACE enabled`<br>`TRACE [] r.t.e.example.Example.manualLevel - TRACE`<br>`DEBUG [] r.t.e.example.Example.manualLevel <`
- `DEBUG`            | `DEBUG [] r.t.e.example.Example.manualLevel >`<br>`ERROR [] r.t.e.example.Example.manualLevel - ERROR`<br>`ERROR [] r.t.e.example.Example.manualLevel - ERROR if WARN enabled`<br>`ERROR [] r.t.e.example.Example.manualLevel - ERROR if INFO enabled`<br>`ERROR [] r.t.e.example.Example.manualLevel - ERROR if DEBUG enabled`<br>`WARN  [] r.t.e.example.Example.manualLevel - WARN`<br>`WARN  [] r.t.e.example.Example.manualLevel - WARN if INFO enabled`<br>`WARN  [] r.t.e.example.Example.manualLevel - WARN if DEBUG enabled`<br>`INFO  [] r.t.e.example.Example.manualLevel - INFO`<br>`INFO  [] r.t.e.example.Example.manualLevel - INFO if DEBUG enabled`<br>`DEBUG [] r.t.e.example.Example.manualLevel - DEBUG`<br>`DEBUG [] r.t.e.example.Example.manualLevel <`
- `INFO`             | `ERROR [] r.t.e.example.Example.manualLevel - ERROR`<br>`ERROR [] r.t.e.example.Example.manualLevel - ERROR if WARN enabled`<br>`ERROR [] r.t.e.example.Example.manualLevel - ERROR if INFO enabled`<br>`WARN  [] r.t.e.example.Example.manualLevel - WARN`<br>`WARN  [] r.t.e.example.Example.manualLevel - WARN if INFO enabled`<br>`INFO  [] r.t.e.example.Example.manualLevel - INFO`
- `WARN`             | `ERROR [] r.t.e.example.Example.manualLevel - ERROR`<br>`ERROR [] r.t.e.example.Example.manualLevel - ERROR if WARN enabled`<br>`WARN  [] r.t.e.example.Example.manualLevel - WARN`
- `ERROR` `FATAL`    | `ERROR [] r.t.e.example.Example.manualLevel - ERROR`
- `OFF`              | -
 
 ## Release History
 
