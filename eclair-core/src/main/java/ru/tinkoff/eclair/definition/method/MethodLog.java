@@ -45,12 +45,12 @@ public class MethodLog implements MethodDefinition {
     private final ErrorLogResolver errorLogResolver = ErrorLogResolver.getInstance();
     private final Map<Class<? extends Throwable>, ErrorLog> errorLogCache = new ConcurrentHashMap<>();
 
-    private Method method;
-    private List<String> parameterNames;
-    private InLog inLog;
-    private List<ParameterLog> parameterLogs;
-    private OutLog outLog;
-    private Set<ErrorLog> errorLogs;
+    private final Method method;
+    private final List<String> parameterNames;
+    private final InLog inLog;
+    private final List<ParameterLog> parameterLogs;
+    private final OutLog outLog;
+    private final Set<ErrorLog> errorLogs;
 
     public MethodLog(Method method,
                      List<String> parameterNames,

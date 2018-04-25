@@ -31,10 +31,10 @@ import static java.util.Comparator.comparing;
  */
 public class ErrorLog implements LogDefinition {
 
-    private LogLevel level;
-    private LogLevel ifEnabledLevel;
-    private LogLevel verboseLevel;
-    private Filter filter;
+    private final LogLevel level;
+    private final LogLevel ifEnabledLevel;
+    private final LogLevel verboseLevel;
+    private final Filter filter;
 
     public ErrorLog(LogLevel level, LogLevel ifEnabledLevel, LogLevel verboseLevel, Filter filter) {
         this.level = level;

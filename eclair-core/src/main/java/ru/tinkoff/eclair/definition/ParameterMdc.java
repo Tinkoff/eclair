@@ -20,9 +20,9 @@ package ru.tinkoff.eclair.definition;
  */
 public class ParameterMdc {
 
-    private String key;
-    private String expressionString;
-    private boolean global;
+    private final String key;
+    private final String expressionString;
+    private final boolean global;
 
     public ParameterMdc(String key, String expressionString, boolean global) {
         this.key = key;

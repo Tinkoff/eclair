@@ -23,10 +23,10 @@ import ru.tinkoff.eclair.printer.Printer;
  */
 public class OutLog implements LogDefinition {
 
-    private LogLevel level;
-    private LogLevel ifEnabledLevel;
-    private LogLevel verboseLevel;
-    private Printer printer;
+    private final LogLevel level;
+    private final LogLevel ifEnabledLevel;
+    private final LogLevel verboseLevel;
+    private final Printer printer;
 
     public OutLog(LogLevel level, LogLevel ifEnabledLevel, LogLevel verboseLevel, Printer printer) {
         this.level = level;

@@ -27,10 +27,10 @@ import static java.util.Collections.unmodifiableList;
  */
 public class InLog implements LogDefinition {
 
-    private LogLevel level;
-    private LogLevel ifEnabledLevel;
-    private LogLevel verboseLevel;
-    private List<Printer> printers;
+    private final LogLevel level;
+    private final LogLevel ifEnabledLevel;
+    private final LogLevel verboseLevel;
+    private final List<Printer> printers;
 
     public InLog(LogLevel level, LogLevel ifEnabledLevel, LogLevel verboseLevel, List<Printer> printers) {
         this.level = level;

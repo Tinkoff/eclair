@@ -38,12 +38,6 @@ class ExampleTableBuilder extends SampleBuilder {
     private static final int MULTI_LINE_MAX_LENGTH = 3;
     private static final String LINE_SEPARATOR = "<br>";
 
-    private boolean hide = true;
-
-    public void setHide(boolean hide) {
-        this.hide = hide;
-    }
-
     String buildSampleCell(List<ILoggingEvent> events) {
         if (events.isEmpty()) {
             return "-";
@@ -81,7 +75,7 @@ class ExampleTableBuilder extends SampleBuilder {
 
     private String buildLevelsCell(List<LogLevel> logLevels) {
         StringBuilder payload = new StringBuilder(" ");
-        payload.append((hide && logLevels.size() > 2) ? buildCroppedLevelsCell(logLevels) : buildFullLevelsCell(logLevels));
+        payload.append(logLevels.size() > 2 ? buildCroppedLevelsCell(logLevels) : buildFullLevelsCell(logLevels));
         while (payload.length() < LEVELS_CELL_WIDTH) {
             payload.append(" ");
         }

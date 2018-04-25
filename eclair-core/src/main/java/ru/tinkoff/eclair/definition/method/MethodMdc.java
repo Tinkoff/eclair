@@ -29,10 +29,10 @@ import static java.util.Collections.unmodifiableSet;
  */
 public class MethodMdc implements MethodDefinition {
 
-    private Method method;
-    private List<String> parameterNames;
-    private Set<ParameterMdc> methodDefinitions;
-    private List<Set<ParameterMdc>> parameterDefinitions;
+    private final Method method;
+    private final List<String> parameterNames;
+    private final Set<ParameterMdc> methodDefinitions;
+    private final List<Set<ParameterMdc>> parameterDefinitions;
 
     public MethodMdc(Method method,
                      List<String> parameterNames,
