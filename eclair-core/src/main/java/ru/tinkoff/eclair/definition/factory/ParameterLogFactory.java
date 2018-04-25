@@ -26,11 +26,11 @@ import ru.tinkoff.eclair.printer.Printer;
 public class ParameterLogFactory {
 
     public static ParameterLog newInstance(Log log, Printer printer) {
-        return ParameterLog.builder()
-                .level(AnnotationAttribute.LEVEL.extract(log))
-                .ifEnabledLevel(log.ifEnabled())
-                .verboseLevel(log.verbose())
-                .printer(printer)
-                .build();
+        return new ParameterLog(
+                AnnotationAttribute.LEVEL.extract(log),
+                log.ifEnabled(),
+                log.verbose(),
+                printer
+        );
     }
 }

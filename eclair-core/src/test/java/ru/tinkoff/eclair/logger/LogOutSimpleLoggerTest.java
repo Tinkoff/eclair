@@ -21,8 +21,8 @@ import org.junit.Test;
 import org.springframework.boot.logging.LogLevel;
 import org.springframework.boot.logging.LoggerConfiguration;
 import org.springframework.boot.logging.LoggingSystem;
-import ru.tinkoff.eclair.definition.method.MethodLog;
 import ru.tinkoff.eclair.definition.OutLog;
+import ru.tinkoff.eclair.definition.method.MethodLog;
 import ru.tinkoff.eclair.logger.facade.LoggerFacadeFactory;
 import ru.tinkoff.eclair.printer.Printer;
 import ru.tinkoff.eclair.printer.ToStringPrinter;
@@ -285,12 +285,7 @@ public class LogOutSimpleLoggerTest {
         }
 
         private SimpleLogger buildAndInvokeAndGet() {
-            OutLog outLog = OutLog.builder()
-                    .level(level)
-                    .ifEnabledLevel(ifEnabledLevel)
-                    .verboseLevel(verboseLevel)
-                    .printer(printer)
-                    .build();
+            OutLog outLog = new OutLog(level, ifEnabledLevel, verboseLevel, printer);
             return buildAndInvokeAndGet(outLog);
         }
 

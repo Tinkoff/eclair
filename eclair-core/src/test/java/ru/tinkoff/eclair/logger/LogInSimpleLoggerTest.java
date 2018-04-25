@@ -527,12 +527,8 @@ public class LogInSimpleLoggerTest {
          * TODO: add tests with 'ifEnabledLevel != LogLevel.OFF'
          */
         private SimpleLoggerBuilder parameterLog(LogLevel level, LogLevel ifEnabledLevel, LogLevel verboseLevel, Printer printer) {
-            this.parameterLogs.add(ParameterLog.builder()
-                    .level(level)
-                    .ifEnabledLevel(ifEnabledLevel)
-                    .verboseLevel(verboseLevel)
-                    .printer(printer)
-                    .build());
+            ParameterLog parameterLog = new ParameterLog(level, ifEnabledLevel, verboseLevel, printer);
+            this.parameterLogs.add(parameterLog);
             return this;
         }
 
@@ -558,12 +554,8 @@ public class LogInSimpleLoggerTest {
         }
 
         private SimpleLogger buildAndInvokeAndGet() {
-            InLog inLog = InLog.builder()
-                    .level(level)
-                    .ifEnabledLevel(ifEnabledLevel)
-                    .verboseLevel(verboseLevel)
-                    .printers(printers.isEmpty() ? nCopies(arguments.size(), PrinterResolver.defaultPrinter) : printers)
-                    .build();
+            List<Printer> printers = this.printers.isEmpty() ? nCopies(arguments.size(), PrinterResolver.defaultPrinter) : this.printers;
+            InLog inLog = new InLog(level, ifEnabledLevel, verboseLevel, printers);
             return buildAndInvokeAndGet(inLog);
         }
 

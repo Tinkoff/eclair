@@ -15,8 +15,6 @@
 
 package ru.tinkoff.eclair.validate;
 
-import lombok.NonNull;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
@@ -29,16 +27,11 @@ public class AnnotationUsageException extends RuntimeException {
     private final String action;
     private final Annotation annotation;
 
-    public AnnotationUsageException(Method method,
-                                    String message,
-                                    String action) {
+    public AnnotationUsageException(Method method, String message, String action) {
         this(method, message, action, null);
     }
 
-    public AnnotationUsageException(@NonNull Method method,
-                                    @NonNull String message,
-                                    @NonNull String action,
-                                    Annotation annotation) {
+    public AnnotationUsageException(Method method, String message, String action, Annotation annotation) {
         super(message);
         this.method = method;
         this.action = action;

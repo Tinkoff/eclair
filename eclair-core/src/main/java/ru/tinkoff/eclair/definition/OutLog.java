@@ -15,28 +15,25 @@
 
 package ru.tinkoff.eclair.definition;
 
-import lombok.Builder;
-import lombok.NonNull;
 import org.springframework.boot.logging.LogLevel;
 import ru.tinkoff.eclair.printer.Printer;
 
 /**
  * @author Vyacheslav Klapatnyuk
  */
-@Builder
 public class OutLog implements LogDefinition {
 
-    @NonNull
     private LogLevel level;
-
-    @NonNull
     private LogLevel ifEnabledLevel;
-
-    @NonNull
     private LogLevel verboseLevel;
-
-    @NonNull
     private Printer printer;
+
+    public OutLog(LogLevel level, LogLevel ifEnabledLevel, LogLevel verboseLevel, Printer printer) {
+        this.level = level;
+        this.ifEnabledLevel = ifEnabledLevel;
+        this.verboseLevel = verboseLevel;
+        this.printer = printer;
+    }
 
     @Override
     public LogLevel getLevel() {

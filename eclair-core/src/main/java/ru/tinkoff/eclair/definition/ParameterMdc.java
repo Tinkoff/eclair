@@ -15,22 +15,20 @@
 
 package ru.tinkoff.eclair.definition;
 
-import lombok.Builder;
-import lombok.NonNull;
-
 /**
  * @author Vyacheslav Klapatnyuk
  */
-@Builder
 public class ParameterMdc {
 
-    @NonNull
     private String key;
-
-    @NonNull
     private String expressionString;
-
     private boolean global;
+
+    public ParameterMdc(String key, String expressionString, boolean global) {
+        this.key = key;
+        this.expressionString = expressionString;
+        this.global = global;
+    }
 
     public String getKey() {
         return key;

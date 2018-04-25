@@ -28,11 +28,11 @@ import java.util.List;
 public class InLogFactory {
 
     public static InLog newInstance(Log.in logIn, List<Printer> printers) {
-        return InLog.builder()
-                .level(AnnotationAttribute.LEVEL.extract(logIn))
-                .ifEnabledLevel(logIn.ifEnabled())
-                .verboseLevel(logIn.verbose())
-                .printers(printers)
-                .build();
+        return new InLog(
+                AnnotationAttribute.LEVEL.extract(logIn),
+                logIn.ifEnabled(),
+                logIn.verbose(),
+                printers
+        );
     }
 }

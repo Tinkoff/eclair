@@ -15,9 +15,6 @@
 
 package ru.tinkoff.eclair.definition.method;
 
-import lombok.Builder;
-import lombok.NonNull;
-import lombok.Singular;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.core.ErrorLogResolver;
 import ru.tinkoff.eclair.definition.ErrorLog;
@@ -32,6 +29,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.springframework.core.annotation.AnnotationUtils.synthesizeAnnotation;
@@ -39,7 +38,6 @@ import static org.springframework.core.annotation.AnnotationUtils.synthesizeAnno
 /**
  * @author Vyacheslav Klapatnyuk
  */
-@Builder
 public class MethodLog implements MethodDefinition {
 
     private static final ErrorLog EMPTY = ErrorLogFactory.newInstance(synthesizeAnnotation(Log.error.class));
@@ -47,24 +45,26 @@ public class MethodLog implements MethodDefinition {
     private final ErrorLogResolver errorLogResolver = ErrorLogResolver.getInstance();
     private final Map<Class<? extends Throwable>, ErrorLog> errorLogCache = new ConcurrentHashMap<>();
 
-    @NonNull
     private Method method;
-
-    @NonNull
-    @Singular
     private List<String> parameterNames;
-
     private InLog inLog;
-
-    @NonNull
-    @Singular
     private List<ParameterLog> parameterLogs;
-
     private OutLog outLog;
-
-    @NonNull
-    @Singular
     private Set<ErrorLog> errorLogs;
+
+    public MethodLog(Method method,
+                     List<String> parameterNames,
+                     InLog inLog,
+                     List<ParameterLog> parameterLogs,
+                     OutLog outLog,
+                     Set<ErrorLog> errorLogs) {
+        this.method = method;
+        this.parameterNames = unmodifiableList(parameterNames);
+        this.inLog = inLog;
+        this.parameterLogs = unmodifiableList(parameterLogs);
+        this.outLog = outLog;
+        this.errorLogs = unmodifiableSet(errorLogs);
+    }
 
     @Override
     public Method getMethod() {

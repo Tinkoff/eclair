@@ -24,10 +24,6 @@ import ru.tinkoff.eclair.definition.ParameterMdc;
 public class ParameterMdcFactory {
 
     public static ParameterMdc newInstance(Mdc mdc) {
-        return ParameterMdc.builder()
-                .key(mdc.key())
-                .expressionString(mdc.value())
-                .global(mdc.global())
-                .build();
+        return new ParameterMdc(mdc.key(), mdc.value(), mdc.global());
     }
 }

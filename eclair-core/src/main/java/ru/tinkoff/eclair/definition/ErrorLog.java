@@ -15,9 +15,6 @@
 
 package ru.tinkoff.eclair.definition;
 
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
 import org.springframework.boot.logging.LogLevel;
 import ru.tinkoff.eclair.core.RelationResolver;
 
@@ -32,20 +29,19 @@ import static java.util.Comparator.comparing;
 /**
  * @author Vyacheslav Klapatnyuk
  */
-@Builder
 public class ErrorLog implements LogDefinition {
 
-    @NonNull
     private LogLevel level;
-
-    @NonNull
     private LogLevel ifEnabledLevel;
-
-    @NonNull
     private LogLevel verboseLevel;
-
-    @NonNull
     private Filter filter;
+
+    public ErrorLog(LogLevel level, LogLevel ifEnabledLevel, LogLevel verboseLevel, Filter filter) {
+        this.level = level;
+        this.ifEnabledLevel = ifEnabledLevel;
+        this.verboseLevel = verboseLevel;
+        this.filter = filter;
+    }
 
     @Override
     public LogLevel getLevel() {
@@ -70,7 +66,6 @@ public class ErrorLog implements LogDefinition {
         return filter.getExcludes();
     }
 
-    @EqualsAndHashCode
     public static class Filter {
 
         private static final Comparator<Class> classComparator =
@@ -97,6 +92,23 @@ public class ErrorLog implements LogDefinition {
             Set<Class<? extends Throwable>> result = new TreeSet<>(classComparator);
             result.addAll(input);
             return unmodifiableSet(result);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Filter filter = (Filter) o;
+            return includes.equals(filter.includes) && excludes.equals(filter.excludes);
+        }
+
+        @Override
+        public int hashCode() {
+            return 31 * includes.hashCode() + excludes.hashCode();
         }
     }
 }

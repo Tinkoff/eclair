@@ -26,11 +26,11 @@ import ru.tinkoff.eclair.printer.Printer;
 public class OutLogFactory {
 
     public static OutLog newInstance(Log.out logOut, Printer printer) {
-        return OutLog.builder()
-                .level(AnnotationAttribute.LEVEL.extract(logOut))
-                .ifEnabledLevel(logOut.ifEnabled())
-                .verboseLevel(logOut.verbose())
-                .printer(printer)
-                .build();
+        return new OutLog(
+                AnnotationAttribute.LEVEL.extract(logOut),
+                logOut.ifEnabled(),
+                logOut.verbose(),
+                printer
+        );
     }
 }

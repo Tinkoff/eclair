@@ -15,7 +15,10 @@
 
 package ru.tinkoff.eclair.definition.method.factory;
 
-import ru.tinkoff.eclair.definition.*;
+import ru.tinkoff.eclair.definition.ErrorLog;
+import ru.tinkoff.eclair.definition.InLog;
+import ru.tinkoff.eclair.definition.OutLog;
+import ru.tinkoff.eclair.definition.ParameterLog;
 import ru.tinkoff.eclair.definition.method.MethodLog;
 
 import java.lang.reflect.Method;
@@ -44,13 +47,6 @@ public class MethodLogFactory {
         if (isNull(inLog) && parameterLogs.stream().allMatch(Objects::isNull) && isNull(outLog) && errorLogs.isEmpty()) {
             return null;
         }
-        return MethodLog.builder()
-                .method(method)
-                .parameterNames(parameterNames)
-                .inLog(inLog)
-                .parameterLogs(parameterLogs)
-                .outLog(outLog)
-                .errorLogs(errorLogs)
-                .build();
+        return new MethodLog(method, parameterNames, inLog, parameterLogs, outLog, errorLogs);
     }
 }

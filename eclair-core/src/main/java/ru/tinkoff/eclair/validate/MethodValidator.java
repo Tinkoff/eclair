@@ -15,7 +15,6 @@
 
 package ru.tinkoff.eclair.validate;
 
-import lombok.RequiredArgsConstructor;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.annotation.Mdc;
 import ru.tinkoff.eclair.core.AnnotationExtractor;
@@ -36,7 +35,6 @@ import static java.util.stream.Collectors.toSet;
 /**
  * @author Vyacheslav Klapatnyuk
  */
-@RequiredArgsConstructor
 public class MethodValidator implements AnnotationUsageValidator<Method> {
 
     private final AnnotationExtractor annotationExtractor;
@@ -50,6 +48,26 @@ public class MethodValidator implements AnnotationUsageValidator<Method> {
     private final MethodMdcsValidator methodMdcsValidator;
     private final MdcsValidator mdcsValidator;
     private final MergedMdcsValidator mergedMdcsValidator;
+
+    public MethodValidator(AnnotationExtractor annotationExtractor,
+                           LogsValidator logsValidator,
+                           LogInsValidator logInsValidator,
+                           LogOutsValidator logOutsValidator,
+                           LogErrorsValidator logErrorsValidator,
+                           ParameterLogsValidator parameterLogsValidator,
+                           MethodMdcsValidator methodMdcsValidator,
+                           MdcsValidator mdcsValidator,
+                           MergedMdcsValidator mergedMdcsValidator) {
+        this.annotationExtractor = annotationExtractor;
+        this.logsValidator = logsValidator;
+        this.logInsValidator = logInsValidator;
+        this.logOutsValidator = logOutsValidator;
+        this.logErrorsValidator = logErrorsValidator;
+        this.parameterLogsValidator = parameterLogsValidator;
+        this.methodMdcsValidator = methodMdcsValidator;
+        this.mdcsValidator = mdcsValidator;
+        this.mergedMdcsValidator = mergedMdcsValidator;
+    }
 
     public void validate(Method method) throws AnnotationUsageException {
         validate(method, method);

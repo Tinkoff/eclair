@@ -15,32 +15,29 @@
 
 package ru.tinkoff.eclair.definition;
 
-import lombok.Builder;
-import lombok.NonNull;
-import lombok.Singular;
 import org.springframework.boot.logging.LogLevel;
 import ru.tinkoff.eclair.printer.Printer;
 
 import java.util.List;
 
+import static java.util.Collections.unmodifiableList;
+
 /**
  * @author Vyacheslav Klapatnyuk
  */
-@Builder
 public class InLog implements LogDefinition {
 
-    @NonNull
     private LogLevel level;
-
-    @NonNull
     private LogLevel ifEnabledLevel;
-
-    @NonNull
     private LogLevel verboseLevel;
-
-    @NonNull
-    @Singular
     private List<Printer> printers;
+
+    public InLog(LogLevel level, LogLevel ifEnabledLevel, LogLevel verboseLevel, List<Printer> printers) {
+        this.level = level;
+        this.ifEnabledLevel = ifEnabledLevel;
+        this.verboseLevel = verboseLevel;
+        this.printers = unmodifiableList(printers);
+    }
 
     @Override
     public LogLevel getLevel() {

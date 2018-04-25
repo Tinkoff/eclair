@@ -15,35 +15,34 @@
 
 package ru.tinkoff.eclair.definition.method;
 
-import lombok.Builder;
-import lombok.NonNull;
-import lombok.Singular;
 import ru.tinkoff.eclair.definition.ParameterMdc;
 
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
 
+import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableSet;
+
 /**
  * @author Vyacheslav Klapatnyuk
  */
-@Builder
 public class MethodMdc implements MethodDefinition {
 
-    @NonNull
     private Method method;
-
-    @NonNull
-    @Singular
     private List<String> parameterNames;
-
-    @NonNull
-    @Singular
     private Set<ParameterMdc> methodDefinitions;
-
-    @NonNull
-    @Singular
     private List<Set<ParameterMdc>> parameterDefinitions;
+
+    public MethodMdc(Method method,
+                     List<String> parameterNames,
+                     Set<ParameterMdc> methodDefinitions,
+                     List<Set<ParameterMdc>> parameterDefinitions) {
+        this.method = method;
+        this.parameterNames = unmodifiableList(parameterNames);
+        this.methodDefinitions = unmodifiableSet(methodDefinitions);
+        this.parameterDefinitions = unmodifiableList(parameterDefinitions);
+    }
 
     @Override
     public Method getMethod() {

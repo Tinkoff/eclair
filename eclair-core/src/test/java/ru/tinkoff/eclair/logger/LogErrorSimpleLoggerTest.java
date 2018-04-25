@@ -22,8 +22,8 @@ import org.springframework.boot.logging.LogLevel;
 import org.springframework.boot.logging.LoggerConfiguration;
 import org.springframework.boot.logging.LoggingSystem;
 import ru.tinkoff.eclair.definition.ErrorLog;
-import ru.tinkoff.eclair.definition.method.MethodLog;
 import ru.tinkoff.eclair.definition.OutLog;
+import ru.tinkoff.eclair.definition.method.MethodLog;
 import ru.tinkoff.eclair.logger.facade.LoggerFacadeFactory;
 import ru.tinkoff.eclair.printer.ToStringPrinter;
 
@@ -181,12 +181,7 @@ public class LogErrorSimpleLoggerTest {
     public void outLogInsteadOfErrorLog() {
         // given
         Throwable throwable = new RuntimeException();
-        OutLog outLog = OutLog.builder()
-                .level(DEBUG)
-                .ifEnabledLevel(OFF)
-                .verboseLevel(DEBUG)
-                .printer(new ToStringPrinter())
-                .build();
+        OutLog outLog = new OutLog(DEBUG, OFF, DEBUG, new ToStringPrinter());
         // when
         SimpleLogger logger = new SimpleLoggerBuilder()
                 .method(method)
@@ -252,18 +247,8 @@ public class LogErrorSimpleLoggerTest {
         }
 
         private SimpleLogger buildAndInvokeAndGet() {
-            ErrorLog errorLog = ErrorLog.builder()
-                    .level(level)
-                    .ifEnabledLevel(ifEnabledLevel)
-                    .verboseLevel(verboseLevel)
-                    .filter(filter)
-                    .build();
-            OutLog outLog = OutLog.builder()
-                    .level(outLevel)
-                    .ifEnabledLevel(outIfEnabledLevel)
-                    .verboseLevel(outVerboseLevel)
-                    .printer(new ToStringPrinter())
-                    .build();
+            ErrorLog errorLog = new ErrorLog(level, ifEnabledLevel, verboseLevel, filter);
+            OutLog outLog = new OutLog(outLevel, outIfEnabledLevel, outVerboseLevel, new ToStringPrinter());
             return buildAndInvokeAndGet(errorLog, outLog);
         }
 

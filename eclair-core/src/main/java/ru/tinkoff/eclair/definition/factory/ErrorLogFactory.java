@@ -28,11 +28,11 @@ public class ErrorLogFactory {
     private static final ErrorFilterFactory errorFilterFactory = ErrorFilterFactory.getInstance();
 
     public static ErrorLog newInstance(Log.error logError) {
-        return ErrorLog.builder()
-                .level(AnnotationAttribute.LEVEL.extract(logError))
-                .ifEnabledLevel(logError.ifEnabled())
-                .verboseLevel(logError.verbose())
-                .filter(errorFilterFactory.buildErrorFilter(logError.ofType(), logError.exclude()))
-                .build();
+        return new ErrorLog(
+                AnnotationAttribute.LEVEL.extract(logError),
+                logError.ifEnabled(),
+                logError.verbose(),
+                errorFilterFactory.buildErrorFilter(logError.ofType(), logError.exclude())
+        );
     }
 }

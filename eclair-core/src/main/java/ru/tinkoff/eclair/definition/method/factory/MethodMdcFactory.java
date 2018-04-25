@@ -15,8 +15,8 @@
 
 package ru.tinkoff.eclair.definition.method.factory;
 
-import ru.tinkoff.eclair.definition.method.MethodMdc;
 import ru.tinkoff.eclair.definition.ParameterMdc;
+import ru.tinkoff.eclair.definition.method.MethodMdc;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
@@ -35,11 +35,6 @@ public class MethodMdcFactory {
         if (methodParameterMdcs.isEmpty() && parameterMdcs.stream().allMatch(Collection::isEmpty)) {
             return null;
         }
-        return MethodMdc.builder()
-                .method(method)
-                .parameterNames(parameterNames)
-                .methodDefinitions(methodParameterMdcs)
-                .parameterDefinitions(parameterMdcs)
-                .build();
+        return new MethodMdc(method, parameterNames, methodParameterMdcs, parameterMdcs);
     }
 }
