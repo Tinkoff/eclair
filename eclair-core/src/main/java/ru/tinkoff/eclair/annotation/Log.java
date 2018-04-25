@@ -19,9 +19,9 @@ import org.springframework.boot.logging.LogLevel;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.annotation.AliasFor;
 import org.springframework.core.annotation.Order;
-import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
 import ru.tinkoff.eclair.logger.EclairLogger;
 import ru.tinkoff.eclair.printer.Printer;
+import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
 
 import java.lang.annotation.*;
 import java.lang.reflect.Method;

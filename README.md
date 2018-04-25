@@ -1,4 +1,5 @@
 # Eclair
+
 Eclair - Java Spring library for AOP logging.
 
 Provides annotations for declarative logging of annotated method execution.
@@ -18,7 +19,46 @@ Includes abstractions for annotations processing, simple implementation and Spri
 * ability to use meta-annotations (applied to other annotations) and annotated method overriding
 * manual logging with invoker class detection is also available
 
+## Annotations
+
+Eclair logs annotated `Methods` and `Parameters` only.<br>
+Implementation is based on standard Spring proxying with all its consequences and limitations.
+
+### `@Log`
+
+Annotated `Method` is able to log beginning and ending (except the emergency ending) of execution.<br>
+Works the same as both `@Log.in` and `@Log.out` annotations with all matching attribute values.<br>
+*Note: emergency ending of the method execution should be specified separately by `@Log.error` annotation.*
+
+Can be defined on `Parameter` and specify logging settings for it.
+
+Should have unique `logger` value per annotated element.<br>
+`Parameter`-level annotation has higher priority settings than `Method`-level with same `logger` value.
+
+ Attribute  | Description
+:-----------|:------------
+`level`     | Expected level to log beginning and ending of method execution.
+`ifEnabled` | Enables logging with `level` only if specified here level is enabled for the current `logger` too.<br> Ignored by default.
+`verbose`   | If specified log-level is enabled for the current `logger` activates detailed logging.<br> For annotated `Method` verbose log includes argument/return values.<br>For annotated `Parameter` verbose log includes argument name.<br> *Note: it is assumed that `OFF` deactivates verbose logging of annotated element for any level.*
+`printer`   | Determines `Printer` implementation by specified bean name (or alias).<br> The printer will be used to convert argument/return values from raw type to `String`.<br> *Note: if not specified highest priority compatible printer or `PrinterResolver#defaultPrinter` will be used.*
+`logger`    | Determines `EclairLogger` implementation by specified bean name (or alias) which should process this annotation.<br> *Note: if not specified single candidate or `Primary` bean will be used for processing.*
+
+> See also @Log.in, @Log.out and @Log.error annotations and their specific attributes
+
+### `@Mdc`
+
+Defines MDC (Mapped Diagnostic Context) entry. MDC is level-insensitive.<br>
+Before method execution beginning, `@Mdc` will be processed first and after ending cleared last.<br>
+So annotations `@Log` / `@Log.in` / `@Log.out` of the same method will be processed *inside* `@Mdc` processing.
+
+ Attribute | Description
+:----------|:------------
+`key`      | Key of the MDC entry.<br> If empty, it will be synthesized by code meta-data: annotated method or parameter name.<br> *Note: It is not always possible to obtain information about parameter names at runtime.<br> In that case, MDC keys will contain method name and parameter index.*
+`value`    | Value of the MDC entry.<br> Can contain SpEL (Spring Expression Language) and invoke static methods or beans by id from the `ApplicationContext`.<br> If empty, it will be synthesized by code meta-data: annotated parameter value (or each parameter of annotated method).
+`global`   | Key/value pair defined by this annotation automatically cleared after exit from the method by default.<br> `global` MDC is available within `ThreadLocal` scope.
+
 ## Getting started
+
 Add this to your POM.
 ```xml
 <dependency>
@@ -29,6 +69,7 @@ Add this to your POM.
 ```
 
 ## Usage examples
+
 The examples assume that you are using a standard `SimpleLogger` and that you have the following configuration property:
 ```yaml
 logging.pattern.console: '%-5level [%X] %logger{35} %msg%n'
@@ -39,6 +80,7 @@ All available log levels in order from the most common `TRACE` to the rarest `OF
 ```
 TRACE > DEBUG > INFO > WARN > ERROR = FATAL > OFF
 ```
+> Used Spring Boot log levels enum: `org.springframework.boot.logging.LogLevel`
 
 ### Declarative logging
 The left table column shows the configured available logging level for the current method.<br>
