@@ -21,8 +21,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
-import lombok.Getter;
-import lombok.Setter;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -114,9 +112,15 @@ public class JacksonPrinterTest {
     public static class Root {
 
         @XmlElement
-        @Getter
-        @Setter
         private String value;
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)
@@ -124,15 +128,27 @@ public class JacksonPrinterTest {
     public static class NotRoot {
 
         @XmlElement
-        @Getter
-        @Setter
         private String value;
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
     }
 
     public static class Empty {
 
-        @Getter
-        @Setter
         private String value;
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
     }
 }

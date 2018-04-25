@@ -16,7 +16,6 @@
 package ru.tinkoff.eclair.definition.method;
 
 import lombok.Builder;
-import lombok.Getter;
 import lombok.NonNull;
 import lombok.Singular;
 import ru.tinkoff.eclair.definition.ParameterMdc;
@@ -28,7 +27,6 @@ import java.util.Set;
 /**
  * @author Vyacheslav Klapatnyuk
  */
-@Getter
 @Builder
 public class MethodMdc implements MethodDefinition {
 
@@ -46,4 +44,21 @@ public class MethodMdc implements MethodDefinition {
     @NonNull
     @Singular
     private List<Set<ParameterMdc>> parameterDefinitions;
+
+    @Override
+    public Method getMethod() {
+        return method;
+    }
+
+    public List<String> getParameterNames() {
+        return parameterNames;
+    }
+
+    public Set<ParameterMdc> getMethodDefinitions() {
+        return methodDefinitions;
+    }
+
+    public List<Set<ParameterMdc>> getParameterDefinitions() {
+        return parameterDefinitions;
+    }
 }

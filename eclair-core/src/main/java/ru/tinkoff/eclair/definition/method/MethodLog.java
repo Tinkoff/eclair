@@ -16,7 +16,6 @@
 package ru.tinkoff.eclair.definition.method;
 
 import lombok.Builder;
-import lombok.Getter;
 import lombok.NonNull;
 import lombok.Singular;
 import ru.tinkoff.eclair.annotation.Log;
@@ -45,32 +44,48 @@ public class MethodLog implements MethodDefinition {
 
     private static final ErrorLog EMPTY = ErrorLogFactory.newInstance(synthesizeAnnotation(Log.error.class));
 
-    @Getter
+    private final ErrorLogResolver errorLogResolver = ErrorLogResolver.getInstance();
+    private final Map<Class<? extends Throwable>, ErrorLog> errorLogCache = new ConcurrentHashMap<>();
+
     @NonNull
     private Method method;
 
-    @Getter
     @NonNull
     @Singular
     private List<String> parameterNames;
 
-    @Getter
     private InLog inLog;
 
-    @Getter
     @NonNull
     @Singular
     private List<ParameterLog> parameterLogs;
 
-    @Getter
     private OutLog outLog;
 
     @NonNull
     @Singular
     private Set<ErrorLog> errorLogs;
 
-    private final ErrorLogResolver errorLogResolver = ErrorLogResolver.getInstance();
-    private final Map<Class<? extends Throwable>, ErrorLog> errorLogCache = new ConcurrentHashMap<>();
+    @Override
+    public Method getMethod() {
+        return method;
+    }
+
+    public List<String> getParameterNames() {
+        return parameterNames;
+    }
+
+    public InLog getInLog() {
+        return inLog;
+    }
+
+    public List<ParameterLog> getParameterLogs() {
+        return parameterLogs;
+    }
+
+    public OutLog getOutLog() {
+        return outLog;
+    }
 
     public ErrorLog findErrorLog(Class<? extends Throwable> causeClass) {
         ErrorLog found = errorLogCache.get(causeClass);

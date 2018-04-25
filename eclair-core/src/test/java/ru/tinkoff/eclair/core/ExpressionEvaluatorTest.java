@@ -15,8 +15,6 @@
 
 package ru.tinkoff.eclair.core;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -203,9 +201,15 @@ public class ExpressionEvaluatorTest {
 
         private final String privateField = "private";
 
-        @Getter
-        @Setter
         private String publicField = "public";
+
+        public String getPublicField() {
+            return publicField;
+        }
+
+        public void setPublicField(String publicField) {
+            this.publicField = publicField;
+        }
 
         @Override
         public String toString() {

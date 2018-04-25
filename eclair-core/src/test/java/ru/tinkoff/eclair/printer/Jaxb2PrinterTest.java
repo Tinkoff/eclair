@@ -15,8 +15,6 @@
 
 package ru.tinkoff.eclair.printer;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.junit.Test;
 import org.springframework.oxm.MarshallingFailureException;
 import org.springframework.oxm.XmlMappingException;
@@ -111,9 +109,15 @@ public class Jaxb2PrinterTest {
     public static class Root {
 
         @XmlElement
-        @Getter
-        @Setter
         private String value;
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)
@@ -121,15 +125,27 @@ public class Jaxb2PrinterTest {
     public static class NotRoot {
 
         @XmlElement
-        @Getter
-        @Setter
         private String value;
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
     }
 
     public static class Empty {
 
-        @Getter
-        @Setter
         private String value;
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
     }
 }

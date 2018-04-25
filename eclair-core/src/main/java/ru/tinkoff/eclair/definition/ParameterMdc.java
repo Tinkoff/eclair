@@ -16,13 +16,11 @@
 package ru.tinkoff.eclair.definition;
 
 import lombok.Builder;
-import lombok.Getter;
 import lombok.NonNull;
 
 /**
  * @author Vyacheslav Klapatnyuk
  */
-@Getter
 @Builder
 public class ParameterMdc {
 
@@ -33,4 +31,16 @@ public class ParameterMdc {
     private String expressionString;
 
     private boolean global;
+
+    public String getKey() {
+        return key;
+    }
+
+    public String getExpressionString() {
+        return expressionString;
+    }
+
+    public boolean isGlobal() {
+        return global;
+    }
 }

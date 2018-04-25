@@ -16,8 +16,6 @@
 package ru.tinkoff.eclair.logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Getter;
-import lombok.Setter;
 import org.aopalliance.intercept.MethodInvocation;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,15 +23,15 @@ import org.springframework.boot.logging.LogLevel;
 import org.springframework.boot.logging.LoggerConfiguration;
 import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
-import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
 import ru.tinkoff.eclair.definition.InLog;
-import ru.tinkoff.eclair.definition.method.MethodLog;
 import ru.tinkoff.eclair.definition.ParameterLog;
+import ru.tinkoff.eclair.definition.method.MethodLog;
 import ru.tinkoff.eclair.logger.facade.LoggerFacadeFactory;
 import ru.tinkoff.eclair.printer.JacksonPrinter;
 import ru.tinkoff.eclair.printer.Jaxb2Printer;
 import ru.tinkoff.eclair.printer.Printer;
 import ru.tinkoff.eclair.printer.ToStringPrinter;
+import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
@@ -604,12 +602,26 @@ public class LogInSimpleLoggerTest {
 
     @XmlRootElement
     @XmlType(name = "dto")
-    @Getter
-    @Setter
     public static class Dto {
 
         private int i;
         private String s;
+
+        public int getI() {
+            return i;
+        }
+
+        public void setI(int i) {
+            this.i = i;
+        }
+
+        public String getS() {
+            return s;
+        }
+
+        public void setS(String s) {
+            this.s = s;
+        }
 
         @Override
         public String toString() {

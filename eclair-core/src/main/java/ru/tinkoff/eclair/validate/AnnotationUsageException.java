@@ -15,7 +15,6 @@
 
 package ru.tinkoff.eclair.validate;
 
-import lombok.Getter;
 import lombok.NonNull;
 
 import java.lang.annotation.Annotation;
@@ -24,7 +23,6 @@ import java.lang.reflect.Method;
 /**
  * @author Vyacheslav Klapatnyuk
  */
-@Getter
 public class AnnotationUsageException extends RuntimeException {
 
     private final Method method;
@@ -45,5 +43,17 @@ public class AnnotationUsageException extends RuntimeException {
         this.method = method;
         this.action = action;
         this.annotation = annotation;
+    }
+
+    public Method getMethod() {
+        return method;
+    }
+
+    public String getAction() {
+        return action;
+    }
+
+    public Annotation getAnnotation() {
+        return annotation;
     }
 }

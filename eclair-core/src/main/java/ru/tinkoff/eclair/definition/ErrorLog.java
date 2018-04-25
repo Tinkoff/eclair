@@ -17,7 +17,6 @@ package ru.tinkoff.eclair.definition;
 
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.NonNull;
 import org.springframework.boot.logging.LogLevel;
 import ru.tinkoff.eclair.core.RelationResolver;
@@ -36,20 +35,32 @@ import static java.util.Comparator.comparing;
 @Builder
 public class ErrorLog implements LogDefinition {
 
-    @Getter
     @NonNull
     private LogLevel level;
 
-    @Getter
     @NonNull
     private LogLevel ifEnabledLevel;
 
-    @Getter
     @NonNull
     private LogLevel verboseLevel;
 
     @NonNull
     private Filter filter;
+
+    @Override
+    public LogLevel getLevel() {
+        return level;
+    }
+
+    @Override
+    public LogLevel getIfEnabledLevel() {
+        return ifEnabledLevel;
+    }
+
+    @Override
+    public LogLevel getVerboseLevel() {
+        return verboseLevel;
+    }
 
     public Set<Class<? extends Throwable>> getIncludes() {
         return filter.getIncludes();
@@ -59,7 +70,6 @@ public class ErrorLog implements LogDefinition {
         return filter.getExcludes();
     }
 
-    @Getter
     @EqualsAndHashCode
     public static class Filter {
 
@@ -73,6 +83,14 @@ public class ErrorLog implements LogDefinition {
         public Filter(Set<Class<? extends Throwable>> includes, Set<Class<? extends Throwable>> excludes) {
             this.includes = constructSortedUnmodifiableSet(includes);
             this.excludes = constructSortedUnmodifiableSet(excludes);
+        }
+
+        public Set<Class<? extends Throwable>> getIncludes() {
+            return includes;
+        }
+
+        public Set<Class<? extends Throwable>> getExcludes() {
+            return excludes;
         }
 
         private Set<Class<? extends Throwable>> constructSortedUnmodifiableSet(Set<Class<? extends Throwable>> input) {
