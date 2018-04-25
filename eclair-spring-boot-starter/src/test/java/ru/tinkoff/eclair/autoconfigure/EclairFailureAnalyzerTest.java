@@ -72,25 +72,4 @@ public class EclairFailureAnalyzerTest {
                 "    - method: public void ru.tinkoff.eclair.autoconfigure.EclairFailureAnalyzerTest.method()";
         assertThat(description, is(expected));
     }
-
-    @Test(expected = NullPointerException.class)
-    public void buildDescriptionMethodNull() {
-        // given, when
-        new AnnotationUsageException(null, "message", "action");
-        // then expected exception
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void buildDescriptionMessageNull() {
-        // given, when
-        new AnnotationUsageException(method, null, "action");
-        // then expected exception
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void buildDescriptionActionNull() {
-        // given, when
-        new AnnotationUsageException(method, "message", null);
-        // then expected exception
-    }
 }
