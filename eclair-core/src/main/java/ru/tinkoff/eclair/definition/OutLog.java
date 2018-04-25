@@ -16,10 +16,14 @@
 package ru.tinkoff.eclair.definition;
 
 import org.springframework.boot.logging.LogLevel;
+import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.printer.Printer;
 
 /**
+ * Simple DTO matches to @Log.out annotation.
+ *
  * @author Vyacheslav Klapatnyuk
+ * @see Log.out
  */
 public class OutLog implements LogDefinition {
 

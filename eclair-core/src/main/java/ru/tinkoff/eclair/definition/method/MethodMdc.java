@@ -15,9 +15,11 @@
 
 package ru.tinkoff.eclair.definition.method;
 
+import ru.tinkoff.eclair.annotation.Mdc;
 import ru.tinkoff.eclair.definition.ParameterMdc;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.List;
 import java.util.Set;
 
@@ -25,7 +27,10 @@ import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableSet;
 
 /**
+ * Composite DTO matches to set of @Mdc annotations defined on {@link Method} and its {@link Parameter}s.
+ *
  * @author Vyacheslav Klapatnyuk
+ * @see Mdc
  */
 public class MethodMdc implements MethodDefinition {
 

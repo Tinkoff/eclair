@@ -16,10 +16,16 @@
 package ru.tinkoff.eclair.definition;
 
 import org.springframework.boot.logging.LogLevel;
+import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.printer.Printer;
 
+import java.lang.reflect.Parameter;
+
 /**
+ * Simple DTO matches to @Log annotation defined on {@link Parameter}.
+ *
  * @author Vyacheslav Klapatnyuk
+ * @see Log
  */
 public class ParameterLog implements LogDefinition {
 

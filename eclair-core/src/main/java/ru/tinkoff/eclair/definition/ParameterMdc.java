@@ -15,8 +15,15 @@
 
 package ru.tinkoff.eclair.definition;
 
+import ru.tinkoff.eclair.annotation.Mdc;
+
+import java.lang.reflect.Parameter;
+
 /**
+ * Simple DTO matches to @Mdc annotation defined on {@link Parameter}.
+ *
  * @author Vyacheslav Klapatnyuk
+ * @see Mdc
  */
 public class ParameterMdc {
 

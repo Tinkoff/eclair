@@ -24,6 +24,7 @@ import ru.tinkoff.eclair.definition.ParameterLog;
 import ru.tinkoff.eclair.definition.factory.ErrorLogFactory;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,7 +37,14 @@ import static java.util.Objects.nonNull;
 import static org.springframework.core.annotation.AnnotationUtils.synthesizeAnnotation;
 
 /**
+ * Composite DTO matches to set of @Log, @Log.in, @Log.out and @Log.error annotations
+ * defined on {@link Method} and its {@link Parameter}s with one 'logger'.
+ *
  * @author Vyacheslav Klapatnyuk
+ * @see Log
+ * @see Log.in
+ * @see Log.out
+ * @see Log.error
  */
 public class MethodLog implements MethodDefinition {
 
