@@ -16,7 +16,6 @@
 package ru.tinkoff.eclair.definition;
 
 import org.springframework.boot.logging.LogLevel;
-import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.printer.Printer;
 
 import java.util.List;
@@ -27,7 +26,7 @@ import static java.util.Collections.unmodifiableList;
  * Simple DTO matches to @Log.in annotation.
  *
  * @author Vyacheslav Klapatnyuk
- * @see Log.in
+ * @see ru.tinkoff.eclair.annotation.Log.in
  */
 public class InLog implements LogDefinition {
 

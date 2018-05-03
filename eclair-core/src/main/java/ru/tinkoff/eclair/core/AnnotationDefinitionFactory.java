@@ -16,10 +16,10 @@
 package ru.tinkoff.eclair.core;
 
 import ru.tinkoff.eclair.annotation.Log;
-import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
 import ru.tinkoff.eclair.definition.*;
 import ru.tinkoff.eclair.definition.factory.*;
 import ru.tinkoff.eclair.printer.Printer;
+import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
 
 import java.lang.reflect.Method;
 import java.util.Iterator;

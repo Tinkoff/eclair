@@ -42,9 +42,9 @@ import static org.springframework.core.annotation.AnnotationUtils.synthesizeAnno
  *
  * @author Vyacheslav Klapatnyuk
  * @see Log
- * @see Log.in
- * @see Log.out
- * @see Log.error
+ * @see ru.tinkoff.eclair.annotation.Log.in
+ * @see ru.tinkoff.eclair.annotation.Log.out
+ * @see ru.tinkoff.eclair.annotation.Log.error
  */
 public class MethodLog implements MethodDefinition {
 

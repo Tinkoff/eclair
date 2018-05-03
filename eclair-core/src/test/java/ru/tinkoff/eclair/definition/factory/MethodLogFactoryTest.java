@@ -17,7 +17,10 @@ package ru.tinkoff.eclair.definition.factory;
 
 import org.junit.Test;
 import ru.tinkoff.eclair.annotation.Log;
-import ru.tinkoff.eclair.definition.*;
+import ru.tinkoff.eclair.definition.ErrorLog;
+import ru.tinkoff.eclair.definition.InLog;
+import ru.tinkoff.eclair.definition.OutLog;
+import ru.tinkoff.eclair.definition.ParameterLog;
 import ru.tinkoff.eclair.definition.method.MethodLog;
 import ru.tinkoff.eclair.definition.method.factory.MethodLogFactory;
 import ru.tinkoff.eclair.printer.ToStringPrinter;

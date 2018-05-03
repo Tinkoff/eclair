@@ -17,8 +17,8 @@ package ru.tinkoff.eclair.definition.factory;
 
 import org.junit.Test;
 import ru.tinkoff.eclair.annotation.Mdc;
-import ru.tinkoff.eclair.definition.method.MethodMdc;
 import ru.tinkoff.eclair.definition.ParameterMdc;
+import ru.tinkoff.eclair.definition.method.MethodMdc;
 import ru.tinkoff.eclair.definition.method.factory.MethodMdcFactory;
 
 import java.lang.reflect.Method;

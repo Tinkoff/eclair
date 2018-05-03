@@ -102,15 +102,15 @@ class Example {
 
     @Log.out(printer = "maskJaxb2Printer")
     Dto printers(@Log(printer = "maskJaxb2Printer") Dto xml,
-                        @Log(printer = "jacksonPrinter") Dto json,
-                        Integer i) {
+                 @Log(printer = "jacksonPrinter") Dto json,
+                 Integer i) {
         return xml;
     }
 
     @Log.in(INFO)
     void parameterLevels(@Log(INFO) Double d,
-                                @Log(DEBUG) String s,
-                                @Log(TRACE) Integer i) {
+                         @Log(DEBUG) String s,
+                         @Log(TRACE) Integer i) {
     }
 
     @Log.in(INFO)
@@ -118,8 +118,8 @@ class Example {
     @Log.error(level = WARN, ofType = RuntimeException.class, exclude = NullPointerException.class)
     @Log.error(level = ERROR, ofType = {Error.class, Exception.class})
     Dto mix(@Log(printer = "jaxb2Printer") Dto xml,
-                   @Log(ifEnabled = TRACE, printer = "jacksonPrinter") Dto json,
-                   Integer i) {
+            @Log(ifEnabled = TRACE, printer = "jacksonPrinter") Dto json,
+            Integer i) {
         throw new IllegalArgumentException("Something strange happened");
     }
 

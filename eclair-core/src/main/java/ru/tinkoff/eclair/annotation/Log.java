@@ -33,9 +33,9 @@ import static org.springframework.boot.logging.LogLevel.*;
  * Annotated {@link Method} is able to log beginning and ending (except the emergency ending) of execution.
  * Works the same as both {@link in} and {@link out} annotations with all matching attribute values.
  * Note: emergency ending of the method execution should be specified separately by {@link error} annotation.
- *
+ * <p>
  * Can be defined on {@link Parameter} and specify logging settings for it.
- *
+ * <p>
  * Should have unique {@link #logger} value per annotated element.
  * {@link Parameter}-level annotation has higher priority settings than {@link Method}-level with same {@link #logger} value.
  *

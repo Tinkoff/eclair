@@ -17,10 +17,10 @@ package ru.tinkoff.eclair.definition.factory;
 
 import org.junit.Test;
 import ru.tinkoff.eclair.annotation.Log;
-import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
 import ru.tinkoff.eclair.definition.InLog;
 import ru.tinkoff.eclair.printer.Printer;
 import ru.tinkoff.eclair.printer.ToStringPrinter;
+import ru.tinkoff.eclair.printer.resolver.PrinterResolver;
 
 import java.util.HashMap;
 import java.util.List;

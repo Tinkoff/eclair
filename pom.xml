@@ -5,11 +5,12 @@
 
     <groupId>ru.tinkoff</groupId>
     <artifactId>eclair</artifactId>
-    <version>0.8.1</version>
+    <version>0.8.2</version>
     <packaging>pom</packaging>
 
     <name>Eclair</name>
     <description>Parent POM providing dependency and plugin management for submodules</description>
+    <url>https://github.com/TinkoffCreditSystems/eclair</url>
     <inceptionYear>2018</inceptionYear>
     <organization>
         <name>Tinkoff Bank</name>
@@ -30,6 +31,17 @@
         </developer>
     </developers>
 
+    <modules>
+        <module>eclair-core</module>
+        <module>eclair-spring-boot-starter</module>
+    </modules>
+
+    <scm>
+        <connection>scm:git:https://github.com/TinkoffCreditSystems/eclair.git</connection>
+        <developerConnection>scm:git:https://github.com/TinkoffCreditSystems/eclair.git</developerConnection>
+        <url>https://github.com/TinkoffCreditSystems/eclair</url>
+    </scm>
+
     <properties>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -38,17 +50,12 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
     </properties>
 
-    <modules>
-        <module>eclair-core</module>
-        <module>eclair-spring-boot-starter</module>
-    </modules>
-
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-parent</artifactId>
-                <version>1.5.11.RELEASE</version>
+                <version>1.5.12.RELEASE</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>

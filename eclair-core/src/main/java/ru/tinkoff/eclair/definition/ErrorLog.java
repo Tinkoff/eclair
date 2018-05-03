@@ -16,7 +16,6 @@
 package ru.tinkoff.eclair.definition;
 
 import org.springframework.boot.logging.LogLevel;
-import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.core.RelationResolver;
 
 import java.util.Comparator;
@@ -31,7 +30,7 @@ import static java.util.Comparator.comparing;
  * Simple DTO matches to @Log.error annotation.
  *
  * @author Vyacheslav Klapatnyuk
- * @see Log.error
+ * @see ru.tinkoff.eclair.annotation.Log.error
  */
 public class ErrorLog implements LogDefinition {
 
