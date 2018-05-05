@@ -64,7 +64,7 @@ Add this to your POM.
 <dependency>
     <groupId>ru.tinkoff</groupId>
     <artifactId>eclair-spring-boot-starter</artifactId>
-    <version>0.8.1</version>
+    <version>0.8.2</version>
 </dependency>
 ```
 
@@ -249,6 +249,7 @@ void manual() {
 
 ## Release History
 
+06.05.2018 - `0.8.2` Published on Maven Central Repository<br>
 25.04.2018 - `0.8.1` Removed Lombok dependency<br>
 24.04.2018 - `0.8.0` Basic features
 
