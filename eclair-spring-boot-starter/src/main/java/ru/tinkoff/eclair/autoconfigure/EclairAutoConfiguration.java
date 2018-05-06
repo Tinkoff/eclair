@@ -101,24 +101,32 @@ public class EclairAutoConfiguration {
             return new OverriddenToStringPrinter();
         }
 
-        @Bean
+        @Configuration
         @ConditionalOnClass(Jaxb2Marshaller.class)
-        @ConditionalOnSingleCandidate(Jaxb2Marshaller.class)
-        @ConditionalOnMissingBean(Jaxb2Printer.class)
-        @Order(100)
-        public Printer jaxb2Printer(ObjectProvider<Jaxb2Marshaller> jaxb2Marshaller) {
-            Jaxb2Marshaller marshaller = jaxb2Marshaller.getObject();
-            return new Jaxb2Printer(marshaller)
-                    .addPreProcessor(new JaxbElementWrapper(marshaller));
+        static class Jaxb2PrinterConfiguration {
+
+            @Bean
+            @ConditionalOnSingleCandidate(Jaxb2Marshaller.class)
+            @ConditionalOnMissingBean(Jaxb2Printer.class)
+            @Order(100)
+            public Printer jaxb2Printer(ObjectProvider<Jaxb2Marshaller> jaxb2Marshaller) {
+                Jaxb2Marshaller marshaller = jaxb2Marshaller.getObject();
+                return new Jaxb2Printer(marshaller)
+                        .addPreProcessor(new JaxbElementWrapper(marshaller));
+            }
         }
 
-        @Bean
+        @Configuration
         @ConditionalOnClass(ObjectMapper.class)
-        @ConditionalOnSingleCandidate(ObjectMapper.class)
-        @ConditionalOnMissingBean
-        @Order(200)
-        public JacksonPrinter jacksonPrinter(ObjectProvider<ObjectMapper> objectMapper) {
-            return new JacksonPrinter(objectMapper.getObject());
+        static class JacksonPrinterConfiguration {
+
+            @Bean
+            @ConditionalOnSingleCandidate(ObjectMapper.class)
+            @ConditionalOnMissingBean
+            @Order(200)
+            public JacksonPrinter jacksonPrinter(ObjectProvider<ObjectMapper> objectMapper) {
+                return new JacksonPrinter(objectMapper.getObject());
+            }
         }
 
         @Bean

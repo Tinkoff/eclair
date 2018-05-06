@@ -8,7 +8,7 @@ Includes abstractions for annotations processing, simple implementation and Spri
 ## Features
 
 * events logging detected by Spring AOP: *beginning*, *ending* or *emergency ending* of method execution
-* flexible filtering `Throwable` types for logging
+* flexible filtering [`Throwable`](https://docs.oracle.com/javase/8/docs/api/java/lang/Throwable.html) types for logging
 * configurable verbosity based on the enabled log level
 * pre-defined printers to log arguments or method return value in different formats:
     * `JSON` (by Jackson)
@@ -21,58 +21,60 @@ Includes abstractions for annotations processing, simple implementation and Spri
 
 ## Annotations
 
-Eclair logs annotated `Methods` and `Parameters` only.<br>
+Eclair logs annotated [`Method`](https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Method.html)s and [`Parameter`](https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Parameter.html)s only.<br>
 Implementation is based on standard Spring proxying with all its consequences and limitations.
 
-### `@Log`
+### [`@Log`](https://github.com/TinkoffCreditSystems/eclair/blob/master/eclair-core/src/main/java/ru/tinkoff/eclair/annotation/Log.java)
 
-Annotated `Method` is able to log beginning and ending (except the emergency ending) of execution.<br>
-Works the same as both `@Log.in` and `@Log.out` annotations with all matching attribute values.<br>
-*Note: emergency ending of the method execution should be specified separately by `@Log.error` annotation.*
+Annotated [`Method`](https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Method.html) is able to log beginning and ending (except the emergency ending) of execution.<br>
+Works the same as both [`@Log.in`](https://github.com/TinkoffCreditSystems/eclair/blob/master/eclair-core/src/main/java/ru/tinkoff/eclair/annotation/Log.java) and [`@Log.out`](https://github.com/TinkoffCreditSystems/eclair/blob/master/eclair-core/src/main/java/ru/tinkoff/eclair/annotation/Log.java) annotations with all matching attribute values.<br>
+*Note: emergency ending of the method execution should be specified separately by [`@Log.error`](https://github.com/TinkoffCreditSystems/eclair/blob/master/eclair-core/src/main/java/ru/tinkoff/eclair/annotation/Log.java) annotation.*
 
-Can be defined on `Parameter` and specify logging settings for it.
+Can be defined on [`Parameter`](https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Parameter.html) and specify logging settings for it.
 
 Should have unique `logger` value per annotated element.<br>
-`Parameter`-level annotation has higher priority settings than `Method`-level with same `logger` value.
+[`Parameter`](https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Parameter.html)-level annotation has higher priority settings than [`Method`](https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Method.html)-level with same `logger` value.
 
  Attribute  | Description
 :-----------|:------------
 `level`     | Expected level to log beginning and ending of method execution.
 `ifEnabled` | Enables logging with `level` only if specified here level is enabled for the current `logger` too.<br> Ignored by default.
-`verbose`   | If specified log-level is enabled for the current `logger` activates detailed logging.<br> For annotated `Method` verbose log includes argument/return values.<br>For annotated `Parameter` verbose log includes argument name.<br> *Note: it is assumed that `OFF` deactivates verbose logging of annotated element for any level.*
-`printer`   | Determines `Printer` implementation by specified bean name (or alias).<br> The printer will be used to convert argument/return values from raw type to `String`.<br> *Note: if not specified highest priority compatible printer or `PrinterResolver#defaultPrinter` will be used.*
-`logger`    | Determines `EclairLogger` implementation by specified bean name (or alias) which should process this annotation.<br> *Note: if not specified single candidate or `Primary` bean will be used for processing.*
+`verbose`   | If specified log-level is enabled for the current `logger` activates detailed logging.<br> For annotated [`Method`](https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Method.html) verbose log includes argument/return values.<br>For annotated [`Parameter`](https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Parameter.html) verbose log includes argument name.<br> *Note: it is assumed that `OFF` deactivates verbose logging of annotated element for any level.*
+`printer`   | Determines [`Printer`](https://github.com/TinkoffCreditSystems/eclair/blob/master/eclair-core/src/main/java/ru/tinkoff/eclair/printer/Printer.java) implementation by specified bean name (or alias).<br> The printer will be used to convert argument/return values from raw type to [`String`](https://docs.oracle.com/javase/8/docs/api/java/lang/String.html).<br> *Note: if not specified highest priority compatible printer or [`PrinterResolver#defaultPrinter`](https://github.com/TinkoffCreditSystems/eclair/blob/master/eclair-core/src/main/java/ru/tinkoff/eclair/printer/resolver/PrinterResolver.java) will be used.*
+`logger`    | Determines [`EclairLogger`](https://github.com/TinkoffCreditSystems/eclair/blob/master/eclair-core/src/main/java/ru/tinkoff/eclair/logger/EclairLogger.java) implementation by specified bean name (or alias) which should process this annotation.<br> *Note: if not specified single candidate or `Primary` bean will be used for processing.*
 
-> See also @Log.in, @Log.out and @Log.error annotations and their specific attributes
+> See also [`@Log.in`](https://github.com/TinkoffCreditSystems/eclair/blob/master/eclair-core/src/main/java/ru/tinkoff/eclair/annotation/Log.java), [`@Log.out`](https://github.com/TinkoffCreditSystems/eclair/blob/master/eclair-core/src/main/java/ru/tinkoff/eclair/annotation/Log.java) and [`@Log.error`](https://github.com/TinkoffCreditSystems/eclair/blob/master/eclair-core/src/main/java/ru/tinkoff/eclair/annotation/Log.java) annotations and their specific attributes
 
-### `@Mdc`
+### [`@Mdc`](https://github.com/TinkoffCreditSystems/eclair/blob/master/eclair-core/src/main/java/ru/tinkoff/eclair/annotation/Mdc.java)
 
 Defines MDC (Mapped Diagnostic Context) entry. MDC is level-insensitive.<br>
-Before method execution beginning, `@Mdc` will be processed first and after ending cleared last.<br>
-So annotations `@Log` / `@Log.in` / `@Log.out` of the same method will be processed *inside* `@Mdc` processing.
+Before method execution beginning, [`@Mdc`](https://github.com/TinkoffCreditSystems/eclair/blob/master/eclair-core/src/main/java/ru/tinkoff/eclair/annotation/Mdc.java) will be processed first and after ending cleared last.<br>
+So annotations [`@Log`](https://github.com/TinkoffCreditSystems/eclair/blob/master/eclair-core/src/main/java/ru/tinkoff/eclair/annotation/Log.java) / [`@Log.in`](https://github.com/TinkoffCreditSystems/eclair/blob/master/eclair-core/src/main/java/ru/tinkoff/eclair/annotation/Log.java) / [`@Log.out`](https://github.com/TinkoffCreditSystems/eclair/blob/master/eclair-core/src/main/java/ru/tinkoff/eclair/annotation/Log.java) of the same method will be processed *inside* [`@Mdc`](https://github.com/TinkoffCreditSystems/eclair/blob/master/eclair-core/src/main/java/ru/tinkoff/eclair/annotation/Mdc.java) processing.
 
  Attribute | Description
 :----------|:------------
 `key`      | Key of the MDC entry.<br> If empty, it will be synthesized by code meta-data: annotated method or parameter name.<br> *Note: It is not always possible to obtain information about parameter names at runtime.<br> In that case, MDC keys will contain method name and parameter index.*
 `value`    | Value of the MDC entry.<br> Can contain SpEL (Spring Expression Language) and invoke static methods or beans by id from the `ApplicationContext`.<br> If empty, it will be synthesized by code meta-data: annotated parameter value (or each parameter of annotated method).
-`global`   | Key/value pair defined by this annotation automatically cleared after exit from the method by default.<br> `global` MDC is available within `ThreadLocal` scope.
+`global`   | Key/value pair defined by this annotation automatically cleared after exit from the method by default.<br> `global` MDC is available within [`ThreadLocal`](https://docs.oracle.com/javase/8/docs/api/java/lang/ThreadLocal.html) scope.
 
 ## Getting started
 
-Add this to your POM.
+> Eclair compatible with Java 8, Spring Boot 1.5.0+.
+
+Add this to your POM:
 ```xml
 <dependency>
     <groupId>ru.tinkoff</groupId>
     <artifactId>eclair-spring-boot-starter</artifactId>
-    <version>0.8.2</version>
+    <version>0.8.3</version>
 </dependency>
 ```
 
 ## Usage examples
 
-The examples assume that you are using a standard `SimpleLogger` and that you have the following configuration property:
+The examples assume that you are using a standard [`SimpleLogger`](https://github.com/TinkoffCreditSystems/eclair/blob/master/eclair-core/src/main/java/ru/tinkoff/eclair/logger/SimpleLogger.java) and that you have the following configuration property:
 ```yaml
-logging.pattern.console: '%-5level [%X] %logger{35} %msg%n'
+logging.pattern.console: %d{yyyy-MM-dd HH:mm:ss.SSS UTC} [%thread] %-5level [%X] %logger{35} %msg%n
 ```
 All available log levels in order from the most common `TRACE` to the rarest `OFF`:
  * `OFF` deactivates logging completely
@@ -111,7 +113,7 @@ boolean verbose(String s, Integer i, Double d) {
  `INFO`             | `INFO  [] r.t.eclair.example.Example.verbose >`<br>`INFO  [] r.t.eclair.example.Example.verbose <`
  `WARN` .. `OFF`    | -
 
-#### Try to print arguments by `Jaxb2Printer` as `XML`
+#### Try to print arguments by [`Jaxb2Printer`](https://github.com/TinkoffCreditSystems/eclair/blob/master/eclair-core/src/main/java/ru/tinkoff/eclair/printer/Jaxb2Printer.java) as `XML`
 You can specify printer's bean name or alias.
 ```java
 @Log(printer = "jaxb2Printer")
@@ -125,8 +127,8 @@ void verboseXml(Dto dto, Integer i) {
 
 #### Filter errors by type
 Errors can be filtered multiple times by `ofType` and `exclude` attributes.<br>
-By default `ofType` contains `Throwable.class` and includes all subtypes.<br>
-If the thrown exception matches any of `@Log.error` filters it will be logged according to the settings of the corresponding annotation.  
+By default `ofType` contains [`Throwable`](https://docs.oracle.com/javase/8/docs/api/java/lang/Throwable.html) and includes all subtypes.<br>
+If the thrown exception matches any of [`@Log.error`](https://github.com/TinkoffCreditSystems/eclair/blob/master/eclair-core/src/main/java/ru/tinkoff/eclair/annotation/Log.java) filters it will be logged according to the settings of the corresponding annotation.  
 ##### Annotated method
 ```java
 @Log.error(level = WARN, ofType = {NullPointerException.class, IndexOutOfBoundsException.class})
@@ -162,7 +164,7 @@ void parameter(@Log(INFO) Dto dto, String s, Integer i) {
  `WARN` .. `OFF`    | -
 
 #### Multiple loggers in application
-You can have several `EclairLogger` implementations in your application context.<br>
+You can have several [`EclairLogger`](https://github.com/TinkoffCreditSystems/eclair/blob/master/eclair-core/src/main/java/ru/tinkoff/eclair/logger/EclairLogger.java) implementations in your application context.<br>
 This can be useful for logging various slices of information to different targets.
 > If `logger` attribute not defined, single candidate or `@Primary` bean will be used.
 ```java
@@ -176,14 +178,14 @@ void twoLoggers() {
 MDC - Mapped Diagnostic Context
 
 Key/value pair defined by annotation automatically cleared after exit from the method.<br>
-`global` MDC is available within `ThreadLocal` scope.<br>
+`global` MDC is available within [`ThreadLocal`](https://docs.oracle.com/javase/8/docs/api/java/lang/ThreadLocal.html) scope.<br>
 `value` attribute can contain SpEL expression and invoke static methods or beans by id from the application context.<br>
 > Note: MDC is level-insensitive and printed every time.<br>
 > Note: MDC does not guarantee order of elements when printing.
 
 #### Common usage
-Before method execution beginning, `@Mdc` annotations will be processed first and after ending cleared last.<br>
-So annotations `@Log` / `@Log.in` / `@Log.out` of the same method will be processed *inside* `@Mdc` processing. 
+Before method execution beginning, [`@Mdc`](https://github.com/TinkoffCreditSystems/eclair/blob/master/eclair-core/src/main/java/ru/tinkoff/eclair/annotation/Mdc.java) annotations will be processed first and after ending cleared last.<br>
+So annotations [`@Log`](https://github.com/TinkoffCreditSystems/eclair/blob/master/eclair-core/src/main/java/ru/tinkoff/eclair/annotation/Log.java) / [`@Log.in`](https://github.com/TinkoffCreditSystems/eclair/blob/master/eclair-core/src/main/java/ru/tinkoff/eclair/annotation/Log.java) / [`@Log.out`](https://github.com/TinkoffCreditSystems/eclair/blob/master/eclair-core/src/main/java/ru/tinkoff/eclair/annotation/Log.java) of the same method will be processed *inside* [`@Mdc`](https://github.com/TinkoffCreditSystems/eclair/blob/master/eclair-core/src/main/java/ru/tinkoff/eclair/annotation/Mdc.java) processing. 
 ```java
 @Log
 void outer() {
@@ -226,11 +228,11 @@ DEBUG [length=8, dto=Dto{i=12, s='password'}] r.t.e.example.Example.mdcByArgumen
 ```
 
 ### Manual logging
-Inject `ManualLogger` implementation for manual logging.<br>
-> If execution time is important to you, manual logging with `ManualLogger` is not recommended.
+Inject [`ManualLogger`](https://github.com/TinkoffCreditSystems/eclair/blob/master/eclair-core/src/main/java/ru/tinkoff/eclair/logger/ManualLogger.java) implementation for manual logging.<br>
+> If execution time is important to you, manual logging with [`ManualLogger`](https://github.com/TinkoffCreditSystems/eclair/blob/master/eclair-core/src/main/java/ru/tinkoff/eclair/logger/ManualLogger.java) is not recommended.
 
 #### Manual
-Expensive calculations may be wrapped into Java 8 `Supplier` interface for lazy initialization.
+Expensive calculations may be wrapped into [`Supplier`](https://docs.oracle.com/javase/8/docs/api/java/util/function/Supplier.html) for lazy initialization.
 ```java
 @Autowired
 private ManualLogger logger;
@@ -249,6 +251,7 @@ void manual() {
 
 ## Release History
 
+07.05.2018 - `0.8.3` Corrected optional classes usage in auto-configuration
 06.05.2018 - `0.8.2` Published on Maven Central Repository<br>
 25.04.2018 - `0.8.1` Removed Lombok dependency<br>
 24.04.2018 - `0.8.0` Basic features

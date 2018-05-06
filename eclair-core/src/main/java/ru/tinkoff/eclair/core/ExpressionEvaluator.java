@@ -15,8 +15,6 @@
 
 package ru.tinkoff.eclair.core;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.expression.*;
 import org.springframework.expression.common.LiteralExpression;
 
@@ -29,8 +27,6 @@ import static java.util.Objects.isNull;
  * @author Vyacheslav Klapatnyuk
  */
 public class ExpressionEvaluator {
-
-    private static final Logger logger = LoggerFactory.getLogger(ExpressionEvaluator.class);
 
     private static final ParserContext parserContext = null;
 
@@ -49,7 +45,7 @@ public class ExpressionEvaluator {
         try {
             return expressionCache.computeIfAbsent(expressionString, this::parse).getValue(evaluationContext);
         } catch (EvaluationException e) {
-            return handleEvaluationException(expressionString, e);
+            return expressionString;
         }
     }
 
@@ -60,24 +56,14 @@ public class ExpressionEvaluator {
         try {
             return expressionCache.computeIfAbsent(expressionString, this::parse).getValue(evaluationContext, rootObject);
         } catch (EvaluationException e) {
-            return handleEvaluationException(expressionString, e);
+            return expressionString;
         }
-    }
-
-    private Object handleEvaluationException(String expressionString, EvaluationException e) {
-        if (logger.isDebugEnabled()) {
-            logger.warn("Expression string could not be evaluated: '{}'", expressionString, e);
-        }
-        return expressionString;
     }
 
     private Expression parse(String expressionString) {
         try {
             return expressionParser.parseExpression(expressionString, parserContext);
         } catch (ParseException e) {
-            if (logger.isDebugEnabled()) {
-                logger.warn("Expression string could not be parsed: '{}'", expressionString, e);
-            }
             return new LiteralExpression(expressionString);
         }
     }

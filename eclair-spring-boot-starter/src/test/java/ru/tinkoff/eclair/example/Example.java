@@ -15,6 +15,8 @@
 
 package ru.tinkoff.eclair.example;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import ru.tinkoff.eclair.annotation.Log;
@@ -37,6 +39,14 @@ class Example {
 
     @Log
     void simple() {
+        // logic
+    }
+
+    void simplePlain() {
+        Logger logger = LoggerFactory.getLogger("ru.tinkoff.eclair.example.Example.simple");
+        logger.debug(">");
+        // logic
+        logger.debug("<");
     }
 
     @Log
@@ -44,12 +54,43 @@ class Example {
         throw new RuntimeException();
     }
 
+    void simpleErrorPlain() {
+        Logger logger = LoggerFactory.getLogger("ru.tinkoff.eclair.example.Example.simpleError");
+        logger.debug(">");
+        try {
+            throw new RuntimeException();
+        } catch (Exception e) {
+            logger.debug("!");
+            throw e;
+        }
+    }
+
     @Log(INFO)
     void level() {
+        // logic
+    }
+
+    void levelPlain() {
+        Logger logger = LoggerFactory.getLogger("ru.tinkoff.eclair.example.Example.level");
+        logger.info(">");
+        // logic
+        logger.info("<");
     }
 
     @Log(level = INFO, ifEnabled = DEBUG)
     void ifEnabled() {
+        // logic
+    }
+
+    void ifEnabledPlain() {
+        Logger logger = LoggerFactory.getLogger("ru.tinkoff.eclair.example.Example.ifEnabled");
+        if (logger.isDebugEnabled()) {
+            logger.info(">");
+        }
+        // logic
+        if (logger.isDebugEnabled()) {
+            logger.info("<");
+        }
     }
 
     @Log(INFO)
@@ -57,9 +98,33 @@ class Example {
         return false;
     }
 
+    boolean verbosePlain(String s, Integer i, Double d) {
+        Logger logger = LoggerFactory.getLogger("ru.tinkoff.eclair.example.Example.verbose");
+        if (logger.isDebugEnabled()) {
+            logger.info("> s=\"{}\", i={}, d={}", s, i, d);
+        } else {
+            logger.info(">");
+        }
+        boolean result = false;
+        if (logger.isDebugEnabled()) {
+            logger.info("< {}", result);
+        } else {
+            logger.info("<");
+        }
+        return result;
+    }
+
     @Log(verbose = OFF)
     boolean verboseDisabled(String s, Integer i, Double d) {
         return false;
+    }
+
+    boolean verboseDisabledPlain(String s, Integer i, Double d) {
+        Logger logger = LoggerFactory.getLogger("ru.tinkoff.eclair.example.Example.verboseDisabled");
+        logger.debug(">");
+        boolean result = false;
+        logger.debug("<");
+        return result;
     }
 
     @Log(printer = "jacksonPrinter")
