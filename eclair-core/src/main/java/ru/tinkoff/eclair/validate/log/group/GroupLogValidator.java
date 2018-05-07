@@ -58,24 +58,26 @@ abstract class GroupLogValidator<T extends Annotation> implements AnnotationUsag
 
     Map<String, List<T>> groupAnnotationsByLogger(Method method, Set<T> annotations) {
         return annotations.stream()
-                .collect(groupingBy(annotation -> {
-                    String loggerName = AnnotationAttribute.LOGGER.extract(annotation);
-                    return loggerNames.entrySet().stream()
-                            .filter(entry -> entry.getValue().contains(loggerName))
-                            .findFirst()
-                            .map(Map.Entry::getKey)
-                            .orElseThrow(() -> {
-                                if (loggerName.isEmpty()) {
-                                    return new AnnotationUsageException(method,
-                                            "Primary logger not found among candidates",
-                                            "Annotate the needed logger by '@Primary' or specify the logger name explicitly",
-                                            annotation);
-                                }
-                                return new AnnotationUsageException(method,
-                                        format("Unknown logger '%s'", loggerName),
-                                        "Use correct bean name or alias to specify 'logger'",
-                                        annotation);
-                            });
-                }));
+                .collect(groupingBy(annotation -> getLoggerName(method, annotation)));
+    }
+
+    private String getLoggerName(Method method, T annotation) {
+        String loggerName = AnnotationAttribute.LOGGER.extract(annotation);
+        return loggerNames.entrySet().stream()
+                .filter(entry -> entry.getValue().contains(loggerName))
+                .findFirst()
+                .map(Map.Entry::getKey)
+                .orElseThrow(() -> {
+                    if (loggerName.isEmpty()) {
+                        return new AnnotationUsageException(method,
+                                "Primary logger not found among candidates",
+                                "Annotate the needed logger by '@Primary' or specify the logger name explicitly",
+                                annotation);
+                    }
+                    return new AnnotationUsageException(method,
+                            format("Unknown logger '%s'", loggerName),
+                            "Use correct bean name or alias to specify 'logger'",
+                            annotation);
+                });
     }
 }
