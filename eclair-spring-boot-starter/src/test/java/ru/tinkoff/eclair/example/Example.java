@@ -297,7 +297,7 @@ class Example {
      * Equals to next
      */
     @Log.in(ERROR)
-    @Log(TRACE)
+    @Log.out(TRACE)
     void inLog() {
     }
 
@@ -310,7 +310,7 @@ class Example {
      * Equals to next
      */
     @Log.out(ERROR)
-    @Log(TRACE)
+    @Log.in(TRACE)
     void outLog() {
     }
 

@@ -21,6 +21,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.boot.logging.LogLevel;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.annotation.Mdc;
 import ru.tinkoff.eclair.core.AnnotationExtractor;
@@ -34,8 +35,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.singleton;
-import static java.util.Collections.singletonList;
+import static java.util.Collections.*;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.eq;
@@ -137,9 +137,8 @@ public class MethodValidatorTest {
         // given
         AnnotationExtractor annotationExtractor = mock(AnnotationExtractor.class);
 
-        Set<Log> logs = singleton(synthesizeAnnotation(Log.class));
-        Set<Log.in> logIns = singleton(synthesizeAnnotation(Log.in.class));
-        Set<Log.out> logOuts = singleton(synthesizeAnnotation(Log.out.class));
+        Set<Log.in> logIns = singleton(synthesizeAnnotation(singletonMap("value", LogLevel.DEBUG), Log.in.class, null));
+        Set<Log.out> logOuts = singleton(synthesizeAnnotation(singletonMap("value", LogLevel.ERROR), Log.out.class, null));
         Set<Log.error> logErrors = singleton(synthesizeAnnotation(Log.error.class));
         Set<Log> parameterLogs = singleton(synthesizeAnnotation(Log.class));
         Set<Log> parameterLogs1 = singleton(synthesizeAnnotation(Log.class));
@@ -147,7 +146,6 @@ public class MethodValidatorTest {
         Set<Mdc> parameterMdcs = singleton(synthesizeAnnotation(Mdc.class));
         Set<Mdc> parameterMdcs1 = singleton(synthesizeAnnotation(Mdc.class));
 
-        when(annotationExtractor.getLogs(method)).thenReturn(logs);
         when(annotationExtractor.getLogIns(method)).thenReturn(logIns);
         when(annotationExtractor.getLogOuts(method)).thenReturn(logOuts);
         when(annotationExtractor.getLogErrors(method)).thenReturn(logErrors);
@@ -178,7 +176,6 @@ public class MethodValidatorTest {
         methodValidator.validate(method);
 
         // then
-        verify(logsValidator).validate(method, logs);
         verify(logInsValidator).validate(method, logIns);
         verify(logOutsValidator).validate(method, logOuts);
         verify(logErrorsValidator).validate(method, logErrors);
@@ -186,6 +183,56 @@ public class MethodValidatorTest {
         verify(methodMdcsValidator).validate(method, mdcs);
         verifyMdcs(mdcsValidator, parameterMdcs, parameterMdcs1);
         verify(mergedMdcsValidator).validate(eq(method), any());
+    }
+
+    @Test(expected = AnnotationUsageException.class)
+    public void validateLogAndLogInUsage() {
+        // given
+        AnnotationExtractor annotationExtractor = mock(AnnotationExtractor.class);
+
+        Set<Log> logs = singleton(synthesizeAnnotation(Log.class));
+        Set<Log.in> logIns = singleton(synthesizeAnnotation(Log.in.class));
+        when(annotationExtractor.getLogs(method)).thenReturn(logs);
+        when(annotationExtractor.getLogIns(method)).thenReturn(logIns);
+        MethodValidator methodValidator = givenMethodValidator(annotationExtractor);
+
+        //when
+        methodValidator.validate(method);
+        // then expected exception
+    }
+
+    @Test(expected = AnnotationUsageException.class)
+    public void validateLogOutAndLogInUsage() {
+        // given
+        AnnotationExtractor annotationExtractor = mock(AnnotationExtractor.class);
+
+        Set<Log.out> logOuts = singleton(synthesizeAnnotation(Log.out.class));
+        Set<Log.in> logIns = singleton(synthesizeAnnotation(Log.in.class));
+        when(annotationExtractor.getLogOuts(method)).thenReturn(logOuts);
+        when(annotationExtractor.getLogIns(method)).thenReturn(logIns);
+        MethodValidator methodValidator = givenMethodValidator(annotationExtractor);
+
+        //when
+        methodValidator.validate(method);
+        // then expected exception
+    }
+
+    @Test(expected = AnnotationUsageException.class)
+    public void validateLogAndLogOutAndLogInUsage() {
+        // given
+        AnnotationExtractor annotationExtractor = mock(AnnotationExtractor.class);
+
+        Set<Log> logs = singleton(synthesizeAnnotation(singletonMap("value", LogLevel.INFO), Log.class, null));
+        Set<Log.out> logOuts = singleton(synthesizeAnnotation(Log.out.class));
+        Set<Log.in> logIns = singleton(synthesizeAnnotation(Log.in.class));
+        when(annotationExtractor.getLogs(method)).thenReturn(logs);
+        when(annotationExtractor.getLogOuts(method)).thenReturn(logOuts);
+        when(annotationExtractor.getLogIns(method)).thenReturn(logIns);
+        MethodValidator methodValidator = givenMethodValidator(annotationExtractor);
+
+        //when
+        methodValidator.validate(method);
+        // then expected exception
     }
 
     private void verifyParameterLogs(ParameterLogsValidator parameterLogsValidator, Set<Log> parameterLogs, Set<Log> parameterLogs1) {

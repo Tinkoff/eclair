@@ -15,6 +15,7 @@
 
 package ru.tinkoff.eclair.validate;
 
+import org.springframework.core.annotation.AnnotationUtils;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.annotation.Mdc;
 import ru.tinkoff.eclair.core.AnnotationExtractor;
@@ -23,12 +24,10 @@ import ru.tinkoff.eclair.validate.mdc.group.MdcsValidator;
 import ru.tinkoff.eclair.validate.mdc.group.MergedMdcsValidator;
 import ru.tinkoff.eclair.validate.mdc.group.MethodMdcsValidator;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static java.util.stream.Collectors.toSet;
 
@@ -73,12 +72,6 @@ public class MethodValidator implements AnnotationUsageValidator<Method> {
         validate(method, method);
     }
 
-    /**
-     * TODO: Log + Log.in           -> Log.in + Log.out ?-> Log
-     * TODO: Log + Log.out          -> Log.in + Log.out ?-> Log
-     * TODO: Log + Log.in + Log.out -> Log.in + Log.out ?-> Log
-     * TODO: Log.in + Log.out      ?-> Log
-     */
     @Override
     public void validate(Method method, Method target) throws AnnotationUsageException {
         Set<Log> logs = annotationExtractor.getLogs(target);
@@ -130,6 +123,7 @@ public class MethodValidator implements AnnotationUsageValidator<Method> {
         if (!methodAnnotationFound && !argAnnotationFound) {
             return;
         }
+        validateLogInAndOutUsage(target, logs, logIns, logOuts);
 
         logsValidator.validate(target, logs);
         logInsValidator.validate(target, logIns);
@@ -146,5 +140,42 @@ public class MethodValidator implements AnnotationUsageValidator<Method> {
         Set<Mdc> mergedMdcs = new HashSet<>(mdcs);
         mergedMdcs.addAll(parameterMdcs.stream().flatMap(Collection::stream).collect(toSet()));
         return mergedMdcs;
+    }
+
+    private void validateLogInAndOutUsage(Method target, Set<Log> logs, Set<Log.in> logIns, Set<Log.out> logOuts) {
+        ArrayList<Annotation> annotations = new ArrayList<>();
+        annotations.addAll(logIns);
+        annotations.addAll(logOuts);
+        annotations.addAll(logs);
+        if (!logs.isEmpty() && (!logIns.isEmpty() || !logOuts.isEmpty())) {
+            if (compareLogAttributes(annotations)) {
+                throw new AnnotationUsageException(target,
+                        "Don't use @Log, @Log.in and @Log.out together with the same config",
+                        "Use only @Log to define the same behavior for beginning and ending logging");
+            } else {
+                throw new AnnotationUsageException(target,
+                        "Don't use @Log with @Log.in or @Log.out",
+                        "Use both @Log.in and @Log.out annotations to define different behavior" +
+                                "for beginning and ending logging");
+            }
+        } else if (!logIns.isEmpty() && !logOuts.isEmpty() && compareLogAttributes(annotations)) {
+            throw new AnnotationUsageException(target,
+                    "Don't use @Log.in and @Log.out together with the same config",
+                    "Use only @Log to define the same behavior for beginning and ending logging");
+        }
+    }
+
+    private <T extends Annotation> boolean compareLogAttributes(List<T> logs) {
+        Set<Annotation> set = new TreeSet<>((o1, o2) -> {
+            Map<String, Object> first = AnnotationUtils.getAnnotationAttributes(o1);
+            Map<String, Object> second = AnnotationUtils.getAnnotationAttributes(o2);
+            if (first.equals(second)) {
+                return 0;
+            } else {
+                return 1;
+            }
+        });
+        set.addAll(logs);
+        return set.size() == 1;
     }
 }
