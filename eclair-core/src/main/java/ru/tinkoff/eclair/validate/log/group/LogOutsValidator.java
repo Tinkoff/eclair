@@ -38,7 +38,17 @@ public class LogOutsValidator extends GroupLogValidator<Log.out> {
 
     @Override
     public void validate(Method method, Set<Log.out> target) throws AnnotationUsageException {
-        super.validate(method, target);
+        if (method.getReturnType().equals(Void.TYPE) || method.getReturnType().equals(Void.class)) {
+            groupAnnotationsByLogger(method, target).forEach((key, logOuts) -> logOuts.forEach(logOut -> {
+                if (!logOut.printer().isEmpty()) {
+                    throw new AnnotationUsageException(method,
+                            "Printer was defined for void method",
+                            "Remove unnecessary printer parameter.");
+                }
+            }));
+        } else {
+            super.validate(method, target);
+        }
         target.forEach(logOut -> logOutValidator.validate(method, logOut));
     }
 }

@@ -18,6 +18,7 @@ package ru.tinkoff.eclair.validate.log.group;
 import org.junit.Before;
 import org.junit.Test;
 import ru.tinkoff.eclair.annotation.Log;
+import ru.tinkoff.eclair.validate.AnnotationUsageException;
 import ru.tinkoff.eclair.validate.log.single.LogValidator;
 
 import java.lang.reflect.Method;
@@ -57,5 +58,20 @@ public class LogOutsValidatorTest {
         logOutsValidator.validate(method, annotations);
         // then
         verify(logValidator).validate(method, logOut);
+    }
+
+    @Test(expected = AnnotationUsageException.class)
+    public void validateVoidMethodLogging() {
+        //given
+        Map<String, Set<String>> loggerNames = singletonMap("logger", new HashSet<>(asList("logger", "")));
+        @SuppressWarnings("unchecked")
+        LogValidator<Log.out> logValidator = (LogValidator<Log.out>) mock(LogValidator.class);
+        LogOutsValidator logOutsValidator = new LogOutsValidator(loggerNames, logValidator);
+        Map<String, Object> printer = singletonMap("printer", "jacksonPrinter");
+        Log.out logOut = synthesizeAnnotation(printer, Log.out.class, null);
+        Set<Log.out> annotation = singleton(logOut);
+        //when
+        logOutsValidator.validate(method, annotation);
+        //then expected exception
     }
 }
