@@ -234,6 +234,20 @@ public class MethodValidatorTest {
         // then expected exception
     }
 
+    @Test(expected = AnnotationUsageException.class)
+    public void validateLevelOffUsage(){
+        // given
+        AnnotationExtractor annotationExtractor = mock(AnnotationExtractor.class);
+
+        Set<Log> logs = singleton(synthesizeAnnotation(singletonMap("value", LogLevel.OFF), Log.class, null));
+        when(annotationExtractor.getLogs(method)).thenReturn(logs);
+        MethodValidator methodValidator = givenMethodValidator(annotationExtractor);
+
+        //when
+        methodValidator.validate(method);
+        // then expected exception
+    }
+
     private void verifyParameterLogs(ParameterLogsValidator parameterLogsValidator, Set<Log> parameterLogs, Set<Log> parameterLogs1) {
         verify(parameterLogsValidator, times(2)).validate(eq(method), parameterLogsCaptor.capture());
         Iterator<Set<Log>> parameterLogsIterator = parameterLogsCaptor.getAllValues().iterator();

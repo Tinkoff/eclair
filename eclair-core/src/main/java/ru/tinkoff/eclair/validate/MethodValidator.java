@@ -15,9 +15,11 @@
 
 package ru.tinkoff.eclair.validate;
 
+import org.springframework.boot.logging.LogLevel;
 import org.springframework.core.annotation.AnnotationUtils;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.annotation.Mdc;
+import ru.tinkoff.eclair.core.AnnotationAttribute;
 import ru.tinkoff.eclair.core.AnnotationExtractor;
 import ru.tinkoff.eclair.validate.log.group.*;
 import ru.tinkoff.eclair.validate.mdc.group.MdcsValidator;
@@ -25,9 +27,12 @@ import ru.tinkoff.eclair.validate.mdc.group.MergedMdcsValidator;
 import ru.tinkoff.eclair.validate.mdc.group.MethodMdcsValidator;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toSet;
 
@@ -123,6 +128,8 @@ public class MethodValidator implements AnnotationUsageValidator<Method> {
         if (!methodAnnotationFound && !argAnnotationFound) {
             return;
         }
+        validateLevelValue(target, Stream.of(logs, logIns, logOuts, logErrors)
+                .flatMap(Collection::stream).collect(Collectors.toList()));
         validateLogInAndOutUsage(target, logs, logIns, logOuts);
 
         logsValidator.validate(target, logs);
@@ -134,6 +141,14 @@ public class MethodValidator implements AnnotationUsageValidator<Method> {
         methodMdcsValidator.validate(target, mdcs);
         parameterMdcs.forEach(item -> mdcsValidator.validate(target, item));
         mergedMdcsValidator.validate(target, mergeMdcs(mdcs, parameterMdcs));
+    }
+
+    private void validateLevelValue(Method target, List<Annotation> annotations) {
+        if (annotations.stream().anyMatch(annotation -> AnnotationAttribute.LEVEL.extract(annotation).equals(LogLevel.OFF))) {
+            throw new AnnotationUsageException(target,
+                    "Don't use level = LogLevel.OFF for methods. It's equivalent to no annotation",
+                    "Remove unnecessary annotation");
+        }
     }
 
     private Set<Mdc> mergeMdcs(Set<Mdc> mdcs, List<Set<Mdc>> parameterMdcs) {
@@ -165,7 +180,7 @@ public class MethodValidator implements AnnotationUsageValidator<Method> {
         }
     }
 
-    private <T extends Annotation> boolean compareLogAttributes(List<T> logs) {
+    private boolean compareLogAttributes(List<Annotation> logs) {
         Set<Annotation> set = new TreeSet<>((o1, o2) -> {
             Map<String, Object> first = AnnotationUtils.getAnnotationAttributes(o1);
             Map<String, Object> second = AnnotationUtils.getAnnotationAttributes(o2);
