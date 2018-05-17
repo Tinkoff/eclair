@@ -17,7 +17,7 @@ package ru.tinkoff.eclair.validate.log.group;
 
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.validate.AnnotationUsageException;
-import ru.tinkoff.eclair.validate.log.single.LogValidator;
+import ru.tinkoff.eclair.validate.log.single.LogOutValidator;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -28,27 +28,17 @@ import java.util.Set;
  */
 public class LogOutsValidator extends GroupLogValidator<Log.out> {
 
-    private final LogValidator<Log.out> logOutValidator;
+    private final LogOutValidator logOutValidator;
 
     public LogOutsValidator(Map<String, Set<String>> loggerNames,
-                            LogValidator<Log.out> logOutValidator) {
+                            LogOutValidator logOutValidator) {
         super(loggerNames);
         this.logOutValidator = logOutValidator;
     }
 
     @Override
     public void validate(Method method, Set<Log.out> target) throws AnnotationUsageException {
-        if (method.getReturnType().equals(Void.TYPE) || method.getReturnType().equals(Void.class)) {
-            groupAnnotationsByLogger(method, target).forEach((key, logOuts) -> logOuts.forEach(logOut -> {
-                if (!logOut.printer().isEmpty()) {
-                    throw new AnnotationUsageException(method,
-                            "Printer was defined for void method",
-                            "Remove unnecessary printer parameter.");
-                }
-            }));
-        } else {
-            super.validate(method, target);
-        }
+        super.validate(method, target);
         target.forEach(logOut -> logOutValidator.validate(method, logOut));
     }
 }

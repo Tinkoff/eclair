@@ -15,23 +15,20 @@
 
 package ru.tinkoff.eclair.validate;
 
-import org.springframework.boot.logging.LogLevel;
-import org.springframework.core.annotation.AnnotationUtils;
 import ru.tinkoff.eclair.annotation.Log;
 import ru.tinkoff.eclair.annotation.Mdc;
-import ru.tinkoff.eclair.core.AnnotationAttribute;
 import ru.tinkoff.eclair.core.AnnotationExtractor;
 import ru.tinkoff.eclair.validate.log.group.*;
 import ru.tinkoff.eclair.validate.mdc.group.MdcsValidator;
 import ru.tinkoff.eclair.validate.mdc.group.MergedMdcsValidator;
 import ru.tinkoff.eclair.validate.mdc.group.MethodMdcsValidator;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toSet;
@@ -48,6 +45,7 @@ public class MethodValidator implements AnnotationUsageValidator<Method> {
     private final LogOutsValidator logOutsValidator;
     private final LogErrorsValidator logErrorsValidator;
     private final ParameterLogsValidator parameterLogsValidator;
+    private final MethodLogsValidator methodLogsValidator;
 
     private final MethodMdcsValidator methodMdcsValidator;
     private final MdcsValidator mdcsValidator;
@@ -59,7 +57,7 @@ public class MethodValidator implements AnnotationUsageValidator<Method> {
                            LogOutsValidator logOutsValidator,
                            LogErrorsValidator logErrorsValidator,
                            ParameterLogsValidator parameterLogsValidator,
-                           MethodMdcsValidator methodMdcsValidator,
+                           MethodLogsValidator methodLogsValidator, MethodMdcsValidator methodMdcsValidator,
                            MdcsValidator mdcsValidator,
                            MergedMdcsValidator mergedMdcsValidator) {
         this.annotationExtractor = annotationExtractor;
@@ -68,6 +66,7 @@ public class MethodValidator implements AnnotationUsageValidator<Method> {
         this.logOutsValidator = logOutsValidator;
         this.logErrorsValidator = logErrorsValidator;
         this.parameterLogsValidator = parameterLogsValidator;
+        this.methodLogsValidator = methodLogsValidator;
         this.methodMdcsValidator = methodMdcsValidator;
         this.mdcsValidator = mdcsValidator;
         this.mergedMdcsValidator = mergedMdcsValidator;
@@ -128,69 +127,24 @@ public class MethodValidator implements AnnotationUsageValidator<Method> {
         if (!methodAnnotationFound && !argAnnotationFound) {
             return;
         }
-        validateLevelValue(target, Stream.of(logs, logIns, logOuts, logErrors)
-                .flatMap(Collection::stream).collect(Collectors.toList()));
-        validateLogInAndOutUsage(target, logs, logIns, logOuts);
 
         logsValidator.validate(target, logs);
         logInsValidator.validate(target, logIns);
         logOutsValidator.validate(target, logOuts);
         logErrorsValidator.validate(target, logErrors);
         parameterLogs.forEach(log -> parameterLogsValidator.validate(target, log));
+        methodLogsValidator.validate(target, Stream.of(logs, logOuts, logIns)
+                .flatMap(Collection::stream)
+                .collect(toSet()));
 
         methodMdcsValidator.validate(target, mdcs);
         parameterMdcs.forEach(item -> mdcsValidator.validate(target, item));
         mergedMdcsValidator.validate(target, mergeMdcs(mdcs, parameterMdcs));
     }
 
-    private void validateLevelValue(Method target, List<Annotation> annotations) {
-        if (annotations.stream().anyMatch(annotation -> AnnotationAttribute.LEVEL.extract(annotation).equals(LogLevel.OFF))) {
-            throw new AnnotationUsageException(target,
-                    "Don't use level = LogLevel.OFF for methods. It's equivalent to no annotation",
-                    "Remove unnecessary annotation");
-        }
-    }
-
     private Set<Mdc> mergeMdcs(Set<Mdc> mdcs, List<Set<Mdc>> parameterMdcs) {
         Set<Mdc> mergedMdcs = new HashSet<>(mdcs);
         mergedMdcs.addAll(parameterMdcs.stream().flatMap(Collection::stream).collect(toSet()));
         return mergedMdcs;
-    }
-
-    private void validateLogInAndOutUsage(Method target, Set<Log> logs, Set<Log.in> logIns, Set<Log.out> logOuts) {
-        ArrayList<Annotation> annotations = new ArrayList<>();
-        annotations.addAll(logIns);
-        annotations.addAll(logOuts);
-        annotations.addAll(logs);
-        if (!logs.isEmpty() && (!logIns.isEmpty() || !logOuts.isEmpty())) {
-            if (compareLogAttributes(annotations)) {
-                throw new AnnotationUsageException(target,
-                        "Don't use @Log, @Log.in and @Log.out together with the same config",
-                        "Use only @Log to define the same behavior for beginning and ending logging");
-            } else {
-                throw new AnnotationUsageException(target,
-                        "Don't use @Log with @Log.in or @Log.out",
-                        "Use both @Log.in and @Log.out annotations to define different behavior" +
-                                "for beginning and ending logging");
-            }
-        } else if (!logIns.isEmpty() && !logOuts.isEmpty() && compareLogAttributes(annotations)) {
-            throw new AnnotationUsageException(target,
-                    "Don't use @Log.in and @Log.out together with the same config",
-                    "Use only @Log to define the same behavior for beginning and ending logging");
-        }
-    }
-
-    private boolean compareLogAttributes(List<Annotation> logs) {
-        Set<Annotation> set = new TreeSet<>((o1, o2) -> {
-            Map<String, Object> first = AnnotationUtils.getAnnotationAttributes(o1);
-            Map<String, Object> second = AnnotationUtils.getAnnotationAttributes(o2);
-            if (first.equals(second)) {
-                return 0;
-            } else {
-                return 1;
-            }
-        });
-        set.addAll(logs);
-        return set.size() == 1;
     }
 }

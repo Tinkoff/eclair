@@ -306,19 +306,6 @@ class Example {
     void inOut() {
     }
 
-    /**
-     * Equals to next
-     */
-    @Log.out(ERROR)
-    @Log.in(TRACE)
-    void outLog() {
-    }
-
-    @Log.out(ERROR)
-    @Log.in(TRACE)
-    void outIn() {
-    }
-
     // TODO: add example for {@link LogError} ordering (in order of appearance)
 
     @Target({ElementType.METHOD, ElementType.PARAMETER})
@@ -346,7 +333,6 @@ class Example {
      * As if there is no '@Log.in' above method:
      * DEBUG [] ru.tinkoff.eclair.example.Example.offLevelWithArg > a=1
      */
-    @Log.in(OFF)
     void offLevelWithArg(@Log int a) {
     }
 
