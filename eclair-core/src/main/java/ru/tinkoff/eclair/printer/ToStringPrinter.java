@@ -24,8 +24,15 @@ public class ToStringPrinter extends Printer {
 
     @Override
     protected String serialize(Object input) {
+        return serialize(input, true);
+    }
+
+    protected String serialize(Object input, boolean wrapStrings) {
         if (input instanceof String) {
-            return "\"" + input + "\"";
+            if (wrapStrings) {
+                return "\"" + input + "\"";
+            }
+            return ((String) input);
         }
         if (input.getClass().isArray()) {
             // in the expected descending order of popularity
@@ -57,4 +64,5 @@ public class ToStringPrinter extends Printer {
         }
         return input.toString();
     }
+
 }
