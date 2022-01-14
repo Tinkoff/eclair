@@ -16,7 +16,6 @@
 package ru.tinkoff.eclair.logger;
 
 import org.aopalliance.intercept.MethodInvocation;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.boot.logging.LogLevel;
 import org.springframework.boot.logging.LoggingSystem;
 import ru.tinkoff.eclair.core.LoggerNameBuilder;
@@ -25,10 +24,7 @@ import ru.tinkoff.eclair.definition.InLog;
 import ru.tinkoff.eclair.definition.OutLog;
 import ru.tinkoff.eclair.definition.ParameterLog;
 import ru.tinkoff.eclair.definition.method.MethodLog;
-import ru.tinkoff.eclair.logger.collector.LogInCollector;
-import ru.tinkoff.eclair.logger.collector.LogOutCollector;
-import ru.tinkoff.eclair.logger.collector.StringJoinerLogInCollector;
-import ru.tinkoff.eclair.logger.collector.ToStringLogOutCollector;
+import ru.tinkoff.eclair.logger.collector.*;
 import ru.tinkoff.eclair.logger.facade.LoggerFacade;
 import ru.tinkoff.eclair.logger.facade.LoggerFacadeFactory;
 import ru.tinkoff.eclair.logger.facade.Slf4JLoggerFacadeFactory;
@@ -73,14 +69,24 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
 
     private final LoggerFacadeFactory loggerFacadeFactory;
     private final LoggingSystem loggingSystem;
+    private final LogInCollectorFactory<?> logInCollectorFactory;
+    private final LogOutCollector<?> logOutCollector;
 
     public SimpleLogger() {
         this(new Slf4JLoggerFacadeFactory(), LoggingSystem.get(SimpleLogger.class.getClassLoader()));
     }
 
     public SimpleLogger(LoggerFacadeFactory loggerFacadeFactory, LoggingSystem loggingSystem) {
+        this(loggerFacadeFactory, loggingSystem, StringJoinerLogInCollectorFactory.INSTANCE,
+                ToStringLogOutCollector.INSTANCE);
+    }
+
+    public SimpleLogger(LoggerFacadeFactory loggerFacadeFactory, LoggingSystem loggingSystem,
+                        LogInCollectorFactory<?> logInCollectorFactory, LogOutCollector<?> logOutCollector) {
         this.loggerFacadeFactory = loggerFacadeFactory;
         this.loggingSystem = loggingSystem;
+        this.logInCollectorFactory = logInCollectorFactory;
+        this.logOutCollector = logOutCollector;
     }
 
     /**
@@ -177,12 +183,6 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
      */
     @Override
     protected void logIn(MethodInvocation invocation, MethodLog methodLog) {
-        logInCollecting(invocation, methodLog, new StringJoinerLogInCollector());
-    }
-
-    @Nullable
-    protected <T> T logInCollecting(MethodInvocation invocation, MethodLog methodLog,
-                                    LogInCollector<T> logInCollector) {
         String loggerName = getLoggerName(invocation);
         LogLevel level = null;
 
@@ -202,6 +202,7 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
         boolean isParameterLogVerboseFound = false;
         boolean isParameterLogSkippedFound = false;
         Object[] arguments = invocation.getArguments();
+        LogInCollector<?> logInCollector = logInCollectorFactory.create();
         for (int a = 0; a < arguments.length; a++) {
             ParameterLog parameterLog = methodLog.getParameterLogs().get(a);
             boolean isParameterLogDefined = nonNull(parameterLog);
@@ -250,7 +251,7 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
 
         if (isInLogLogEnabled || isParameterLogVerboseFound) {
             LoggerFacade loggerFacade = loggerFacadeFactory.getLoggerFacade(loggerName);
-            T collected = logInCollector.collect();
+            Object collected = logInCollector.collect();
             if (collected instanceof CharSequence) {
                 String collectedString = collected.toString();
                 String message = collectedString.isEmpty() ? IN : IN + " " + collectedString;
@@ -258,10 +259,7 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
             } else {
                 loggerFacade.log(level, IN, collected);
             }
-            return collected;
         }
-
-        return null;
     }
 
     /**
@@ -285,22 +283,16 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
      */
     @Override
     protected void logOut(MethodInvocation invocation, MethodLog methodLog, Object result) {
-        logOutCollecting(invocation, methodLog, result, ToStringLogOutCollector.INSTANCE);
-    }
-
-    @Nullable
-    protected <T> T logOutCollecting(MethodInvocation invocation, MethodLog methodLog, Object result,
-                                     LogOutCollector<T> logOutCollector) {
         OutLog outLog = methodLog.getOutLog();
         if (isNull(outLog)) {
-            return null;
+            return;
         }
         String loggerName = getLoggerName(invocation);
         if (!isLogEnabled(loggerName, expectedLevelResolver.apply(outLog))) {
-            return null;
+            return;
         }
 
-        T collected = logOutCollector.collect(buildResultClause(invocation, outLog, result, loggerName));
+        Object collected = logOutCollector.collect(buildResultClause(invocation, outLog, result, loggerName));
         LoggerFacade loggerFacade = loggerFacadeFactory.getLoggerFacade(loggerName);
         if (collected instanceof CharSequence) {
             String collectedString = collected.toString();
@@ -309,7 +301,6 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
         } else {
             loggerFacade.log(outLog.getLevel(), OUT, collected);
         }
-        return collected;
     }
 
     private String buildResultClause(MethodInvocation invocation, OutLog outLog, Object result, String loggerName) {
