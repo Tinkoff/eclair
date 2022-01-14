@@ -67,13 +67,13 @@ public class EclairAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public LogInCollectorFactory<?> logInCollectorFactory() {
+    public LogInCollectorFactory<?> stringJoinerLogInCollectorFactory() {
         return StringJoinerLogInCollectorFactory.INSTANCE;
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public LogOutCollector<?> logOutCollector() {
+    public LogOutCollector<?> toStringLogOutCollector() {
         return ToStringLogOutCollector.INSTANCE;
     }
 

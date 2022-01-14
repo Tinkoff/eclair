@@ -1,5 +1,7 @@
 package ru.tinkoff.eclair.logger.collector;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.StringJoiner;
 
 public class StringJoinerLogInCollector implements LogInCollector<String> {
@@ -15,7 +17,7 @@ public class StringJoinerLogInCollector implements LogInCollector<String> {
     }
 
     @Override
-    public void addParameter(String parameterName, String value) {
+    public void addParameter(@Nullable String parameterName, @Nullable String value) {
         if (parameterName == null) {
             joiner.add(value);
         } else {
