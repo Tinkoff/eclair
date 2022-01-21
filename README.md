@@ -251,7 +251,7 @@ void manual() {
 
 ## Release History
 
-TODO       - `0.8.4` Make SimpleLogger more extendable<br>
+21.01.2022 - `0.8.4` Make SimpleLogger more extendable<br>
 07.05.2018 - `0.8.3` Corrected optional classes usage in auto-configuration<br>
 06.05.2018 - `0.8.2` Published on Maven Central Repository<br>
 25.04.2018 - `0.8.1` Removed Lombok dependency<br>
