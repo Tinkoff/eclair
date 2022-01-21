@@ -29,6 +29,11 @@
             <id>klapatnyuk</id>
             <name>Vyacheslav Klapatnyuk</name>
         </developer>
+        <developer>
+            <id>a.yazychyan</id>
+            <name>Areg Yazychyan</name>
+            <email>a.yazychyan@tinkoff.ru</email>
+        </developer>
     </developers>
 
     <modules>
@@ -119,20 +124,27 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
-                <version>1.6</version>
-                <configuration>
-                    <executable>${gpg.executable}</executable>
-                    <passphrase>${gpg.passphrase}</passphrase>
-                    <homedir>${gpg.homedir}</homedir>
-                </configuration>
+                <version>3.0.1</version>
                 <executions>
                     <execution>
+                        <id>sign-artifacts</id>
                         <phase>verify</phase>
                         <goals>
                             <goal>sign</goal>
                         </goals>
+                        <configuration>
+                            <executable>${gpg.executable}</executable>
+                            <keyname>${gpg.keyname}</keyname>
+                            <passphraseServerId>${gpg.keyname}</passphraseServerId>
+                            <passphrase>${gpg.passphrase}</passphrase>
+                        </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>3.0.0-M2</version>
             </plugin>
         </plugins>
     </build>
