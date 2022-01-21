@@ -21,6 +21,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.expression.BeanFactoryResolver;
@@ -39,6 +40,8 @@ import ru.tinkoff.eclair.core.BeanFactoryHelper;
 import ru.tinkoff.eclair.core.ExpressionEvaluator;
 import ru.tinkoff.eclair.logger.EclairLogger;
 import ru.tinkoff.eclair.logger.SimpleLogger;
+import ru.tinkoff.eclair.logger.collector.*;
+import ru.tinkoff.eclair.logger.facade.Slf4JLoggerFacadeFactory;
 import ru.tinkoff.eclair.printer.*;
 import ru.tinkoff.eclair.printer.processor.JaxbElementWrapper;
 import ru.tinkoff.eclair.printer.resolver.AliasedPrinterResolver;
@@ -64,8 +67,25 @@ public class EclairAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public EclairLogger simpleLogger() {
-        return new SimpleLogger();
+    public LogInCollectorFactory<?> stringJoinerLogInCollectorFactory() {
+        return StringJoinerLogInCollectorFactory.INSTANCE;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public LogOutCollector<?> toStringLogOutCollector() {
+        return ToStringLogOutCollector.INSTANCE;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public EclairLogger simpleLogger(LogInCollectorFactory<?> logInCollectorFactory, LogOutCollector<?> logOutCollector) {
+        return new SimpleLogger(
+                new Slf4JLoggerFacadeFactory(),
+                LoggingSystem.get(SimpleLogger.class.getClassLoader()),
+                logInCollectorFactory,
+                logOutCollector
+        );
     }
 
     @Bean

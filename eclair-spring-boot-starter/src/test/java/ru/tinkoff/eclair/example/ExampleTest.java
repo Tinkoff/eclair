@@ -26,6 +26,7 @@ import org.junit.runner.RunWith;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.logging.LogLevel;
 import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.context.annotation.Bean;
@@ -39,7 +40,9 @@ import ru.tinkoff.eclair.autoconfigure.EclairAutoConfiguration;
 import ru.tinkoff.eclair.core.LoggerNameBuilder;
 import ru.tinkoff.eclair.logger.EclairLogger;
 import ru.tinkoff.eclair.logger.SimpleLogger;
+import ru.tinkoff.eclair.logger.collector.*;
 import ru.tinkoff.eclair.logger.facade.LoggerFacadeFactory;
+import ru.tinkoff.eclair.logger.facade.Slf4JLoggerFacadeFactory;
 import ru.tinkoff.eclair.printer.Jaxb2Printer;
 import ru.tinkoff.eclair.printer.Printer;
 import ru.tinkoff.eclair.printer.processor.JaxbElementWrapper;
@@ -552,8 +555,13 @@ public class ExampleTest {
 
         @Bean
         @Primary
-        public EclairLogger simpleLogger() {
-            return new SimpleLogger(loggerFacadeFactory, LoggingSystem.get(SimpleLogger.class.getClassLoader()));
+        public EclairLogger simpleLogger(LogInCollectorFactory<?> logInCollectorFactory, LogOutCollector<?> logOutCollector) {
+            return new SimpleLogger(
+                    loggerFacadeFactory,
+                    LoggingSystem.get(SimpleLogger.class.getClassLoader()),
+                    logInCollectorFactory,
+                    logOutCollector
+            );
         }
 
         @Bean

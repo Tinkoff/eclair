@@ -15,8 +15,6 @@
 
 package ru.tinkoff.eclair.printer;
 
-import org.springframework.util.ReflectionUtils;
-
 /**
  * @author Vyacheslav Klapatnyuk
  */
@@ -33,6 +31,17 @@ public class OverriddenToStringPrinter extends ToStringPrinter {
         if (clazz.isEnum()) {
             return true;
         }
-        return !ReflectionUtils.findMethod(clazz, "toString").getDeclaringClass().equals(Object.class);
+        return checkToStringIsOverriden(clazz);
     }
+
+    private boolean checkToStringIsOverriden(Class<?> clazz) {
+        try {
+            // getMethod will traverse the entire hierarchy of superclasses on its own
+            return clazz.getMethod("toString").getDeclaringClass() != Object.class;
+        } catch (NoSuchMethodException e) {
+            // non-interface class must have toString method
+            throw new AssertionError(e);
+        }
+    }
+
 }

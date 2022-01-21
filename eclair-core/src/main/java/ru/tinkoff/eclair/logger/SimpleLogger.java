@@ -24,6 +24,8 @@ import ru.tinkoff.eclair.definition.InLog;
 import ru.tinkoff.eclair.definition.OutLog;
 import ru.tinkoff.eclair.definition.ParameterLog;
 import ru.tinkoff.eclair.definition.method.MethodLog;
+import ru.tinkoff.eclair.logger.collector.*;
+import ru.tinkoff.eclair.logger.facade.LoggerFacade;
 import ru.tinkoff.eclair.logger.facade.LoggerFacadeFactory;
 import ru.tinkoff.eclair.logger.facade.Slf4JLoggerFacadeFactory;
 import ru.tinkoff.eclair.printer.Printer;
@@ -67,14 +69,24 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
 
     private final LoggerFacadeFactory loggerFacadeFactory;
     private final LoggingSystem loggingSystem;
+    private final LogInCollectorFactory<?> logInCollectorFactory;
+    private final LogOutCollector<?> logOutCollector;
 
     public SimpleLogger() {
         this(new Slf4JLoggerFacadeFactory(), LoggingSystem.get(SimpleLogger.class.getClassLoader()));
     }
 
     public SimpleLogger(LoggerFacadeFactory loggerFacadeFactory, LoggingSystem loggingSystem) {
+        this(loggerFacadeFactory, loggingSystem, StringJoinerLogInCollectorFactory.INSTANCE,
+                ToStringLogOutCollector.INSTANCE);
+    }
+
+    public SimpleLogger(LoggerFacadeFactory loggerFacadeFactory, LoggingSystem loggingSystem,
+                        LogInCollectorFactory<?> logInCollectorFactory, LogOutCollector<?> logOutCollector) {
         this.loggerFacadeFactory = loggerFacadeFactory;
         this.loggingSystem = loggingSystem;
+        this.logInCollectorFactory = logInCollectorFactory;
+        this.logOutCollector = logOutCollector;
     }
 
     /**
@@ -187,10 +199,10 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
             }
         }
 
-        StringBuilder builder = new StringBuilder();
         boolean isParameterLogVerboseFound = false;
         boolean isParameterLogSkippedFound = false;
         Object[] arguments = invocation.getArguments();
+        LogInCollector<?> logInCollector = logInCollectorFactory.create();
         for (int a = 0; a < arguments.length; a++) {
             ParameterLog parameterLog = methodLog.getParameterLogs().get(a);
             boolean isParameterLogDefined = nonNull(parameterLog);
@@ -212,38 +224,41 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
                 continue;
             }
 
-            // print delimiter
-            if (isParameterLogVerboseFound) {
-                builder.append(", ");
-            } else {
-                builder.append(" ");
-                isParameterLogVerboseFound = true;
-            }
+            isParameterLogVerboseFound = true;
 
-            // print parameter name
+            // get parameter name
+            String parameterName = null;
             if (!isParameterLogDefined || isLogEnabled(loggerName, parameterLog.getVerboseLevel())) {
-                String parameterName = methodLog.getParameterNames().get(a);
-                if (nonNull(parameterName)) {
-                    builder.append(parameterName).append("=");
-                } else if (isParameterLogSkippedFound) {
-                    builder.append(Integer.toString(a)).append("=");
+                parameterName = methodLog.getParameterNames().get(a);
+                if (isNull(parameterName) && isParameterLogSkippedFound) {
+                    parameterName = Integer.toString(a);
                 }
             }
 
-            // print parameter value
+            // get parameter value
             Object argument = arguments[a];
+            String parameterValue;
             if (isNull(argument)) {
-                builder.append((String) null);
+                parameterValue = null;
             } else if (isParameterLogDefined) {
-                builder.append(printArgument(parameterLog.getPrinter(), argument));
+                parameterValue = printArgument(parameterLog.getPrinter(), argument);
             } else {
-                builder.append(printArgument(inLog.getPrinters().get(a), argument));
+                parameterValue = printArgument(inLog.getPrinters().get(a), argument);
             }
+
+            logInCollector.addParameter(parameterName, parameterValue);
         }
 
         if (isInLogLogEnabled || isParameterLogVerboseFound) {
-            String message = IN + builder.toString();
-            loggerFacadeFactory.getLoggerFacade(loggerName).log(level, message);
+            LoggerFacade loggerFacade = loggerFacadeFactory.getLoggerFacade(loggerName);
+            Object collected = logInCollector.collect();
+            if (collected instanceof CharSequence) {
+                String collectedString = collected.toString();
+                String message = collectedString.isEmpty() ? IN : IN + " " + collectedString;
+                loggerFacade.log(level, message);
+            } else {
+                loggerFacade.log(level, IN, collected);
+            }
         }
     }
 
@@ -276,18 +291,26 @@ public class SimpleLogger extends LevelSensitiveLogger implements ManualLogger {
         if (!isLogEnabled(loggerName, expectedLevelResolver.apply(outLog))) {
             return;
         }
-        String message = OUT + buildResultClause(invocation, outLog, result, loggerName);
-        loggerFacadeFactory.getLoggerFacade(loggerName).log(outLog.getLevel(), message);
+
+        Object collected = logOutCollector.collect(buildResultClause(invocation, outLog, result, loggerName));
+        LoggerFacade loggerFacade = loggerFacadeFactory.getLoggerFacade(loggerName);
+        if (collected instanceof CharSequence) {
+            String collectedString = collected.toString();
+            String message = collectedString.isEmpty() ? OUT : OUT + " " + collectedString;
+            loggerFacade.log(outLog.getLevel(), message);
+        } else {
+            loggerFacade.log(outLog.getLevel(), OUT, collected);
+        }
     }
 
     private String buildResultClause(MethodInvocation invocation, OutLog outLog, Object result, String loggerName) {
         if (isLogEnabled(loggerName, outLog.getVerboseLevel())) {
             if (nonNull(result)) {
-                return " " + printArgument(outLog.getPrinter(), result);
+                return printArgument(outLog.getPrinter(), result);
             }
             Class<?> returnType = invocation.getMethod().getReturnType();
             if (returnType != void.class && returnType != Void.class) {
-                return " null";
+                return null;
             }
         }
         return "";
