@@ -66,7 +66,7 @@ Add this to your POM:
 <dependency>
     <groupId>ru.tinkoff</groupId>
     <artifactId>eclair-spring-boot-starter</artifactId>
-    <version>0.8.4</version>
+    <version>0.9.0</version>
 </dependency>
 ```
 
@@ -251,6 +251,7 @@ void manual() {
 
 ## Release History
 
+19.05.2023 - `0.9.0` SpringBoot 3.0 support<br>
 21.01.2022 - `0.8.4` Make SimpleLogger more extendable<br>
 07.05.2018 - `0.8.3` Corrected optional classes usage in auto-configuration<br>
 06.05.2018 - `0.8.2` Published on Maven Central Repository<br>
